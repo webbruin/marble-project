@@ -1,19 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
+      name: 'main',
+      component: import('../views/Main.vue'),
+      children: [
+        { path: '/', name: 'home', component: import('../views/Home.vue') },
+        { path: '/shop', name: 'shop', component: import('../views/Shop.vue') },
+        { path: '/cart', name: 'cart', component: import('../views/Cart.vue') },
+        { path: '/my', name: 'my', component: import('../views/My.vue') },
+      ]
     },
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   component: () => import('../views/AboutView.vue'),
-    // },
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: import('../views/404.vue') },
   ],
 })
 
