@@ -279,7 +279,7 @@ const clickRoom = (item) => {
           background-image: url(../assets/images/home/recharge-go.png);
           transform: rotate(-0.452deg);
           position: absolute;
-          bottom: .vw(-3)[];
+          bottom: .vw(-2)[];
           right: .vw(-5)[];
         }
 
