@@ -6,14 +6,14 @@
         <img class="icon" :src="item.icon" alt="">
         <span class="text" :class="{ light: currentRoom == item.value }">{{ item.name }}</span>
       </div>
-      <div class="more" @click="moreRoom">更多</div>
+      <div class="more" @click="moreRoomTab">更多</div>
     </div>
     <div class="banner">
       <img src="../assets/images/home/banner.png" alt="">
     </div>
     <div class="entry">
       <div class="left">
-        <div class="recharge">
+        <div class="recharge" @click="showRechargeDialog = true">
           <p class="text">弹珠充值</p>
           <p class="desc">弹珠充值充值中心</p>
           <img src="../assets/images/home/recharge-icon.png" alt="" class="icon">
@@ -69,12 +69,15 @@
         </div>
       </div>
     </div>
+    <RechargeDialog :show="showRechargeDialog" @toggleShow="showRechargeDialog = $event"></RechargeDialog>
   </main>
+
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import RechargeDialog from '../components/RechargeDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -101,7 +104,7 @@ const currentRoom = ref('low')
 const currentFilter = ref('recommend')
 // 低到高-low 高到低-hight
 const priceSort = ref('')
-
+// 房间列表
 const roomList = ref([
   { status: 1, user: [], roomName: '新人福利房间', ballCount: 2 },
   { status: 2, user: [1, 2, 3, 4, 5, 6, 7, 8], roomName: '新人福利房间', ballCount: 2 },
@@ -110,6 +113,8 @@ const roomList = ref([
   { status: 1, user: [1, 2, 3, 4, 5, 6, 7, 8], roomName: '新人福利房间', ballCount: 2 },
   { status: 1, user: [1, 2, 3, 4, 5, 6, 7, 8], roomName: '新人福利房间', ballCount: 2 },
 ])
+// 
+const showRechargeDialog = ref(false)
 
 onMounted(() => {
 
@@ -119,7 +124,7 @@ const clickRoomTab = (item) => {
   currentRoom.value = item.value
 }
 
-const moreRoom = () => {
+const moreRoomTab = () => {
   // router.push('');
 }
 
@@ -136,7 +141,7 @@ const clickFilter = (type) => {
 }
 
 const clickRoom = (item) => {
-  // router.push('');
+  router.push({ name: 'room', params: { id: 88, name: 'test' }, query: { a: 111, b: 222 } });
 }
 </script>
 
