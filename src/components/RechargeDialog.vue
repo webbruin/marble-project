@@ -19,7 +19,7 @@
           <div class="sub-title">支付方式</div>
           <div class="payway-list">
             <div class="item" v-for="(item, index) in paywayList" :key="index" @click="clickPayway(item)">
-              <img src="../assets/images/alipay.png" alt="" class="icon">
+              <img src="@/assets/images/alipay.png" alt="" class="icon">
               <span class="text">{{ item.name }}</span>
               <i class="select" :class="{ 'selected': selectedPayway === item.value }"></i>
             </div>
@@ -78,6 +78,10 @@ onMounted(() => {
 })
 
 const clickConfirm = () => {
+  if (!isAggre.value) {
+    alert('请阅读并同意《充值协议》')
+    return;
+  }
   showRechargeSuccess.value = true
   emit('toggleShow', false)
 }
@@ -146,7 +150,7 @@ const closeRechargeSuccess = () => {
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/close.png);
+    background-image: url(@/assets/images/close.png);
     margin-bottom: .vw(20)[];
   }
 
@@ -158,7 +162,7 @@ const closeRechargeSuccess = () => {
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/recharge-bg.png);
+    background-image: url(@/assets/images/recharge-bg.png);
     position: relative;
     padding: .vw(23)[] .vw(16)[] .vw(17)[] .vw(16)[];
 
@@ -169,7 +173,7 @@ const closeRechargeSuccess = () => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../assets/images/recharge-icon.png);
+      background-image: url(@/assets/images/recharge-icon.png);
       position: absolute;
       top: .vw(-57)[];
       right: .vw(4)[];
@@ -224,7 +228,7 @@ const closeRechargeSuccess = () => {
               background-size: 100%;
               background-position: center;
               background-repeat: no-repeat;
-              background-image: url(../assets/images/ball.png);
+              background-image: url(@/assets/images/ball.png);
               margin-right: .vw(4)[];
             }
 
@@ -308,11 +312,11 @@ const closeRechargeSuccess = () => {
               background-size: 100%;
               background-position: center;
               background-repeat: no-repeat;
-              background-image: url(../assets/images/shop/select.png);
+              background-image: url(@/assets/images/shop/select.png);
               margin-left: .vw(10)[];
 
               &.selected {
-                background-image: url(../assets/images/shop/selected.png);
+                background-image: url(@/assets/images/shop/selected.png);
               }
             }
           }
@@ -345,11 +349,11 @@ const closeRechargeSuccess = () => {
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
-          background-image: url(../assets/images/shop/select.png);
+          background-image: url(@/assets/images/shop/select.png);
           margin-right: .vw(6)[];
 
           &.selected {
-            background-image: url(../assets/images/shop/selected.png);
+            background-image: url(@/assets/images/shop/selected.png);
           }
         }
 
@@ -392,7 +396,7 @@ const closeRechargeSuccess = () => {
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/recharge-success-bg.png);
+    background-image: url(@/assets/images/recharge-success-bg.png);
     position: relative;
     padding-top: .vw(50)[];
 
@@ -403,7 +407,7 @@ const closeRechargeSuccess = () => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../assets/images/recharge-success-icon.png);
+      background-image: url(@/assets/images/recharge-success-icon.png);
       position: absolute;
       top: .vw(-25)[];
       right: .vw(8)[];
@@ -452,7 +456,7 @@ const closeRechargeSuccess = () => {
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/close.png);
+    background-image: url(@/assets/images/close.png);
     margin-top: .vw(62)[];
   }
 }

@@ -2,12 +2,10 @@
   <main class="room">
     <div class="live-stream"></div>
     <div class="body">
-      <div class="header">
-        <div class="back" @click="back"></div>
-      </div>
+      <Header></Header>
       <div class="tabbar">
         <div class="status">
-          <img class="icon" src="../assets/images/avatar.png" alt="">
+          <img class="icon" src="@/assets/images/avatar.png" alt="">
           <span class="text">正在游戏中</span>
         </div>
         <div class="status" v-if="false">
@@ -15,7 +13,7 @@
         </div>
         <div class="audience-list" v-if="audiences.length">
           <div class="user" v-for="(item, index) in audiences.slice(0, 3)" :key="index">
-            <img class="icon" src="../assets/images/avatar.png" alt="">
+            <img class="icon" src="@/assets/images/avatar.png" alt="">
           </div>
           <div class="user">
             <span class="count">{{ audiences.length }}</span>
@@ -25,7 +23,7 @@
       <div class="left-button-list">
         <div class="button">
           <i class="icon">
-            <img src="../assets/images/room/icon7.png" alt="">
+            <img src="@/assets/images/room/icon7.png" alt="">
           </i>
           <span class="text">故障报告</span>
         </div>
@@ -34,38 +32,38 @@
         <template v-if="!collapse">
           <div class="button">
             <i class="icon">
-              <img src="../assets/images/room/icon1.png" alt="">
+              <img src="@/assets/images/room/icon1.png" alt="">
             </i>
             <span class="text">游戏规则</span>
           </div>
           <div class="button">
             <i class="icon">
-              <img src="../assets/images/room/icon2.png" alt="">
+              <img src="@/assets/images/room/icon2.png" alt="">
             </i>
             <span class="text">中奖记录</span>
           </div>
           <div class="button">
             <i class="icon">
-              <img src="../assets/images/room/icon3.png" alt="">
+              <img src="@/assets/images/room/icon3.png" alt="">
             </i>
             <span class="text">音乐：开</span>
           </div>
           <div class="button">
             <i class="icon">
-              <img src="../assets/images/room/icon4.png" alt="">
+              <img src="@/assets/images/room/icon4.png" alt="">
             </i>
             <span class="text">联系客服</span>
           </div>
           <div class="button">
             <i class="icon">
-              <img src="../assets/images/room/icon5.png" alt="">
+              <img src="@/assets/images/room/icon5.png" alt="">
             </i>
             <span class="text">刷新</span>
           </div>
         </template>
         <div class="button" @click="collapse = !collapse">
           <i class="icon">
-            <img src="../assets/images/room/icon6.png" alt="">
+            <img src="@/assets/images/room/icon6.png" alt="">
           </i>
           <span class="text">{{ collapse ? '展开' : '收起' }}</span>
         </div>
@@ -96,13 +94,13 @@
                 <span>+满</span>
               </div>
               <div class="item" @click="changeBall(-stepBall)">
-                <img class="sub" src="../assets/images/room/sub-ball.png" alt="">
+                <img class="sub" src="@/assets/images/room/sub-ball.png" alt="">
               </div>
               <div class="item">
                 <input type="number" v-model="ball" @input="ballChange" />
               </div>
               <div class="item" @click="changeBall(stepBall)">
-                <img class="add" src="../assets/images/room/add-ball.png" alt="">
+                <img class="add" src="@/assets/images/room/add-ball.png" alt="">
               </div>
             </div>
           </div>
@@ -116,7 +114,7 @@
           </div>
         </div>
         <div class="start" v-else>
-          <img src="../assets/images/room/start-game.png" alt="" class="button" @click="clickStart">
+          <img src="@/assets/images/room/start-game.png" alt="" class="button" @click="clickStart">
         </div>
       </div>
     </div>
@@ -157,10 +155,6 @@ onMounted(() => {
   // console.log(111, route.params);
   // console.log(222, route.query);
 })
-
-const back = () => {
-  router.back()
-}
 
 const changeBall = (value) => {
   ball.value += value
@@ -236,25 +230,6 @@ const initStickEvent = () => {
     height: 100%;
     position: relative;
     z-index: 1;
-
-    .header {
-      height: .vw(54)[];
-      display: flex;
-      align-items: center;
-      position: absolute;
-      top: .vw(0)[];
-      left: .vw(6)[];
-      right: .vw(6)[];
-
-      .back {
-        width: .vw(24)[];
-        height: .vw(24)[];
-        background-size: 100%;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-image: url(../assets/images/arrow-left.png);
-      }
-    }
 
     .tabbar {
       display: flex;
@@ -465,11 +440,11 @@ const initStickEvent = () => {
           }
 
           .ball {
-            background-image: url(../assets/images/ball.png);
+            background-image: url(@/assets/images/ball.png);
           }
 
           .point {
-            background-image: url(../assets/images/point.png);
+            background-image: url(@/assets/images/point.png);
           }
 
           .count {
@@ -612,7 +587,7 @@ const initStickEvent = () => {
               background-size: 100%;
               background-position: center;
               background-repeat: no-repeat;
-              background-image: url(../assets/images/room/arrow-top.png);
+              background-image: url(@/assets/images/room/arrow-top.png);
               position: absolute;
               top: .vw(5)[];
               left: 50%;
@@ -650,7 +625,7 @@ const initStickEvent = () => {
                   background-size: 100%;
                   background-position: center;
                   background-repeat: no-repeat;
-                  background-image: url(../assets/images/room/joy-stick.png);
+                  background-image: url(@/assets/images/room/joy-stick.png);
                   transform: rotate(180deg);
                   transform-origin: left;
                 }
@@ -666,7 +641,7 @@ const initStickEvent = () => {
                   background-size: 100%;
                   background-position: center;
                   background-repeat: no-repeat;
-                  background-image: url(../assets/images/room/joy-stick.png);
+                  background-image: url(@/assets/images/room/joy-stick.png);
                   transform-origin: left;
                 }
               }
@@ -728,7 +703,7 @@ const initStickEvent = () => {
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/room/warninng-dialog-bg.png);
+    background-image: url(@/assets/images/room/warninng-dialog-bg.png);
     position: relative;
     padding-top: .vw(50)[];
 
@@ -739,7 +714,7 @@ const initStickEvent = () => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../assets/images/room/warninng-dialog-icon.png);
+      background-image: url(@/assets/images/room/warninng-dialog-icon.png);
       position: absolute;
       top: .vw(-102)[];
       right: .vw(-26)[];
@@ -779,7 +754,7 @@ const initStickEvent = () => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../assets/images/room/warninng-dialog-confirm.png);
+      background-image: url(@/assets/images/room/warninng-dialog-confirm.png);
     }
   }
 
@@ -789,7 +764,7 @@ const initStickEvent = () => {
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/close.png);
+    background-image: url(@/assets/images/close.png);
     margin-top: .vw(103)[];
   }
 }

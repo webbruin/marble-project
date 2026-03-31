@@ -59,7 +59,7 @@ const closeDialog = () => {
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/room/warninng-dialog-bg.png);
+    background-image: url(@/assets/images/room/warninng-dialog-bg.png);
     position: relative;
     padding-top: .vw(50)[];
 
@@ -70,7 +70,7 @@ const closeDialog = () => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../assets/images/room/warninng-dialog-icon.png);
+      background-image: url(@/assets/images/room/warninng-dialog-icon.png);
       position: absolute;
       top: .vw(-102)[];
       right: .vw(-26)[];
@@ -110,7 +110,7 @@ const closeDialog = () => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../assets/images/room/warninng-dialog-confirm.png);
+      background-image: url(@/assets/images/room/warninng-dialog-confirm.png);
     }
   }
 
@@ -120,7 +120,7 @@ const closeDialog = () => {
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/close.png);
+    background-image: url(@/assets/images/close.png);
     margin-top: .vw(103)[];
   }
 }

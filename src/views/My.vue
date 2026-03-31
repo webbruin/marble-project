@@ -2,24 +2,24 @@
   <main class="my">
     <div class="user">
       <div class="avatar">
-        <img src="../assets/images/avatar.png" alt="">
+        <img src="@/assets/images/avatar.png" alt="">
       </div>
       <div class="info">
-        <p class="name">叶兴涛</p>
-        <p class="id">ID:85351231</p>
+        <p class="name">{{ userInfo.userName }}</p>
+        <p class="id">ID:{{ userInfo.userId }}</p>
       </div>
       <div class="entry"></div>
     </div>
     <div class="vip">
       <div class="info">
         <div class="level">
-          <img src="../assets/images/my/crown.png" alt="" class="icon">
-          <span class="text">当前会员等级 V1</span>
+          <img src="@/assets/images/my/crown.png" alt="" class="icon">
+          <span class="text">当前会员等级 V{{ userInfo.levelValue }}</span>
         </div>
         <div class="progress">
-          <p :style="{ 'width': '30%' }"></p>
+          <p :style="{ 'width': `${userInfo.pointCardAmount / userInfo.memberPointTotalAmount}%` }"></p>
         </div>
-        <div class="count">3,211/10,000</div>
+        <div class="count">{{ userInfo.pointCardAmount }}/{{ userInfo.memberPointTotalAmount }}</div>
         <i class="vip-icon1" :class="{ 'level1': true }"></i>
       </div>
     </div>
@@ -80,6 +80,24 @@
 </template>
 
 <script setup>
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const userInfo = ref({})
+
+onMounted(() => {
+  getUserInfo()
+})
+
+const getUserInfo = async () => {
+  const res = await api.post('/user/info/getUserInfo')
+  if (res.code === 200) {
+    userInfo.value = res.data
+    console.log(111, userInfo.value)
+  } else {
+    $toast.info(res.message)
+  }
+}
 </script>
 
 <style scoped lang="less">
@@ -91,7 +109,7 @@
   background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
-  background-image: url(../assets/images/my/my-bg.png);
+  background-image: url(@/assets/images/my/my-bg.png);
   background-color: #F6F6F6;
   padding-top: .vw(30)[];
 
@@ -158,7 +176,7 @@
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url(../assets/images/arrow-right.png);
+        background-image: url(@/assets/images/arrow-right.png);
       }
     }
   }
@@ -227,7 +245,7 @@
         background-repeat: no-repeat;
 
         &.level1 {
-          background-image: url(../assets/images/my/vip-icon1.png);
+          background-image: url(@/assets/images/my/vip-icon1.png);
         }
       }
     }
@@ -272,7 +290,7 @@
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
-          background-image: url(../assets/images/arrow-right.png);
+          background-image: url(@/assets/images/arrow-right.png);
           margin-left: .vw(4)[];
         }
       }
@@ -297,19 +315,19 @@
           margin-bottom: .vw(11)[];
 
           &.status1 {
-            background-image: url(../assets/images/my/order1.png);
+            background-image: url(@/assets/images/my/order1.png);
           }
 
           &.status2 {
-            background-image: url(../assets/images/my/order2.png);
+            background-image: url(@/assets/images/my/order2.png);
           }
 
           &.status3 {
-            background-image: url(../assets/images/my/order3.png);
+            background-image: url(@/assets/images/my/order3.png);
           }
 
           &.status4 {
-            background-image: url(../assets/images/my/order4.png);
+            background-image: url(@/assets/images/my/order4.png);
           }
         }
 
@@ -364,7 +382,7 @@
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
-          background-image: url(../assets/images/arrow-right.png);
+          background-image: url(@/assets/images/arrow-right.png);
           margin-left: .vw(4)[];
         }
       }
@@ -394,23 +412,23 @@
           margin-bottom: .vw(11)[];
 
           &.service1 {
-            background-image: url(../assets/images/my/service1.png);
+            background-image: url(@/assets/images/my/service1.png);
           }
 
           &.service2 {
-            background-image: url(../assets/images/my/service2.png);
+            background-image: url(@/assets/images/my/service2.png);
           }
 
           &.service3 {
-            background-image: url(../assets/images/my/service3.png);
+            background-image: url(@/assets/images/my/service3.png);
           }
 
           &.service4 {
-            background-image: url(../assets/images/my/service4.png);
+            background-image: url(@/assets/images/my/service4.png);
           }
 
           &.service5 {
-            background-image: url(../assets/images/my/service5.png);
+            background-image: url(@/assets/images/my/service5.png);
           }
         }
 

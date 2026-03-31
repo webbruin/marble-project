@@ -1,7 +1,7 @@
 <template>
   <div class="ball-success" v-if="show">
     <div class="body">
-      <img src="../assets/images/ball.png" alt="">
+      <img src="@/assets/images/ball.png" alt="">
     </div>
     <div class="close" @click="closeDialog">恭喜弹珠X{{ ball }}</div>
   </div>
@@ -16,15 +16,22 @@ const props = defineProps({
   ball: Number,
 })
 const emit = defineEmits(['toggleShow'])
-const time = ref(5000)
+const time = ref(2000)
 const timer = ref(null)
 
 onMounted(() => {
-  timer.value = setTimeout(() => {
-    clearTimeout(timer.value)
-    closeDialog()
-  }, time.value)
+
 })
+
+watch(
+  () => props.show, (newName, oldName) => {
+    if (newName) {
+      timer.value = setTimeout(() => {
+        closeDialog()
+      }, time.value)
+    }
+  }
+)
 
 const closeDialog = () => {
   clearTimeout(timer.value)
@@ -67,7 +74,7 @@ const closeDialog = () => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../assets/images/flash.png);
+      background-image: url(@/assets/images/flash.png);
       position: absolute;
       animation: rotate 2s linear infinite;
 

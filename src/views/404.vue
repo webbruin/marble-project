@@ -7,7 +7,10 @@
 </template>
 
 <script setup>
-// import TheWelcome from '../components/TheWelcome.vue'
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.vw(@number) {
+  @return: calc(@number / 375 * 100vw);
+}
+</style>

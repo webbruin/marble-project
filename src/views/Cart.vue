@@ -1,9 +1,10 @@
 <template>
   <main class="cart">
-    <div class="header">
-      <span class="bag">背包</span>
-      <span class="address">地址管理</span>
-    </div>
+    <Header :show-back="false" title="背包">
+      <template #right>
+        <span class="address-edit">地址管理</span>
+      </template>
+    </Header>
     <div class="body">
       <div class="tag">
         <div class="all-count">购物车总共15件</div>
@@ -20,7 +21,7 @@
             </div>
             <div class="module">
               <div class="cover">
-                <img src="../assets/images/shop/cover.png" alt="">
+                <img src="@/assets/images/shop/cover.png" alt="">
               </div>
               <div class="info">
                 <p class="name">​​反骨糯米糍​​</p>
@@ -29,9 +30,9 @@
               </div>
             </div>
             <div class="option">
-              <i class="sub"></i>
+              <i class="sub" :class="{ 'disabled': false }"></i>
               <span class="count">1</span>
-              <i class="plus"></i>
+              <i class="plus" :class="{ 'disabled': false }"></i>
             </div>
           </div>
         </template>
@@ -74,29 +75,13 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
 
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: .vw(11)[] .vw(16)[] .vw(14)[] .vw(16)[];
-
-    .bag {
-      color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(18)[];
-      line-height: .vw(18)[];
-      font-weight: 500;
-      font-style: normal;
-    }
-
-    .address {
-      color: var(--text--);
-      font-family: "PingFang SC";
-      font-size: .vw(14)[];
-      line-height: .vw(14)[];
-      font-weight: 400;
-      font-style: normal;
-    }
+  .address-edit {
+    color: var(--text--);
+    font-family: "PingFang SC";
+    font-size: .vw(14)[];
+    line-height: .vw(14)[];
+    font-weight: 400;
+    font-style: normal;
   }
 
   .body {
@@ -129,7 +114,7 @@ onMounted(() => {
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
-          background-image: url(../assets/images/shop/trash.png);
+          background-image: url(@/assets/images/shop/trash.png);
           margin-right: .vw(8)[];
         }
 
@@ -162,10 +147,10 @@ onMounted(() => {
             background-size: 100%;
             background-position: center;
             background-repeat: no-repeat;
-            background-image: url(../assets/images/shop/select.png);
+            background-image: url(@/assets/images/shop/select.png);
 
             &.selected {
-              background-image: url(../assets/images/shop/selected.png);
+              background-image: url(@/assets/images/shop/selected.png);
             }
           }
         }
@@ -237,14 +222,19 @@ onMounted(() => {
             background-size: 70%;
             background-position: center;
             background-repeat: no-repeat;
+
+            &.disabled {
+              opacity: .5;
+              pointer-events: none;
+            }
           }
 
           .sub {
-            background-image: url(../assets/images/sub.png);
+            background-image: url(@/assets/images/sub.png);
           }
 
           .plus {
-            background-image: url(../assets/images/plus.png);
+            background-image: url(@/assets/images/plus.png);
           }
 
           .count {
@@ -281,11 +271,11 @@ onMounted(() => {
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url(../assets/images/shop/select.png);
+        background-image: url(@/assets/images/shop/select.png);
         margin-right: .vw(8)[];
 
         &.selected {
-          background-image: url(../assets/images/shop/selected.png);
+          background-image: url(@/assets/images/shop/selected.png);
 
         }
       }

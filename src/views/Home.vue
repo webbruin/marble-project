@@ -2,70 +2,64 @@
   <main class="home">
     <div class="title">弹珠潮玩</div>
     <div class="room-tab">
-      <div class="item" v-for="(item, index) in icons" :key="index" @click="clickRoomTab(item)">
+      <div class="item" v-for="(item, index) in roomLevelList" :key="index" @click="clickRoomTab(item)">
         <img class="icon" :src="item.icon" alt="">
-        <span class="text" :class="{ light: currentRoom == item.value }">{{ item.name }}</span>
+        <span class="text" :class="{ light: roomParams.roomLevel == item.level }">{{ item.name }}</span>
       </div>
       <div class="more" @click="moreRoomTab">更多</div>
     </div>
     <div class="banner">
-      <img src="../assets/images/home/banner.png" alt="">
+      <img src="@/assets/images/home/banner.png" alt="">
     </div>
     <div class="entry">
       <div class="left">
         <div class="recharge" @click="showRechargeDialog = true">
           <p class="text">弹珠充值</p>
           <p class="desc">弹珠充值充值中心</p>
-          <img src="../assets/images/home/recharge-icon.png" alt="" class="icon">
+          <img src="@/assets/images/home/recharge-icon.png" alt="" class="icon">
         </div>
       </div>
       <div class="right">
-        <div class="sign-in">
+        <div class="sign-in" @click="clickCheckIn">
           <p class="text">每日签到</p>
           <p class="desc">签到获得弹珠</p>
-          <img src="../assets/images/home/sign-in-icon.png" alt="" class="icon">
+          <img src="@/assets/images/home/sign-in-icon.png" alt="" class="icon">
         </div>
-        <div class="rank">
+        <div class="rank" @click="clickRanking">
           <p class="text">排行榜</p>
           <p class="desc">查看积分排行榜</p>
-          <img src="../assets/images/home/Rank-icon.png" alt="" class="icon">
+          <img src="@/assets/images/home/Rank-icon.png" alt="" class="icon">
         </div>
       </div>
     </div>
     <div class="filter">
-      <div class="item" :class="{ light: currentFilter === 'recommend' }">
-        <span @click="clickFilter('recommend')">推荐</span>
-      </div>
-      <div class="item" :class="{ light: currentFilter === 'hot' }">
-        <span @click="clickFilter('hot')">热度</span>
-      </div>
-      <div class="item" :class="{ light: currentFilter === 'idle' }">
-        <span @click="clickFilter('idle')">空闲</span>
-      </div>
-      <div class="item" :class="{ light: currentFilter === 'price' }">
-        <span @click="clickFilter('price')">价格</span>
-        <div class="sort" :class="{ 'low': priceSort === 'low', 'hight': priceSort === 'hight' }"></div>
+      <div class="item" :class="{ light: roomParams.sortType === item.type }" v-for="(item, index) in sortTypeList"
+        :key="index">
+        <span @click="clickFilter(item)">{{ item.name }}</span>
+        <template v-if="item.sort">
+          <div class="sort" :class="{ 'low': roomParams.order === 'low', 'hight': roomParams.order === 'hight' }"></div>
+        </template>
       </div>
     </div>
     <div class="room-list">
       <div class="item" v-for="(item, index) in roomList" :key="index" @click="clickRoom(item)">
         <div class="status">
-          <img v-if="item.status === 1" class="icon" src="../assets/images/home/room-idle.png" alt="">
-          <img v-if="item.status === 2" class="icon" src="../assets/images/home/room-gaming.png" alt="">
-          <span class="text">{{ item.status === 2 ? '游戏中' : '空闲中' }}</span>
+          <img v-if="item.useStatus === 1" class="icon" src="@/assets/images/home/room-gaming.png" alt="">
+          <img v-else class="icon" src="@/assets/images/home/room-idle.png" alt="">
+          <span class="text">{{ roomUseStatusEnum[item.useStatus] }}</span>
         </div>
-        <div class="user-list" v-if="item.user.length">
-          <div class="user" v-for="(userItem, userIndex) in item.user.slice(0, 3)" :key="userIndex">
-            <img class="avatar" src="../assets/images/avatar.png" alt="">
+        <div class="user-list" v-if="item.currentPlayerCount">
+          <div class="user" v-for="userIndex in Math.min(item.currentPlayerCount, 3)" :key="userIndex">
+            <img class="avatar" src="@/assets/images/avatar.png" alt="">
           </div>
           <div class="user">
-            <span class="count">{{ item.user.length }}</span>
+            <span class="count">{{ item.currentPlayerCount }}</span>
           </div>
         </div>
         <div class="room-name">{{ item.roomName }}</div>
         <div class="room-ball">
-          <img class="icon" src="../assets/images/ball.png" alt="">
-          <span class="count">X{{ item.ballCount }} 起</span>
+          <img class="icon" src="@/assets/images/ball.png" alt="">
+          <span class="count">X{{ item.entryFee }} 起</span>
         </div>
       </div>
     </div>
@@ -82,65 +76,103 @@ import RechargeDialog from '../components/RechargeDialog.vue'
 const route = useRoute()
 const router = useRouter()
 
-const icons = ref([
+// 房间使用状态枚举：0-空闲，1-使用中，10-故障，11-下线
+const roomUseStatusEnum = {
+  0: '空闲',
+  1: '使用中',
+  10: '故障',
+  11: '下线'
+}
+
+const roomLevelList = ref([
   {
     name: '初级房间',
-    value: 'low',
-    icon: new URL(`../assets/images/home/low-icon.png`, import.meta.url).href,
+    level: 1,
+    icon: new URL(`@/assets/images/home/low-icon.png`, import.meta.url).href,
   },
   {
     name: '中级房间',
-    value: 'middle',
-    icon: new URL(`../assets/images/home/middle-icon.png`, import.meta.url).href,
+    level: 2,
+    icon: new URL(`@/assets/images/home/middle-icon.png`, import.meta.url).href,
   },
   {
     name: '高级房间',
-    value: 'hight',
-    icon: new URL(`../assets/images/home/hight-icon.png`, import.meta.url).href,
+    level: 3,
+    icon: new URL(`@/assets/images/home/hight-icon.png`, import.meta.url).href,
   }
 ])
-const currentRoom = ref('low')
-// 推荐-recommend 热度-hot 空闲-idle 价格-price
-const currentFilter = ref('recommend')
-// 低到高-low 高到低-hight
-const priceSort = ref('')
-// 房间列表
-const roomList = ref([
-  { status: 1, user: [], roomName: '新人福利房间', ballCount: 2 },
-  { status: 2, user: [1, 2, 3, 4, 5, 6, 7, 8], roomName: '新人福利房间', ballCount: 2 },
-  { status: 1, user: [1, 2, 3, 4, 5, 6, 7, 8], roomName: '新人福利房间', ballCount: 2 },
-  { status: 1, user: [1, 2, 3, 4, 5, 6, 7, 8], roomName: '新人福利房间', ballCount: 2 },
-  { status: 1, user: [1, 2, 3, 4, 5, 6, 7, 8], roomName: '新人福利房间', ballCount: 2 },
-  { status: 1, user: [1, 2, 3, 4, 5, 6, 7, 8], roomName: '新人福利房间', ballCount: 2 },
+const sortTypeList = ref([
+  { name: '推荐', type: 'recommend' },
+  { name: '热度', type: 'hot' },
+  { name: '空闲', type: 'idle' },
+  { name: '价格', type: 'price', sort: true },
 ])
+
+const roomParams = ref({
+  roomLevel: 1,  // 房间等级：1-初级，2-中级，3-高级
+  sortType: 'recommend',  // 推荐-recommend 热度-hot 空闲-idle 价格-price
+  order: '',  // 低到高-low 高到低-hight
+})
+// 房间列表
+const roomList = ref([])
 // 
 const showRechargeDialog = ref(false)
 
 onMounted(() => {
-
+  getRoomList()
 })
 
+watch(
+  () => roomParams.value, (newData, oldData) => {
+    getRoomList()
+  },
+  {
+    deep: true
+  }
+)
+
+const getRoomList = async () => {
+  const res = await api.post('/homepage/listRooms', roomParams.value)
+  if (res.code === 200) {
+    roomList.value = res.data
+  } else {
+    $toast.info(res.message)
+  }
+}
+
 const clickRoomTab = (item) => {
-  currentRoom.value = item.value
+  roomParams.value.roomLevel = item.level
 }
 
 const moreRoomTab = () => {
   // router.push('');
 }
 
-const clickFilter = (type) => {
-  currentFilter.value = type
+const clickCheckIn = () => {
+  router.push({ name: 'check-in' });
+}
+
+const clickRanking = () => {
+  router.push({ name: 'ranking' });
+}
+
+const clickFilter = (item) => {
+  roomParams.value.sortType = item.type
   // 价格排序
-  if (currentFilter.value === 'price') {
-    if (priceSort.value === 'low') {
-      priceSort.value = 'hight'
+  if (roomParams.value.sortType === 'price') {
+    if (roomParams.value.order === 'low') {
+      roomParams.value.order = 'hight'
     } else {
-      priceSort.value = 'low'
+      roomParams.value.order = 'low'
     }
   }
 }
 
 const clickRoom = (item) => {
+  if (item.useStatus !== 0) {
+    $toast.info(`该房间目前处于${roomUseStatusEnum[item.useStatus]}中`)
+    return
+  }
   router.push({ name: 'room', params: { id: 88, name: 'test' }, query: { a: 111, b: 222 } });
 }
 </script>
@@ -161,7 +193,7 @@ const clickRoom = (item) => {
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/home/home-bg.png);
+    background-image: url(@/assets/images/home/home-bg.png);
     position: absolute;
     top: 0;
   }
@@ -175,7 +207,7 @@ const clickRoom = (item) => {
     font-size: .vw(32)[];
     line-height: .vw(32)[];
     font-weight: 900;
-    padding: .vw(12)[] .vw(18)[] .vw(9)[] .vw(18)[];
+    padding: .vw(12)[] .vw(18)[] .vw(12)[] .vw(18)[];
   }
 
   .room-tab {
@@ -196,15 +228,15 @@ const clickRoom = (item) => {
       background-repeat: no-repeat;
 
       &:nth-of-type(1) {
-        background-image: url(../assets/images/home/low-room.png);
+        background-image: url(@/assets/images/home/low-room.png);
       }
 
       &:nth-of-type(2) {
-        background-image: url(../assets/images/home/middle-room.png);
+        background-image: url(@/assets/images/home/middle-room.png);
       }
 
       &:nth-of-type(3) {
-        background-image: url(../assets/images/home/hight-room.png);
+        background-image: url(@/assets/images/home/hight-room.png);
       }
 
       .icon {
@@ -265,7 +297,7 @@ const clickRoom = (item) => {
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url(../assets/images/home/recharge-bg.png);
+        background-image: url(@/assets/images/home/recharge-bg.png);
         position: relative;
         overflow: hidden;
 
@@ -276,7 +308,7 @@ const clickRoom = (item) => {
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
-          background-image: url(../assets/images/home/recharge-go.png);
+          background-image: url(@/assets/images/home/recharge-go.png);
           transform: rotate(-0.452deg);
           position: absolute;
           bottom: .vw(-2)[];
@@ -324,7 +356,7 @@ const clickRoom = (item) => {
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url(../assets/images/home/sign-in-bg.png);
+        background-image: url(@/assets/images/home/sign-in-bg.png);
         position: relative;
         overflow: hidden;
         margin-bottom: .vw(8)[];
@@ -368,7 +400,7 @@ const clickRoom = (item) => {
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url(../assets/images/home/rank-bg.png);
+        background-image: url(@/assets/images/home/rank-bg.png);
         position: relative;
         overflow: hidden;
 
@@ -486,7 +518,7 @@ const clickRoom = (item) => {
         background-size: 90%;
         background-position: center .vw(7)[];
         background-repeat: no-repeat;
-        background-image: url(../assets/images/home/filter-select-bg.png);
+        background-image: url(@/assets/images/home/filter-select-bg.png);
       }
     }
   }
@@ -503,7 +535,7 @@ const clickRoom = (item) => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../assets/images/home/room-bg.png);
+      background-image: url(@/assets/images/home/room-bg.png);
       border-radius: .vw(12)[];
       margin-bottom: .vw(10)[];
       position: relative;

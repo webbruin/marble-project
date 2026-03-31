@@ -19,29 +19,29 @@ const icons = ref([
   {
     name: '首页',
     value: 'home',
-    icon1: new URL(`../assets/images/footer/home.png`, import.meta.url).href,
-    icon2: new URL(`../assets/images/footer/home-selected.png`, import.meta.url).href,
+    icon1: new URL(`@/assets/images/footer/home.png`, import.meta.url).href,
+    icon2: new URL(`@/assets/images/footer/home-selected.png`, import.meta.url).href,
     url: '/'
   },
   {
     name: '商场',
     value: 'shop',
-    icon1: new URL(`../assets/images/footer/shop.png`, import.meta.url).href,
-    icon2: new URL(`../assets/images/footer/shop-selected.png`, import.meta.url).href,
+    icon1: new URL(`@/assets/images/footer/shop.png`, import.meta.url).href,
+    icon2: new URL(`@/assets/images/footer/shop-selected.png`, import.meta.url).href,
     url: '/shop'
   },
   {
     name: '背包',
     value: 'cart',
-    icon1: new URL(`../assets/images/footer/cart.png`, import.meta.url).href,
-    icon2: new URL(`../assets/images/footer/cart-selected.png`, import.meta.url).href,
+    icon1: new URL(`@/assets/images/footer/cart.png`, import.meta.url).href,
+    icon2: new URL(`@/assets/images/footer/cart-selected.png`, import.meta.url).href,
     url: '/cart'
   },
   {
     name: '我的',
     value: 'my',
-    icon1: new URL(`../assets/images/footer/my.png`, import.meta.url).href,
-    icon2: new URL(`../assets/images/footer/my-selected.png`, import.meta.url).href,
+    icon1: new URL(`@/assets/images/footer/my.png`, import.meta.url).href,
+    icon2: new URL(`@/assets/images/footer/my-selected.png`, import.meta.url).href,
     url: '/my'
   },
 ])

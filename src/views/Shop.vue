@@ -17,18 +17,15 @@
         </div>
       </div>
       <div class="banner">
-        <img src="../assets/images/home/banner.png" alt="">
+        <img src="@/assets/images/home/banner.png" alt="">
       </div>
       <div class="filter">
-        <div class="item" :class="{ light: currentFilter === 'recommend' }">
-          <span @click="clickFilter('recommend')">推荐</span>
-        </div>
-        <div class="item" :class="{ light: currentFilter === 'hot' }">
-          <span @click="clickFilter('hot')">热度</span>
-        </div>
-        <div class="item" :class="{ light: currentFilter === 'price' }">
-          <span @click="clickFilter('price')">价格</span>
-          <div class="sort" :class="{ 'low': priceSort === 'low', 'hight': priceSort === 'hight' }"></div>
+        <div class="item" :class="{ light: currentFilter === item.type }" v-for="(item, index) in sortTypeList"
+          :key="index">
+          <span @click="clickFilter(item)">{{ item.name }}</span>
+          <template v-if="item.sort">
+            <div class="sort" :class="{ 'low': priceSort === 'low', 'hight': priceSort === 'hight' }"></div>
+          </template>
         </div>
       </div>
       <div class="products">
@@ -36,7 +33,7 @@
           <div v-if="item.vipEntry" class="entry" @click="clickProduct(item)"></div>
           <div v-else class="item" @click="clickProduct(item)">
             <div class="cover">
-              <img src="../assets/images/shop/product.png" alt="">
+              <img src="@/assets/images/shop/product.png" alt="">
             </div>
             <div class="text">可口可乐300ml</div>
             <div class="option">
@@ -57,29 +54,35 @@ import { useRoute, useRouter } from 'vue-router'
 const tabs = ref([
   {
     name: '休闲零食',
-    icon: new URL(`../assets/images/shop/tab1.png`, import.meta.url).href,
+    icon: new URL(`@/assets/images/shop/tab1.png`, import.meta.url).href,
   },
   {
     name: '酒水饮料',
-    icon: new URL(`../assets/images/shop/tab2.png`, import.meta.url).href,
+    icon: new URL(`@/assets/images/shop/tab2.png`, import.meta.url).href,
   },
   {
     name: '儿童玩具',
-    icon: new URL(`../assets/images/shop/tab3.png`, import.meta.url).href,
+    icon: new URL(`@/assets/images/shop/tab3.png`, import.meta.url).href,
   },
   {
     name: '电子数码',
-    icon: new URL(`../assets/images/shop/tab4.png`, import.meta.url).href,
+    icon: new URL(`@/assets/images/shop/tab4.png`, import.meta.url).href,
   },
   {
     name: '数码产品',
-    icon: new URL(`../assets/images/shop/tab5.png`, import.meta.url).href,
+    icon: new URL(`@/assets/images/shop/tab5.png`, import.meta.url).href,
   },
   {
     name: '美妆用品',
-    icon: new URL(`../assets/images/shop/tab6.png`, import.meta.url).href,
+    icon: new URL(`@/assets/images/shop/tab6.png`, import.meta.url).href,
   },
 ])
+const sortTypeList = ref([
+  { name: '推荐', type: 'recommend' },
+  { name: '热度', type: 'hot' },
+  { name: '价格', type: 'price', sort: true },
+])
+
 // 推荐-recommend 热度-hot 价格-price
 const currentFilter = ref('recommend')
 // 低到高-low 高到低-hight
@@ -96,8 +99,8 @@ const clickTab = (item) => {
   console.log(111, item);
 }
 
-const clickFilter = (type) => {
-  currentFilter.value = type
+const clickFilter = (item) => {
+  currentFilter.value = item.type
   // 价格排序
   if (currentFilter.value === 'price') {
     if (priceSort.value === 'low') {
@@ -129,7 +132,7 @@ const clickProduct = (item) => {
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/shop/shop-bg.png);
+    background-image: url(@/assets/images/shop/shop-bg.png);
 
     .title {
       color: var(--light-text--);
@@ -304,7 +307,7 @@ const clickProduct = (item) => {
           background-size: 90%;
           background-position: center .vw(7)[];
           background-repeat: no-repeat;
-          background-image: url(../assets/images/home/filter-select-bg.png);
+          background-image: url(@/assets/images/home/filter-select-bg.png);
         }
       }
     }
@@ -321,7 +324,7 @@ const clickProduct = (item) => {
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url(../assets/images/shop/vip-entry.png);
+        background-image: url(@/assets/images/shop/vip-entry.png);
         margin-bottom: .vw(16)[];
       }
 
@@ -377,7 +380,7 @@ const clickProduct = (item) => {
             background-size: 100%;
             background-position: center;
             background-repeat: no-repeat;
-            background-image: url(../assets/images/add-cart.png);
+            background-image: url(@/assets/images/add-cart.png);
           }
         }
       }

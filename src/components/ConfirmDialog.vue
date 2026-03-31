@@ -4,7 +4,7 @@
     <div class="body">
       <p class="title">确认</p>
       <div class="room" @click="selectedRoom = !selectedRoom">
-        <img src="../assets/images/home/room-bg.png" alt="" class="cover">
+        <img src="@/assets/images/home/room-bg.png" alt="" class="cover">
         <div class="info">
           <p class="text">{{ level }}房间</p>
           <p class="desc">投入弹珠：5枚</p>
@@ -12,7 +12,7 @@
         <i class="select" :class="{ 'selected': selectedRoom }"></i>
       </div>
       <div class="ball-count" @click="selectedBall = !selectedBall">
-        <img src="../assets/images/ball.png" alt="" class="ball">
+        <img src="@/assets/images/ball.png" alt="" class="ball">
         <span class="text">弹珠支付（剩余：6）</span>
         <i class="select" :class="{ 'selected': selectedBall }"></i>
       </div>
@@ -84,7 +84,7 @@ const clickConfirm = () => {
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(../assets/images/room/confirm-dialog-bg.png);
+    background-image: url(@/assets/images/room/confirm-dialog-bg.png);
     position: relative;
     // padding-top: .vw(50)[];
     padding: .vw(23)[] .vw(16)[] .vw(8)[] .vw(16)[];
@@ -96,7 +96,7 @@ const clickConfirm = () => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../assets/images/room/confirm-dialog-icon.png);
+      background-image: url(@/assets/images/room/confirm-dialog-icon.png);
       position: absolute;
       top: .vw(-57)[];
       right: .vw(4)[];
@@ -154,11 +154,11 @@ const clickConfirm = () => {
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url(../assets/images/shop/select.png);
+        background-image: url(@/assets/images/shop/select.png);
         margin-left: .vw(10)[];
 
         &.selected {
-          background-image: url(../assets/images/shop/selected.png);
+          background-image: url(@/assets/images/shop/selected.png);
         }
       }
     }
@@ -186,11 +186,11 @@ const clickConfirm = () => {
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url(../assets/images/shop/select.png);
+        background-image: url(@/assets/images/shop/select.png);
         margin-left: .vw(10)[];
 
         &.selected {
-          background-image: url(../assets/images/shop/selected.png);
+          background-image: url(@/assets/images/shop/selected.png);
         }
       }
     }
