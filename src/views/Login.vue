@@ -30,7 +30,7 @@
           <!-- 表单提交 -->
           <div class="submit">
             <Button :disabled="!(formdata.mobile && (loginType === 'msgCode' ? formdata.msgCode : formdata.password))"
-              @click="clickLogin"></Button>
+              buttonText="立即登录" @click="clickLogin"></Button>
           </div>
         </div>
         <div class="aggrement" @click="isAggre = !isAggre">
@@ -49,6 +49,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Input from '@/components/FormData/Input.vue'
 import Button from '@/components/FormData/Button.vue'
 import { passwordRegExp } from '@/utils'
+import { encrypt } from '@/utils/aes';
 
 const route = useRoute()
 const router = useRouter()
@@ -89,7 +90,7 @@ const clickLogin = async () => {
     })
     return
   }
-  if (!passwordRegExp.test(formdata.value.password)) {
+  if (loginType.value === 'password' && !passwordRegExp.test(formdata.value.password)) {
     $modal.show({ content: '密码必须8-20位，包含字母、数字、特殊字符', showCancel: false })
     return
   }
@@ -102,7 +103,7 @@ const clickLogin = async () => {
   }
   if (loginType.value === 'password') {
     url = '/user/auth/passwordLogin'
-    body = { mobile, password }
+    body = { mobile, password: encrypt(password) }
   }
   const res = await api.post(url, body)
   if (res.code === 200) {
@@ -119,10 +120,10 @@ const clickLogin = async () => {
 }
 
 const clickAggrement1 = () => {
-  // router.push('');
+  router.push({ name: 'aggrement1' });
 }
 const clickAggrement2 = () => {
-  // router.push('');
+  router.push({ name: 'aggrement1' });
 }
 </script>
 

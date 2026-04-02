@@ -2,7 +2,8 @@
   <main class="home">
     <div class="title">弹珠潮玩</div>
     <div class="room-tab">
-      <div class="item" v-for="(item, index) in roomLevelList" :key="index" @click="clickRoomTab(item)">
+      <div class="item" :class="{ 'light': roomParams.roomLevel === item.level }" v-for="(item, index) in roomLevelList"
+        :key="index" @click="clickRoomTab(item)">
         <img class="icon" :src="item.icon" alt="">
         <span class="text" :class="{ light: roomParams.roomLevel == item.level }">{{ item.name }}</span>
       </div>
@@ -173,7 +174,8 @@ const clickRoom = (item) => {
     $toast.info(`该房间目前处于${roomUseStatusEnum[item.useStatus]}中`)
     return
   }
-  router.push({ name: 'room', params: { id: 88, name: 'test' }, query: { a: 111, b: 222 } });
+  const { id, cameraDeviceId, machineCode } = item
+  router.push({ name: 'room', params: { id }, query: { cameraDeviceId, machineCode } });
 }
 </script>
 
@@ -250,6 +252,20 @@ const clickRoom = (item) => {
         font-size: .vw(14)[];
         font-weight: 600;
         font-style: normal;
+      }
+
+      &.light {
+        &:nth-of-type(1) {
+          background-image: url(@/assets/images/home/low-room-selected.png);
+        }
+
+        &:nth-of-type(2) {
+          background-image: url(@/assets/images/home/middle-room-selected.png);
+        }
+
+        &:nth-of-type(3) {
+          background-image: url(@/assets/images/home/hight-room-selected.png);
+        }
       }
     }
 

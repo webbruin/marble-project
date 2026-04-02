@@ -6,13 +6,13 @@
       <p class="title">弹珠充值</p>
       <div class="recharge">
         <div class="ball-count-list">
-          <div class="item" :class="{ 'selected': selectedBallCount === item.price }"
-            v-for="(item, index) in ballCountList" :key="index" @click="clickBallCount(item)">
+          <div class="item" :class="{ 'selected': selectedRechargePackage === item.packageId }"
+            v-for="(item, index) in rechargeList" :key="index" @click="clickPackage(item)">
             <div class="ball">
               <i class="icon"></i>
-              <i class="count">X{{ item.ball }}</i>
+              <i class="count">X{{ item.marbleAmount + item.giftMarbleAmount }}</i>
             </div>
-            <div class="price">{{ item.price }}</div>
+            <div class="price">{{ item.payAmount }}</div>
           </div>
         </div>
         <div class="payway">
@@ -45,8 +45,10 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = defineProps({
   level: String,
@@ -54,58 +56,130 @@ const props = defineProps({
 })
 const emit = defineEmits(['toggleShow'])
 
-const ballCountList = ref([
-  { ball: 5, price: '5.00' },
-  { ball: 20, price: '20.00' },
-  { ball: 50, price: '50.00' },
-  { ball: 100, price: '100.00' },
-  { ball: 200, price: '200.00' },
-  { ball: 500, price: '500.00' },
-  { ball: 1000, price: '1000.00' },
-  { ball: 2000, price: '2000.00' },
-  { ball: 5000, price: '5000.00' },
+const rechargeList = ref([
+  { packageId: 1, marbleAmount: 5, giftMarbleAmount: 10, payAmount: '5.00' },
+  { packageId: 2, marbleAmount: 20, giftMarbleAmount: 10, payAmount: '20.00' },
+  { packageId: 3, marbleAmount: 50, giftMarbleAmount: 10, payAmount: '50.00' },
+  { packageId: 4, marbleAmount: 100, giftMarbleAmount: 10, payAmount: '100.00' },
+  { packageId: 5, marbleAmount: 200, giftMarbleAmount: 10, payAmount: '200.00' },
+  { packageId: 6, marbleAmount: 500, giftMarbleAmount: 10, payAmount: '500.00' },
+  { packageId: 7, marbleAmount: 1000, giftMarbleAmount: 10, payAmount: '1000.00' },
+  { packageId: 8, marbleAmount: 2000, giftMarbleAmount: 10, payAmount: '2000.00' },
+  { packageId: 9, marbleAmount: 5000, giftMarbleAmount: 10, payAmount: '5000.00' },
 ])
-const selectedBallCount = ref('')
+const selectedRechargePackage = ref('')
 const paywayList = ref([
   { value: 'alipay', name: '支付宝' }
 ])
-const selectedPayway = ref('')
+const selectedPayway = ref('alipay')
 const isAggre = ref(false)
 const showRechargeSuccess = ref(false)
+const timer = ref(null)
+const time = ref(1000)  // 轮询间隔1000ms
 
 onMounted(() => {
-
+  getRechargeList()
 })
 
-const clickConfirm = () => {
-  if (!isAggre.value) {
-    alert('请阅读并同意《充值协议》')
+onUnmounted(() => {
+  timer.value && clearInterval(timer.value)
+})
+
+const getRechargeList = async () => {
+  const res = await api.post('/recharge/listPackages')
+  if (res.code === 200) {
+    rechargeList.value = res.data
+  } else {
+    $toast.info(res.message)
+  }
+}
+
+const clickConfirm = async () => {
+  if (!selectedRechargePackage.value) {
+    $toast.info('请选择充值包')
     return;
   }
-  showRechargeSuccess.value = true
-  emit('toggleShow', false)
+  if (!isAggre.value) {
+    $toast.info('请阅读并同意《充值协议》')
+    return;
+  }
+  const body = { packageId: selectedRechargePackage.value }
+  const res = await api.post('/recharge/createWapPayOrder', body)
+  if (res.code === 200) {
+    const { payForm, orderId, payAmount } = res.data
+    const payWindow = window.open('', '_blank')
+    if (payWindow) {
+      payWindow.document.write(payForm)
+      payWindow.document.close()
+      // 轮询支付状态
+      getPayStateCallback({ orderId })
+    } else {
+      // 处理弹窗被拦截
+      $toast.info('请允许弹出窗口，或手动打开支付页面')
+    }
+  } else {
+    $toast.info(res.message)
+  }
+}
+
+// 
+
+/**
+ * 轮询查询支付状态回调，间隔1000ms
+ * 回调状态说明
+ * @param tradeStatus 
+ * WAIT_BUYER_PAY 交易创建，等待买家付款 交易创建
+  TRADE_CLOSED 未付款交易超时关闭，或支付完成后全额退款 交易关闭
+  TRADE_SUCCESS 交易支付成功，可退款 支付成功
+  TRADE_FINISHED 交易结束，不可退款 交易完成
+ */
+const getPayStateCallback = (body) => {
+  timer.value = setInterval(async () => {
+    const res = await api.post('/recharge/queryAlipayOrder', body)
+    if (res.code === 200) {
+      const { tradeStatus } = res.data
+      // 支付成功
+      switch (tradeStatus) {
+        case 'TRADE_SUCCESS':
+        case 'TRADE_FINISHED':
+          $toast.info('支付成功')
+          clearInterval(timer.value)
+          showRechargeSuccess.value = true
+          emit('toggleShow', false)
+          break;
+        case 'WAIT_BUYER_PAY':
+          $toast.loading('支付中...')
+          break;
+        case 'TRADE_CLOSED':
+          clearInterval(timer.value)
+          $toast.info('支付失败')
+          break;
+      }
+    } else {
+      // $toast.info(res.message)
+      $toast.loading('等待中...')
+    }
+  }, time.value)
 }
 
 const clickClose = () => {
   emit('toggleShow', false)
 }
 
-const clickBallCount = (item) => {
-  console.log(111, item);
-  if (selectedBallCount.value === item.price) {
-    selectedBallCount.value = ''
+const clickPackage = (item) => {
+  if (selectedRechargePackage.value === item.packageId) {
+    selectedRechargePackage.value = ''
   } else {
-    selectedBallCount.value = item.price
+    selectedRechargePackage.value = item.packageId
   }
 }
 
 const clickPayway = (item) => {
-  console.log(222, item);
   selectedPayway.value = item.value
 }
 
 const clickAggrement = () => {
-  // router.push('');
+  router.push({ name: 'aggrement1' });
 }
 
 const closeRechargeSuccess = () => {

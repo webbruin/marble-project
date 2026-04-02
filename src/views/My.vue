@@ -8,7 +8,7 @@
         <p class="name">{{ userInfo.userName }}</p>
         <p class="id">ID:{{ userInfo.userId }}</p>
       </div>
-      <div class="entry"></div>
+      <div class="entry" @click="clickRouter('edit-user-info')"></div>
     </div>
     <div class="vip">
       <div class="info">
@@ -20,7 +20,7 @@
           <p :style="{ 'width': `${userInfo.pointCardAmount / userInfo.memberPointTotalAmount}%` }"></p>
         </div>
         <div class="count">{{ userInfo.pointCardAmount }}/{{ userInfo.memberPointTotalAmount }}</div>
-        <i class="vip-icon1" :class="{ 'level1': true }"></i>
+        <i class="vip-icon" :class="`level${userInfo.levelValue}`"></i>
       </div>
     </div>
     <div class="order">
@@ -71,7 +71,7 @@
       </div>
       <div class="status">
         <div class="item">
-          <i class="icon service5"></i>
+          <i class="icon service5" @click="clickRouter('setting')"></i>
           <p class="text">设置</p>
         </div>
       </div>
@@ -83,6 +83,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+const router = useRouter()
 const userInfo = ref({})
 
 onMounted(() => {
@@ -93,10 +94,14 @@ const getUserInfo = async () => {
   const res = await api.post('/user/info/getUserInfo')
   if (res.code === 200) {
     userInfo.value = res.data
-    console.log(111, userInfo.value)
+    localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
   } else {
     $toast.info(res.message)
   }
+}
+
+const clickRouter = (url) => {
+  router.push({ name: url })
 }
 </script>
 
@@ -234,7 +239,7 @@ const getUserInfo = async () => {
         font-style: normal;
       }
 
-      .vip-icon1 {
+      .vip-icon {
         width: .vw(58)[];
         height: .vw(47)[];
         position: absolute;
@@ -246,6 +251,22 @@ const getUserInfo = async () => {
 
         &.level1 {
           background-image: url(@/assets/images/my/vip-icon1.png);
+        }
+
+        &.level2 {
+          background-image: url(@/assets/images/my/vip-icon2.png);
+        }
+
+        &.level3 {
+          background-image: url(@/assets/images/my/vip-icon3.png);
+        }
+
+        &.level4 {
+          background-image: url(@/assets/images/my/vip-icon4.png);
+        }
+
+        &.level5 {
+          background-image: url(@/assets/images/my/vip-icon5.png);
         }
       }
     }

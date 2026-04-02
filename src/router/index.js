@@ -18,9 +18,14 @@ const router = createRouter({
         { path: '/my', name: 'my', component: import('../views/My.vue') },
       ]
     },
-    { path: '/room/:id/:name?', name: 'room', component: import('../views/Room.vue') },
+    { path: '/room/:id', name: 'room', component: import('../views/Room.vue') },
     { path: '/check-in', name: 'check-in', component: import('../views/CheckIn.vue') },
     { path: '/ranking', name: 'ranking', component: import('../views/Ranking.vue') },
+    { path: '/setting', name: 'setting', component: import('../views/Setting.vue') },
+    { path: '/account-cancel', name: 'account-cancel', component: import('../views/AccountCancel.vue') },
+    { path: '/edit-user-info', name: 'edit-user-info', component: import('../views/EditUserInfo.vue') },
+    { path: '/aggrement1', name: 'aggrement1', component: import('../views/Aggrement/Aggrement1.vue') },
+    // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: import('../views/404.vue') },
   ],
 })

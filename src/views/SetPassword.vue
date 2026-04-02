@@ -23,6 +23,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Input from '@/components/FormData/Input.vue'
 import Button from '@/components/FormData/Button.vue'
 import { passwordRegExp } from '@/utils'
+import { encrypt } from '@/utils/aes';
 
 const route = useRoute()
 const router = useRouter()
@@ -44,7 +45,7 @@ const clickConfirm = async () => {
     return
   }
   let body = {
-    password: password1.value
+    password: encrypt(password1.value)
   }
   const res = await api.post('/user/info/setPassword', body)
   if (res.code === 200) {

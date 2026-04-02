@@ -29,27 +29,32 @@
         </div>
       </div>
       <div class="products">
-        <template v-for="(item, index) in productList" :key="index">
-          <div v-if="item.vipEntry" class="entry" @click="clickProduct(item)"></div>
-          <div v-else class="item" @click="clickProduct(item)">
-            <div class="cover">
-              <img src="@/assets/images/shop/product.png" alt="">
-            </div>
-            <div class="text">可口可乐300ml</div>
-            <div class="option">
-              <span class="point">积分 854.00</span>
-              <span class="add-cart"></span>
-            </div>
-          </div>
-        </template>
+        <InfiniteScroll :loading="loading" :loadOver="loadOver" @load="loadMore">
+          <template #content>
+            <template v-for="(item, index) in productList" :key="index">
+              <div v-if="item.vipEntry" class="entry" @click="clickProduct(item)"></div>
+              <div v-else class="item" @click="clickProduct(item)">
+                <div class="cover">
+                  <img src="@/assets/images/shop/product.png" alt="">
+                </div>
+                <div class="text">可口可乐300ml</div>
+                <div class="option">
+                  <span class="point">积分 854.00</span>
+                  <span class="add-cart"></span>
+                </div>
+              </div>
+            </template>
+          </template>
+        </InfiniteScroll>
       </div>
     </div>
   </main>
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import InfiniteScroll from '../components/InfiniteScroll.vue'
 
 const tabs = ref([
   {
@@ -88,15 +93,26 @@ const currentFilter = ref('recommend')
 // 低到高-low 高到低-hight
 const priceSort = ref('')
 // 商品列表
-const productList = ref([{}, { vipEntry: true }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}])
+const productList = ref([{}, { vipEntry: true }])
+const loading = ref(false)
+const loadOver = ref(false)
 
 onMounted(() => {
 
 })
 
+const loadMore = () => {
+  loading.value = true
+  const timer = setTimeout(() => {
+    clearTimeout(timer)
+    loading.value = false
+    // loadOver.value = true
+    productList.value = [...productList.value, ...[{}, {}, {}, {}]]
+  }, 1000)
+}
+
 const clickTab = (item) => {
   // router.push('');
-  console.log(111, item);
 }
 
 const clickFilter = (item) => {
@@ -116,7 +132,6 @@ const clickProduct = (item) => {
   if (item.vipEntry) {
     return;
   }
-  console.log(222, item);
 }
 
 </script>

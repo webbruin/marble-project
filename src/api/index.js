@@ -1,10 +1,6 @@
 import axios from 'axios';
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
-
-// test
-const http = 'http://139.224.246.134:6180';
+const http = 'http://139.224.246.134:6180';  // test
 
 // 1. 创建一个 axios 实例，配置基础地址和超时时间
 const api = axios.create({
@@ -27,18 +23,28 @@ api.interceptors.request.use(
 // 3. 响应拦截器（例如：统一处理错误码）
 api.interceptors.response.use(
   (response) => {
-    // 直接返回 data 部分，组件里不用再写 response.data
-    return response.data;
-  },
-  (error) => {
     // 统一处理 401、500 等错误
-    if (error.response?.status === 401) {
+    if (response.data?.code === 401) {
       // 跳转到登录页
-      localStorage.removeItem('token');
-      router.push({ name: 'login' })
+      setTimeout(() => {
+        localStorage.removeItem('token')
+        location.href = '/login'
+      }, 1000)
+    } else {
+      return response.data;
     }
-    return Promise.reject(error);
-  }
+  },
+  (error) => Promise.reject(error)
+  // (error) => {
+  //   console.log(222, error);
+  //   // 统一处理 401、500 等错误
+  //   if (error.response?.code === 401) {
+  //     // 跳转到登录页
+  //     localStorage.removeItem('token');
+  //     location.href = '/login'
+  //   }
+  //   return Promise.reject(error);
+  // }
 );
 
 export default api;

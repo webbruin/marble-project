@@ -833,6 +833,11 @@ copy-anything@^2.0.1:
   dependencies:
     is-what "^3.14.1"
 
+crypto-js@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.2.0.tgz#4d931639ecdfd12ff80e8186dba6af2c2e856631"
+  integrity sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==
+
 csstype@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.2.3.tgz#ec48c0f3e993e50648c86da559e2610995cf989a"
@@ -926,6 +931,11 @@ es-set-tostringtag@^2.1.0:
     has-tostringtag "^1.0.2"
     hasown "^2.0.2"
 
+es6-promise@^4.2.8:
+  version "4.2.8"
+  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-4.2.8.tgz#4eb21594c972bc40553d276e510539143db53e0a"
+  integrity sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==
+
 esbuild@^0.27.0:
   version "0.27.3"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.27.3.tgz#5859ca8e70a3af956b26895ce4954d7e73bd27a8"
@@ -977,6 +987,14 @@ fdir@^6.5.0:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/fdir/-/fdir-6.5.0.tgz#ed2ab967a331ade62f18d077dae192684d50d350"
   integrity sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==
+
+flv.js@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/flv.js/-/flv.js-1.6.2.tgz#fa3340fe3f7ee01d3977f7876aee66b8436e5922"
+  integrity sha512-xre4gUbX1MPtgQRKj2pxJENp/RnaHaxYvy3YToVVCrSmAWUu85b9mug6pTXF6zakUjNP2lFWZ1rkSX7gxhB/2A==
+  dependencies:
+    es6-promise "^4.2.8"
+    webworkify-webpack "^2.1.5"
 
 follow-redirects@^1.15.11:
   version "1.15.11"
@@ -1583,6 +1601,11 @@ webpack-virtual-modules@^0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/webpack-virtual-modules/-/webpack-virtual-modules-0.6.2.tgz#057faa9065c8acf48f24cb57ac0e77739ab9a7e8"
   integrity sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ==
+
+webworkify-webpack@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/webworkify-webpack/-/webworkify-webpack-2.1.5.tgz#bf4336624c0626cbe85cf1ffde157f7aa90b1d1c"
+  integrity sha512-2akF8FIyUvbiBBdD+RoHpoTbHMQF2HwjcxfDvgztAX5YwbZNyrtfUMgvfgFVsgDhDPVTlkbb5vyasqDHfIDPQw==
 
 wsl-utils@^0.1.0:
   version "0.1.0"

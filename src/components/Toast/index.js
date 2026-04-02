@@ -42,5 +42,6 @@ export const Toast = {
   info: (message, duration = 2000) => createToast({ message, type: 'info', duration }),
   success: (message, duration = 2000) => createToast({ message, type: 'success', duration }),
   error: (message, duration = 2000) => createToast({ message, type: 'error', duration }),
-  warning: (message, duration = 2000) => createToast({ message, type: 'warning', duration })
+  warning: (message, duration = 2000) => createToast({ message, type: 'warning', duration }),
+  loading: (message, duration = 10000000) => createToast({ message, type: 'warning', duration, loading: true })
 }

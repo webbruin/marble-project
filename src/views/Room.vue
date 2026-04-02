@@ -1,6 +1,8 @@
 <template>
   <main class="room">
-    <div class="live-stream"></div>
+    <div class="live-stream">
+      <video ref="videoPlayer" muted controls autoplay playsinline></video>
+    </div>
     <div class="body">
       <Header></Header>
       <div class="tabbar">
@@ -128,6 +130,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useTemplateRef, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import Flv from 'flv.js'
 import WarnningDialog from '../components/WarnningDialog.vue'
 import ConfirmDialog from '../components/ConfirmDialog.vue'
 import BallSuccess from '../components/BallSuccess.vue'
@@ -150,10 +153,17 @@ const stickEvent = ref({});
 const showWarnningDialog = ref(false)
 const showConfirmDialog = ref(false)
 const showBallSuccess = ref(false)
+// 直播拉流
+const videoPlayer = ref(null)
+const streamUrl = ref('')
+let flvPlayer = null
 
 onMounted(() => {
   // console.log(111, route.params);
   // console.log(222, route.query);
+
+  // streamUrl.value = 'http://live.ayowi.vip/live/ZJ_TEST_0001.flv'
+  // loadStreamFlv()
 })
 
 const changeBall = (value) => {
@@ -208,6 +218,47 @@ const initStickEvent = () => {
   })
 }
 
+const loadStreamFlv = () => {
+  if (!streamUrl.value) {
+    return
+  }
+
+  const video = videoPlayer.value
+  if (!video) {
+    return
+  }
+
+  // 清理之前的播放器
+  if (flvPlayer) {
+    flvPlayer.destroy()
+    flvPlayer = null
+  }
+
+  if (streamUrl.value.includes('.flv')) {
+    // 如果需要支持 FLV，可以启用 flv.js
+    if (Flv.isSupported()) {
+      flvPlayer = Flv.createPlayer({
+        url: streamUrl.value,
+        type: 'flv',  // 流类型
+        isLive: true,  // 直播流
+        cors: true,  // 允许跨域
+      }, {
+        enableStashBuffer: false,  // 关闭缓冲，降低延迟
+        lazyLoadMaxDuration: 3,  // 懒加载最大时长
+        seekType: 'range',  // 范围请求
+      })
+      flvPlayer.attachMediaElement(video)
+      flvPlayer.load()
+      flvPlayer.play()
+    } else {
+      $toast.info('当前浏览器不支持 FLV 播放')
+    }
+  } else {
+    // 默认作为普通视频流播放 (如 RTMP 无法直接播放，需要转码)
+    video.src = streamUrl.value
+    video.play()
+  }
+}
 </script>
 
 <style scoped lang="less">
@@ -222,8 +273,13 @@ const initStickEvent = () => {
   .live-stream {
     width: 100%;
     height: 100vh;
-    background-color: yellow;
     position: fixed;
+
+    video {
+      width: 100%;
+      height: 100%;
+      background-color: var(--white--);
+    }
   }
 
   .body {
