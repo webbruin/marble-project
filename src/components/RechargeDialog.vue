@@ -142,10 +142,10 @@ const getPayStateCallback = (body) => {
       switch (tradeStatus) {
         case 'TRADE_SUCCESS':
         case 'TRADE_FINISHED':
-          $toast.info('支付成功')
           clearInterval(timer.value)
-          showRechargeSuccess.value = true
+          $toast.close()
           emit('toggleShow', false)
+          showRechargeSuccess.value = true
           break;
         case 'WAIT_BUYER_PAY':
           $toast.loading('支付中...')

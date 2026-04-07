@@ -1,5 +1,5 @@
 <template>
-  <div class="button" :class="{ 'disabled': disabled }" @click="clickSubmit">{{ buttonText }}
+  <div class="button" :class="{ 'disabled': disabled }" :style="style" @click="clickSubmit">{{ buttonText }}
   </div>
 </template>
 
@@ -16,6 +16,9 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  style: {
+    type: Object
+  }
 })
 const emit = defineEmits(['click'])
 
@@ -49,7 +52,8 @@ const clickSubmit = () => {
   padding: .vw(10)[] .vw(16)[];
 
   &.disabled {
-    background-color: #FFCA91;
+    // background-color: #FFCA91;
+    opacity: 0.7;
     pointer-events: none;
   }
 }

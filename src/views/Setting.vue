@@ -31,6 +31,7 @@ const rows = ref([
     { name: '隐私政策', show: true, router: 'aggrement1' },
   ],
   [
+    { name: '蓝牙连接', show: true, router: 'bluetooth' },
     { name: '实名认证', show: true, router: 'set-password' },
     { name: '设置登录密码', show: true, router: 'set-password' },
     { name: '修改登录密码', show: true, router: 'change-password' },

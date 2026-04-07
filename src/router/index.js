@@ -25,6 +25,7 @@ const router = createRouter({
     { path: '/account-cancel', name: 'account-cancel', component: import('../views/AccountCancel.vue') },
     { path: '/edit-user-info', name: 'edit-user-info', component: import('../views/EditUserInfo.vue') },
     { path: '/aggrement1', name: 'aggrement1', component: import('../views/Aggrement/Aggrement1.vue') },
+    { path: '/bluetooth', name: 'bluetooth', component: import('../views/Bluetooth.vue') },
     // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: import('../views/404.vue') },
   ],
