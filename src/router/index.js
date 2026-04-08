@@ -8,7 +8,6 @@ import Login from '../views/Login.vue';
 import SetPassword from '../views/SetPassword.vue';
 import ChangePassword from '../views/ChangePassword.vue';
 import ForgetPassword from '../views/ForgetPassword.vue';
-
 import Room from '../views/Room.vue';
 import CheckIn from '../views/CheckIn.vue';
 import Ranking from '../views/Ranking.vue';
@@ -17,7 +16,6 @@ import AccountCancel from '../views/AccountCancel.vue';
 import EditUserInfo from '../views/EditUserInfo.vue';
 import Aggrement1 from '../views/Aggrement/Aggrement1.vue';
 import Bluetooth from '../views/Bluetooth.vue';
-
 import NotFountView from '../views/404.vue';
 
 

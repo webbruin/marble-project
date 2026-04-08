@@ -1,12 +1,12 @@
-import '@/assets/main.less'
+import './assets/main.less'
 
 import { createApp } from 'vue'
-import App from '@/App.vue'
-import router from '@/router'
-import Header from '@/components/Header.vue'
-import { Toast } from '@/components/Toast'
-import { Modal } from '@/components/Modal'
-import api from '@/api'
+import App from './App.vue'
+import router from './router'
+import Header from './components/Header.vue'
+import { Toast } from './components/Toast'
+import { Modal } from './components/Modal'
+import api from './api'
 
 const app = createApp(App)
 
