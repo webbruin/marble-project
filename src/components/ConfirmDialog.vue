@@ -53,7 +53,7 @@ const clickConfirm = () => {
 
 .confirm-mask {
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   background-color: rgba(#272933, 0.75);
   position: fixed;
   z-index: 10001;

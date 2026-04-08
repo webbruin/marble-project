@@ -52,8 +52,7 @@ const clickSubmit = () => {
   padding: .vw(10)[] .vw(16)[];
 
   &.disabled {
-    // background-color: #FFCA91;
-    opacity: 0.7;
+    background-color: #FFCA91;
     pointer-events: none;
   }
 }

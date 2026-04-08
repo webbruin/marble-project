@@ -194,7 +194,7 @@ const closeRechargeSuccess = () => {
 
 .recharge-mask {
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   background-color: rgba(#272933, 0.75);
   position: fixed;
   z-index: 10001;
@@ -230,7 +230,7 @@ const closeRechargeSuccess = () => {
 
   .body {
     width: 100%;
-    height: .vw(605)[];
+    min-height: .vw(400)[];
     display: flex;
     flex-direction: column;
     background-size: 100% 100%;
@@ -449,7 +449,7 @@ const closeRechargeSuccess = () => {
 
 .recharge-success {
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;

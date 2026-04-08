@@ -51,7 +51,7 @@
           <img src="@/assets/images/avatar.png" alt="">
         </div>
         <div class="name">{{ item.name }}</div>
-        <div class="piont">
+        <div class="point">
           <i class="icon"></i>
           <span class="text">X{{ item.point }}</span>
         </div>
@@ -64,7 +64,7 @@
           <img src="@/assets/images/avatar.png" alt="">
         </div>
         <div class="name">艾斯君</div>
-        <div class="piont">
+        <div class="point">
           <i class="icon"></i>
           <span class="text">X823</span>
         </div>
@@ -121,7 +121,7 @@ const clickTab = (index) => {
 }
 
 .ranking {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background-color: #F6F6F6;

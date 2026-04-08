@@ -38,7 +38,7 @@ const closeDialog = () => {
 
 .warnning-dialog {
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;

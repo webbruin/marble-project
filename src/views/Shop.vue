@@ -151,6 +151,7 @@ const clickProduct = (item) => {
 
     .title {
       color: var(--light-text--);
+      font-family: "PingFang SC";
       font-size: .vw(32)[];
       line-height: .vw(32)[];
       font-weight: 900;
@@ -174,6 +175,7 @@ const clickProduct = (item) => {
 
       .count {
         color: var(--light-text--);
+        font-family: "PingFang SC";
         font-size: .vw(26)[];
         line-height: .vw(26)[];
         font-weight: 900;

@@ -95,7 +95,7 @@ footer {
         color: var(--text--);
         text-align: center;
         font-family: "PingFang SC";
-        font-size: .vw(14)[];
+        font-size: .vw(12)[];
         font-style: normal;
         font-weight: 500;
         line-height: .vw(14)[];

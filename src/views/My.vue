@@ -70,8 +70,8 @@
         </div>
       </div>
       <div class="status">
-        <div class="item">
-          <i class="icon service5" @click="clickRouter('setting')"></i>
+        <div class="item" @click="clickRouter('setting')">
+          <i class="icon service5"></i>
           <p class="text">设置</p>
         </div>
       </div>

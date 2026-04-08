@@ -31,6 +31,23 @@ const router = createRouter({
   ],
 })
 
+// 需要做登录校验
+const needLoginPage = [
+  'main',
+  'home',
+  'shop',
+  'cart',
+  'my',
+  'set-password',
+  'change-password',
+  'room',
+  'check-in',
+  'ranking',
+  'setting',
+  'account-cancel',
+  'edit-user-info',
+];
+
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   // 将已登录用户，重定向到首页
@@ -39,7 +56,13 @@ router.beforeEach((to, from, next) => {
   }
   // 将未登录用户，重定向到登录页面
   else if (!token && to.name !== 'login') {
-    next({ name: 'login' })
+    // 校验页面登陆
+    const needLogin = needLoginPage.some(name => name === to.name)
+    if (needLogin) {
+      next({ name: 'login' })
+    } else {
+      next()
+    }
   }
   else {
     next()

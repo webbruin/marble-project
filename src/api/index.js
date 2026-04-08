@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const http = 'http://139.224.246.134:6180';  // test
+// const http = 'http://139.224.246.134:6180';  // test
+const http = 'https://pinball.ayowi.vip:6188/prod-api';  // prd
 
 // 1. 创建一个 axios 实例，配置基础地址和超时时间
 const api = axios.create({

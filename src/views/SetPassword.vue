@@ -62,7 +62,7 @@ const clickConfirm = async () => {
 }
 
 main {
-  height: 100vh;
+  height: 100%;
   background-color: #F5F6FA;
 
   .formdata {
@@ -97,7 +97,7 @@ main {
     }
 
     .confirm {
-      margin-top: .vw(240)[];
+      // margin-top: .vw(240)[];
     }
   }
 }

@@ -267,12 +267,12 @@ const loadStreamFlv = () => {
 }
 
 .room {
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 
   .live-stream {
     width: 100%;
-    height: 100vh;
+    height: 100%;
     position: fixed;
 
     video {
@@ -738,7 +738,7 @@ const loadStreamFlv = () => {
 
 .warnning-dialog {
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;

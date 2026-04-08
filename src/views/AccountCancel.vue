@@ -50,7 +50,7 @@ const logout = () => {
 }
 
 .account-cancel {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 

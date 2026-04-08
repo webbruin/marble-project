@@ -55,6 +55,10 @@ const parseOptionalServices = () => {
 
 // 连接主流程
 const connectAndListen = async () => {
+  if (!navigator.bluetooth) {
+    addLog('该设备或浏览器不支持蓝牙连接')
+    return
+  }
   if (bluetoothDevice.value && bluetoothDevice.value.gatt.connected) {
     addLog('设备已连接，如需更换请先断开')
     return
@@ -68,7 +72,8 @@ const connectAndListen = async () => {
       // optionalServices: optionalServices,
       acceptAllDevices: false,
       filters: [
-        { namePrefix: 'JDY-' }
+        { namePrefix: 'JDY-' },
+        { namePrefix: 'BingoBang' },
       ]
     })
     bluetoothDevice.value = device
@@ -290,7 +295,7 @@ const writeCharacteristicValue = async () => {
 }
 
 .bluetooth {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 

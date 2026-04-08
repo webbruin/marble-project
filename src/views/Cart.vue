@@ -318,7 +318,7 @@ onMounted(() => {
       background: var(--Warning-Warning4-Hover, #FFB169);
       padding: .vw(12)[] .vw(24)[];
 
-      .span {
+      .text {
         color: var(--light-text--);
         font-family: "PingFang SC";
         font-size: .vw(16)[];

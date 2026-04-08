@@ -27,11 +27,11 @@
             </div>
             <div class="forget-password" @click="clickForgetPassword">忘记密码</div>
           </template>
-          <!-- 表单提交 -->
-          <div class="submit">
-            <Button :disabled="!(formdata.mobile && (loginType === 'msgCode' ? formdata.msgCode : formdata.password))"
-              buttonText="立即登录" @click="clickLogin"></Button>
-          </div>
+        </div>
+        <!-- 表单提交 -->
+        <div class="submit">
+          <Button :disabled="!(formdata.mobile && (loginType === 'msgCode' ? formdata.msgCode : formdata.password))"
+            buttonText="立即登录" @click="clickLogin"></Button>
         </div>
         <div class="aggrement" @click="isAggre = !isAggre">
           <i class="select" :class="{ 'selected': isAggre }"></i>
@@ -90,10 +90,10 @@ const clickLogin = async () => {
     })
     return
   }
-  if (loginType.value === 'password' && !passwordRegExp.test(formdata.value.password)) {
-    $modal.show({ content: '密码必须8-20位，包含字母、数字、特殊字符', showCancel: false })
-    return
-  }
+  // if (loginType.value === 'password' && !passwordRegExp.test(formdata.value.password)) {
+  //   $modal.show({ content: '密码必须8-20位，包含字母、数字、特殊字符', showCancel: false })
+  //   return
+  // }
   const { mobile, msgCode, password } = formdata.value;
   let url = ''
   let body = {}
@@ -133,7 +133,7 @@ const clickAggrement2 = () => {
 }
 
 .login {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background-size: 100%;
@@ -173,6 +173,8 @@ const clickAggrement2 = () => {
 
     .module {
       height: 100%;
+      display: flex;
+      flex-direction: column;
       background-size: 100%;
       background-position: top;
       background-repeat: no-repeat;
@@ -215,8 +217,8 @@ const clickAggrement2 = () => {
       }
 
       .formdata {
+        flex: 1;
         padding: 0 .vw(15)[];
-        margin-bottom: .vw(67)[];
 
         .item {
           &:not(:last-of-type) {
@@ -249,14 +251,18 @@ const clickAggrement2 = () => {
           top: .vw(-16)[];
         }
 
-        .submit {
-          margin-top: .vw(140)[];
-        }
+      }
+
+      .submit {
+        padding: 0 .vw(15)[];
+        // margin-bottom: .vw(67)[];
+        margin-bottom: .vw(32)[];
       }
 
       .aggrement {
         display: flex;
         padding: 0 .vw(15)[];
+        padding-bottom: .vw(20)[];
 
         .select {
           min-width: .vw(18)[];
