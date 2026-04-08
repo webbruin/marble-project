@@ -1,8 +1,6 @@
 <template>
   <main class="room">
-    <div class="live-stream">
-      <video ref="videoPlayer" muted controls autoplay playsinline></video>
-    </div>
+    <div ref="live-stream" class="live-stream"></div>
     <div class="body">
       <Header></Header>
       <div class="tabbar">
@@ -28,6 +26,12 @@
             <img src="@/assets/images/room/icon7.png" alt="">
           </i>
           <span class="text">故障报告</span>
+        </div>
+        <div class="button">
+          <i class="icon">
+            <img src="@/assets/images/room/icon8.png" alt="">
+          </i>
+          <span class="text">连接手柄</span>
         </div>
       </div>
       <div class="right-button-list" :class="{ 'collapse': collapse }">
@@ -130,10 +134,13 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useTemplateRef, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Flv from 'flv.js'
+import TRTC from 'trtc-sdk-v5';
 import WarnningDialog from '../components/WarnningDialog.vue'
 import ConfirmDialog from '../components/ConfirmDialog.vue'
 import BallSuccess from '../components/BallSuccess.vue'
+// TRTC资源包
+import '../trtc/lib-generate-test-usersig.min'
+import genTestUserSig from '../trtc/generateTestUserSig'
 
 const route = useRoute()
 const router = useRouter()
@@ -153,18 +160,37 @@ const stickEvent = ref({});
 const showWarnningDialog = ref(false)
 const showConfirmDialog = ref(false)
 const showBallSuccess = ref(false)
-// 直播拉流
-const videoPlayer = ref(null)
-const streamUrl = ref('')
-let flvPlayer = null
+const liveStream = useTemplateRef('live-stream')
+const trtc = TRTC.create()  // 创建 TRTC 实例
 
 onMounted(() => {
   // console.log(111, route.params);
   // console.log(222, route.query);
 
-  // streamUrl.value = 'http://live.ayowi.vip/live/ZJ_TEST_0001.flv'
-  // loadStreamFlv()
+  // const sdkAppId = 1600135086
+  // const userId = '10000'
+  // const sdkSecretKey = 'b547fb92700e3db845340995784b11fa0327534e0993af6577b046a82d739a12'
+  // const roomId = 10000001
+  // createRoom(sdkAppId, userId, sdkSecretKey, roomId)
 })
+
+// 创建房间
+const createRoom = async (sdkAppId, userId, sdkSecretKey, roomId) => {
+  try {
+    const { userSig } = genTestUserSig({ sdkAppId, userId, sdkSecretKey })
+    const options = {
+      enableAutoPlayDialog: false  // 关闭音频
+    }
+    await trtc.enterRoom({ sdkAppId, userId, userSig, roomId, ...options })
+  } catch (error) {
+    // console.error('failed to enter room ' + error);
+    $toast.info('加入直播间失败')
+  }
+  // 在进入房间之前，监听 TRTC.EVENT.REMOTE_VIDEO_AVAILABLE 事件，以接收所有远端用户视频发布事件。
+  trtc.on(TRTC.EVENT.REMOTE_VIDEO_AVAILABLE, ({ userId, streamType }) => {
+    trtc.startRemoteVideo({ userId, streamType, view: liveStream.value })
+  })
+}
 
 const changeBall = (value) => {
   ball.value += value
@@ -216,48 +242,6 @@ const initStickEvent = () => {
       window.removeEventListener('touchend', () => { })
     })
   })
-}
-
-const loadStreamFlv = () => {
-  if (!streamUrl.value) {
-    return
-  }
-
-  const video = videoPlayer.value
-  if (!video) {
-    return
-  }
-
-  // 清理之前的播放器
-  if (flvPlayer) {
-    flvPlayer.destroy()
-    flvPlayer = null
-  }
-
-  if (streamUrl.value.includes('.flv')) {
-    // 如果需要支持 FLV，可以启用 flv.js
-    if (Flv.isSupported()) {
-      flvPlayer = Flv.createPlayer({
-        url: streamUrl.value,
-        type: 'flv',  // 流类型
-        isLive: true,  // 直播流
-        cors: true,  // 允许跨域
-      }, {
-        enableStashBuffer: false,  // 关闭缓冲，降低延迟
-        lazyLoadMaxDuration: 3,  // 懒加载最大时长
-        seekType: 'range',  // 范围请求
-      })
-      flvPlayer.attachMediaElement(video)
-      flvPlayer.load()
-      flvPlayer.play()
-    } else {
-      $toast.info('当前浏览器不支持 FLV 播放')
-    }
-  } else {
-    // 默认作为普通视频流播放 (如 RTMP 无法直接播放，需要转码)
-    video.src = streamUrl.value
-    video.play()
-  }
 }
 </script>
 
