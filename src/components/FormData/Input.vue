@@ -1,9 +1,13 @@
 <template>
   <div class="input-item">
+    <div class="slot">
+      <slot name="left" />
+    </div>
     <template v-if="type === 'tel'">
       <span class="tel">+86</span>
     </template>
-    <input class="input" :type="getType" :placeholder="placeholder" v-model="inputValue" />
+    <input class="input" :type="getType" :placeholder="placeholder" :readonly="readonly" :disabled="disabled"
+      v-model="inputValue" />
     <template v-if="type === 'password'">
       <i class="browse" :class="{ 'off': browseOff }" @click="browseOff = !browseOff"></i>
     </template>
@@ -12,6 +16,9 @@
         {{ codeSending ? `${codeCountdown}S后重新获取` : codeText }}
       </span>
     </template>
+    <div class="slot">
+      <slot name="right" />
+    </div>
   </div>
 </template>
 
@@ -32,6 +39,14 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  readonly: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  }
 })
 const inputValue = defineModel({ default: '' })
 const codeText = ref('获取验证码')
@@ -105,7 +120,6 @@ const setCountdown = () => {
   .input {
     flex: 1;
     color: var(--light-text--);
-    font-feature-settings: 'liga' off, 'clig' off;
     font-family: "PingFang SC";
     font-size: .vw(16)[];
     line-height: .vw(27)[];
@@ -130,6 +144,7 @@ const setCountdown = () => {
     line-height: .vw(27)[];
     font-weight: 400;
     font-style: normal;
+    white-space: nowrap;
     margin-left: .vw(10)[];
 
     &.disabled {

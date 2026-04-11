@@ -54,7 +54,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import InfiniteScroll from '../components/InfiniteScroll.vue'
+import InfiniteScroll from '@/components/InfiniteScroll.vue'
 
 const tabs = ref([
   {

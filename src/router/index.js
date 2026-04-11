@@ -12,7 +12,7 @@ const router = createRouter({
         { path: '/shop', name: 'shop', component: () => import('../views/Shop.vue') },
         { path: '/cart', name: 'cart', component: () => import('../views/Cart.vue') },
         { path: '/my', name: 'my', component: () => import('../views/My.vue') },
-      ]
+      ] 
     },
     { path: '/login', name: 'login', component: () => import('../views/Login.vue') },
     { path: '/set-password', name: 'set-password', component: () => import('../views/SetPassword.vue') },
@@ -26,6 +26,13 @@ const router = createRouter({
     { path: '/edit-user-info', name: 'edit-user-info', component: () => import('../views/EditUserInfo.vue') },
     { path: '/aggrement1', name: 'aggrement1', component: () => import('../views/Aggrement/Aggrement1.vue') },
     { path: '/bluetooth', name: 'bluetooth', component: () => import('../views/Bluetooth.vue') },
+    { path: '/real-name-auth', name: 'real-name-auth', component: () => import('../views/RealNameAuth.vue') },
+    { path: '/city', name: 'city', component: () => import('../views/City.vue') },
+    { path: '/use-record', name: 'use-record', component: () => import('../views/UseRecord.vue') },
+    { path: '/ball-record', name: 'ball-record', component: () => import('../views/BallRecord.vue') },
+    { path: '/recharge-record', name: 'recharge-record', component: () => import('../views/RechargeRecord.vue') },
+    { path: '/point-card-record', name: 'point-card-record', component: () => import('../views/PointCardRecord.vue') },
+    { path: '/invitation', name: 'invitation', component: () => import('../views/Invitation.vue') },
     // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/404.vue') },
   ],
@@ -46,6 +53,13 @@ const needLoginPage = [
   'setting',
   'account-cancel',
   'edit-user-info',
+  'real-name-auth',
+  'city',
+  'use-record',
+  'ball-record',
+  'recharge-record',
+  'point-card-record',
+  'invitation'
 ];
 
 router.beforeEach((to, from, next) => {

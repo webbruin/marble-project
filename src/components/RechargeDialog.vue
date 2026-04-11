@@ -56,17 +56,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['toggleShow'])
 
-const rechargeList = ref([
-  { packageId: 1, marbleAmount: 5, giftMarbleAmount: 10, payAmount: '5.00' },
-  { packageId: 2, marbleAmount: 20, giftMarbleAmount: 10, payAmount: '20.00' },
-  { packageId: 3, marbleAmount: 50, giftMarbleAmount: 10, payAmount: '50.00' },
-  { packageId: 4, marbleAmount: 100, giftMarbleAmount: 10, payAmount: '100.00' },
-  { packageId: 5, marbleAmount: 200, giftMarbleAmount: 10, payAmount: '200.00' },
-  { packageId: 6, marbleAmount: 500, giftMarbleAmount: 10, payAmount: '500.00' },
-  { packageId: 7, marbleAmount: 1000, giftMarbleAmount: 10, payAmount: '1000.00' },
-  { packageId: 8, marbleAmount: 2000, giftMarbleAmount: 10, payAmount: '2000.00' },
-  { packageId: 9, marbleAmount: 5000, giftMarbleAmount: 10, payAmount: '5000.00' },
-])
+const rechargeList = ref([])
 const selectedRechargePackage = ref('')
 const paywayList = ref([
   { value: 'alipay', name: '支付宝' }
@@ -231,6 +221,7 @@ const closeRechargeSuccess = () => {
   .body {
     width: 100%;
     min-height: .vw(400)[];
+    max-height: 75vh;
     display: flex;
     flex-direction: column;
     background-size: 100% 100%;

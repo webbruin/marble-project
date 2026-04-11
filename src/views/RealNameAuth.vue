@@ -1,16 +1,24 @@
 <template>
   <main>
-    <Header title="忘记密码"></Header>
+    <Header title="实名认证"></Header>
     <div class="formdata">
-      <p class="title">找回密码，请先验证身份</p>
+      <p class="title">身份信息</p>
       <div class="item">
-        <Input v-model="formdata.mobile" type="tel" placeholder="请输入手机号"></Input>
+        <Input v-model="formdata.realName" type="text" placeholder="请输入">
+          <template #left>
+            <span class="text">姓名</span>
+          </template>
+        </Input>
       </div>
       <div class="item">
-        <Input v-model="formdata.msgCode" :mobile="formdata.mobile" type="code" placeholder="请输入验证码"></Input>
+        <Input v-model="formdata.idCardNo" type="text" placeholder="请输入">
+          <template #left>
+            <span class="text">身份证号</span>
+          </template>
+        </Input>
       </div>
       <div class="confirm">
-        <Button :disabled="!(formdata.mobile && formdata.msgCode)" @click="clickConfirm"></Button>
+        <Button buttonText="提交" :disabled="!(formdata.realName && formdata.idCardNo)" @click="clickConfirm"></Button>
       </div>
     </div>
   </main>
@@ -22,12 +30,11 @@ import { useRoute, useRouter } from 'vue-router'
 import Input from '@/components/FormData/Input.vue'
 import Button from '@/components/FormData/Button.vue'
 
-const route = useRoute()
 const router = useRouter()
 
 const formdata = ref({
-  mobile: '',
-  msgCode: '',
+  realName: '',
+  idCardNo: '',
 })
 
 onMounted(() => {
@@ -36,12 +43,13 @@ onMounted(() => {
 
 const clickConfirm = async () => {
   $toast.loading()
-  const res = await api.post('/user/auth/smsLogin', formdata.value)
+  const res = await api.post('/user/info/realNameAuth', formdata.value)
   if (res.code === 200) {
-    $toast.close()
-    const { access_token, hasPassword } = res.data
-    localStorage.setItem('token', access_token)
-    router.push({ name: 'set-password' })
+    $toast.info('实名认证成功')
+    const timer = setTimeout(() => {
+      clearTimeout(timer)
+      router.back()
+    }, 1500)
   } else {
     $toast.info(res.message)
   }
@@ -72,24 +80,20 @@ main {
     }
 
     .item {
-      .desc {
-        color: var(--text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
-        font-weight: 400;
-        font-style: normal;
-        margin-top: .vw(16)[];
-        margin-left: .vw(13)[];
-      }
-
       &:not(:last-of-type) {
         margin-bottom: .vw(32)[];
       }
-    }
 
-    .confirm {
-      // margin-top: .vw(240)[];
+      .text {
+        width: .vw(80)[];
+        display: inline-block;
+        color: var(--light-text--);
+        font-family: "PingFang SC";
+        font-size: .vw(16)[];
+        line-height: .vw(27)[];
+        font-weight: 500;
+        font-style: normal;
+      }
     }
   }
 }

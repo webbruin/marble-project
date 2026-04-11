@@ -43,6 +43,6 @@ export const Toast = {
   success: (message, duration = 2000) => createToast({ message, type: 'success', duration }),
   error: (message, duration = 2000) => createToast({ message, type: 'error', duration }),
   warning: (message, duration = 2000) => createToast({ message, type: 'warning', duration }),
-  loading: (message, duration = 99999999) => createToast({ message, type: 'warning', duration, loading: true }),
+  loading: (message = '加载中', duration = 99999999) => createToast({ message, type: 'warning', duration, loading: true }),
   close: () => _instance && _instance.close()
 }

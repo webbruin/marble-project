@@ -135,9 +135,9 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useTemplateRef, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TRTC from 'trtc-sdk-v5';
-import WarnningDialog from '../components/WarnningDialog.vue'
-import ConfirmDialog from '../components/ConfirmDialog.vue'
-import BallSuccess from '../components/BallSuccess.vue'
+import WarnningDialog from '@/components/WarnningDialog.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import BallSuccess from '@/components/BallSuccess.vue'
 // TRTC资源包
 import '../trtc/lib-generate-test-usersig.min'
 import genTestUserSig from '../trtc/generateTestUserSig'

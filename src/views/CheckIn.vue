@@ -46,7 +46,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import BallSuccess from '../components/BallSuccess.vue'
+import BallSuccess from '@/components/BallSuccess.vue'
 
 const rankList = ref([
   { name: '第一天', ball: 3 },

@@ -38,9 +38,16 @@ const cancel = (url) => {
 
 }
 
-const logout = () => {
-  localStorage.removeItem('token')
-  router.push({ name: 'login' })
+const logout = async () => {
+  $toast.loading('退出中')
+  const res = await api.post('/user/auth/logout')
+  if (res.code === 200) {
+    $toast.info('退出登陆成功')
+    localStorage.removeItem('token')
+    router.replace({ name: 'login' })
+  } else {
+    $toast.info(res.message)
+  }
 }
 </script>
 

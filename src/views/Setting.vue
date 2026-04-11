@@ -32,7 +32,7 @@ const rows = ref([
   ],
   [
     { name: '蓝牙连接', show: true, router: 'bluetooth' },
-    { name: '实名认证', show: true, router: 'set-password' },
+    { name: '实名认证', show: true, router: 'real-name-auth' },
     { name: '设置登录密码', show: true, router: 'set-password' },
     { name: '修改登录密码', show: true, router: 'change-password' },
     { name: '账号注销', show: true, router: 'account-cancel' },
@@ -50,9 +50,16 @@ const clickRouter = (url) => {
   router.push({ name: url })
 }
 
-const logout = () => {
-  localStorage.removeItem('token')
-  router.push({ name: 'login' })
+const logout = async () => {
+  $toast.loading('退出中')
+  const res = await api.post('/user/auth/logout')
+  if (res.code === 200) {
+    $toast.info('退出登陆成功')
+    localStorage.removeItem('token')
+    router.replace({ name: 'login' })
+  } else {
+    $toast.info(res.message)
+  }
 }
 </script>
 

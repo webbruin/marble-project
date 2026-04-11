@@ -49,6 +49,7 @@ onMounted(() => {
 }
 
 .toast {
+  min-width: .vw(100)[];
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -79,6 +80,7 @@ onMounted(() => {
   .text {
     color: var(--white--);
     font-size: .vw(14)[];
+    text-align: justify;
   }
 }
 
