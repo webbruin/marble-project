@@ -27,7 +27,7 @@
           </i>
           <span class="text">故障报告</span>
         </div>
-        <div class="button">
+        <div class="button" @click="showBluetoothConnect = true">
           <i class="icon">
             <img src="@/assets/images/room/icon8.png" alt="">
           </i>
@@ -42,7 +42,7 @@
             </i>
             <span class="text">游戏规则</span>
           </div>
-          <div class="button">
+          <div class="button" @click="clickRouter('point-card-record')">
             <i class="icon">
               <img src="@/assets/images/room/icon2.png" alt="">
             </i>
@@ -125,6 +125,16 @@
       </div>
     </div>
   </main>
+
+  <div class="bluetooth-connect-dialog" v-if="showBluetoothConnect">
+    <div class="mask" @click="showBluetoothConnect = false"></div>
+    <div class="content">
+      <p class="text">设备连接</p>
+      <p class="desc">请确保蓝牙正常开启，连接手柄需要蓝牙处在开启状态</p>
+      <div class="confirm" @click="clickBluetoothConnect">立即连接</div>
+    </div>
+  </div>
+
   <WarnningDialog :show="showWarnningDialog" :level="'初级'" :ball="10" @toggleShow="showWarnningDialog = $event">
   </WarnningDialog>
   <ConfirmDialog :show="showConfirmDialog" :level="'初级'" @toggleShow="showConfirmDialog = $event"></ConfirmDialog>
@@ -160,6 +170,7 @@ const stickEvent = ref({});
 const showWarnningDialog = ref(false)
 const showConfirmDialog = ref(false)
 const showBallSuccess = ref(false)
+const showBluetoothConnect = ref(false)
 const liveStream = useTemplateRef('live-stream')
 const trtc = TRTC.create()  // 创建 TRTC 实例
 
@@ -242,6 +253,17 @@ const initStickEvent = () => {
       window.removeEventListener('touchend', () => { })
     })
   })
+}
+
+const clickRouter = (url) => {
+  if (!url) {
+    return
+  }
+  router.push({ name: url })
+}
+
+const clickBluetoothConnect = async () => {
+  showBluetoothConnect.value = false
 }
 </script>
 
@@ -720,69 +742,75 @@ const initStickEvent = () => {
   }
 }
 
-.warnning-dialog {
+.bluetooth-connect-dialog {
   width: 100vw;
   height: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: center;
-  background-color: rgba(#272933, 0.75);
+  background-color: rgba(#000311, 0.45);
   position: fixed;
   z-index: 10001;
   left: 0;
   top: 0;
 
-  .body {
-    width: .vw(330)[];
-    height: .vw(242)[];
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
+  .mask {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+
+  .content {
+    width: .vw(358)[];
+    height: .vw(232)[];
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
-    background-image: url(@/assets/images/room/warninng-dialog-bg.png);
+    background-image: url(@/assets/images/room/bluetooth-connect-bg.png);
     position: relative;
-    padding-top: .vw(50)[];
+    z-index: 10002;
+    padding: .vw(24)[];
 
     &::before {
       content: '';
-      width: .vw(174)[];
-      height: .vw(174)[];
+      width: .vw(88)[];
+      height: .vw(88)[];
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(@/assets/images/room/warninng-dialog-icon.png);
+      background-image: url(@/assets/images/room/bluetooth-connect-icon.png);
       position: absolute;
-      top: .vw(-102)[];
-      right: .vw(-26)[];
+      top: .vw(-11)[];
+      right: .vw(12)[];
     }
 
     .text {
       color: var(--light-text--);
       font-family: "PingFang SC";
-      font-size: .vw(32)[];
-      line-height: .vw(32)[];
-      font-weight: 600;
+      font-size: .vw(30)[];
+      line-height: .vw(30)[];
+      letter-spacing: .vw(5)[];
+      font-weight: 900;
       font-style: normal;
-      margin-bottom: .vw(24)[];
+      margin-bottom: .vw(37)[];
     }
 
     .desc {
-      color: #50525C;
+      color: #332A03;
       font-family: "PingFang SC";
-      font-size: .vw(24)[];
-      line-height: .vw(24)[];
+      font-size: .vw(14)[];
+      line-height: .vw(22)[];
       font-weight: 500;
       font-style: normal;
-      margin-bottom: .vw(24)[];
+      margin-bottom: .vw(11)[];
     }
 
     .confirm {
-      width: .vw(130)[];
-      height: .vw(40)[];
+      width: 100%;
+      height: .vw(48)[];
       display: flex;
       align-items: center;
       justify-content: center;
@@ -791,21 +819,10 @@ const initStickEvent = () => {
       line-height: .vw(16)[];
       font-weight: 500;
       font-style: normal;
-      background-size: 100%;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-image: url(@/assets/images/room/warninng-dialog-confirm.png);
+      border-radius: .vw(45)[];
+      border: 1px solid #FF3A64;
+      background: linear-gradient(90deg, #FD689A 0%, #FFAB2D 100%);
     }
-  }
-
-  .close {
-    width: .vw(24)[];
-    height: .vw(24)[];
-    background-size: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-image: url(@/assets/images/close.png);
-    margin-top: .vw(103)[];
   }
 }
 </style>

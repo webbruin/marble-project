@@ -5,13 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 7100",
+    "dev:test": "vite --port 7100 --mode test",
+    "dev:prod": "vite --port 7100 --mode production",
     "build": "vite build",
+    "build:test": "vite build --mode test",
+    "build:prod": "vite build --mode production",
     "preview": "vite preview",
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
     "axios": "^1.14.0",
     "crypto-js": "^4.2.0",
+    "qrcode": "^1.5.4",
     "trtc-sdk-v5": "^5.16.0",
     "vue": "^3.5.29",
     "vue-router": "^5.0.3"

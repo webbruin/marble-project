@@ -4,7 +4,8 @@
     <div class="body">
       <div class="module" v-for="(item, index) in rows" :key="index">
         <template v-for="(childItem, childIndex) in item" :key="childIndex">
-          <div class="item" v-if="childItem.show" @click="clickRouter(childItem.router)">
+          <div class="item" v-if="childItem.show"
+            @click="clickRouter(childItem.router, childItem.params, childItem.query)">
             <span class="text">{{ childItem.name }}</span>
             <i class="icon"></i>
           </div>
@@ -26,9 +27,9 @@ const router = useRouter()
 
 const rows = ref([
   [
-    { name: '购买说明', show: true, router: 'aggrement1' },
-    { name: '充值协议', show: true, router: 'aggrement1' },
-    { name: '隐私政策', show: true, router: 'aggrement1' },
+    { name: '购买说明', show: true, router: 'aggrement', params: { type: 'gmsm' } },
+    { name: '充值协议', show: true, router: 'aggrement', params: { type: 'czxy' } },
+    { name: '隐私政策', show: true, router: 'aggrement', params: { type: 'ysxy' } },
   ],
   [
     { name: '蓝牙连接', show: true, router: 'bluetooth' },
@@ -43,11 +44,11 @@ onMounted(() => {
 
 })
 
-const clickRouter = (url) => {
-  if (!url) {
+const clickRouter = (name, params = {}, query = {}) => {
+  if (!name) {
     return
   }
-  router.push({ name: url })
+  router.push({ name, params, query })
 }
 
 const logout = async () => {

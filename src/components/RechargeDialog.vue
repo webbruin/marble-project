@@ -26,8 +26,8 @@
           </div>
         </div>
         <div class="confirm" @click="clickConfirm">确认充值</div>
-        <div class="aggrement" @click="isAggre = !isAggre">
-          <i class="select" :class="{ 'selected': isAggre }"></i>
+        <div class="aggrement" @click="isAgree = !isAgree">
+          <i class="select" :class="{ 'selected': isAgree }"></i>
           <div class="text">须满18周岁，请勾选<span class="bold" @click.stop="clickAggrement">《充值协议》</span></div>
         </div>
       </div>
@@ -62,7 +62,7 @@ const paywayList = ref([
   { value: 'alipay', name: '支付宝' }
 ])
 const selectedPayway = ref('alipay')
-const isAggre = ref(false)
+const isAgree = ref(false)
 const showRechargeSuccess = ref(false)
 const timer = ref(null)
 const time = ref(1000)  // 轮询间隔1000ms
@@ -89,7 +89,7 @@ const clickConfirm = async () => {
     $toast.info('请选择充值包')
     return;
   }
-  if (!isAggre.value) {
+  if (!isAgree.value) {
     $toast.info('请阅读并同意《充值协议》')
     return;
   }
@@ -169,7 +169,7 @@ const clickPayway = (item) => {
 }
 
 const clickAggrement = () => {
-  router.push({ name: 'aggrement1' });
+  router.push({ name: 'aggrement', params: { type: 'czxy' } })
 }
 
 const closeRechargeSuccess = () => {

@@ -42,6 +42,7 @@ const back = () => {
   align-items: center;
   justify-content: center;
   position: relative;
+  background-color: var(--white--);
 
   .back {
     width: .vw(40)[];

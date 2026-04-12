@@ -26,22 +26,22 @@
     <div class="order">
       <div class="info">
         <p class="title">我的订单</p>
-        <p class="entry">查看全部订单</p>
+        <p class="entry" @click="clickRouter('order')">查看全部订单</p>
       </div>
       <div class="status">
-        <div class="item">
+        <div class="item" @click="clickRouter('order', { type: 'pending' })">
           <i class="icon status1"></i>
           <p class="text">待付款</p>
         </div>
-        <div class="item">
+        <div class="item" @click="clickRouter('order', { type: 'shipment' })">
           <i class="icon status2"></i>
           <p class="text">待发货</p>
         </div>
-        <div class="item">
+        <div class="item" @click="clickRouter('order', { type: 'beReceived' })">
           <i class="icon status3"></i>
           <p class="text">待收货</p>
         </div>
-        <div class="item">
+        <div class="item" @click="clickRouter('order', { type: 'refunded' })">
           <i class="icon status4"></i>
           <p class="text">退款/售后</p>
         </div>
@@ -52,11 +52,11 @@
         <p class="title">我的服务</p>
       </div>
       <div class="status">
-        <div class="item">
+        <div class="item" @click="clickRouter('use-record')">
           <i class="icon service1"></i>
           <p class="text">使用记录</p>
         </div>
-        <div class="item">
+        <div class="item" @click="clickRouter('address')">
           <i class="icon service2"></i>
           <p class="text">地址管理</p>
         </div>
@@ -100,8 +100,11 @@ const getUserInfo = async () => {
   }
 }
 
-const clickRouter = (url) => {
-  router.push({ name: url })
+const clickRouter = (name, params = {}, query = {}) => {
+  if (!name) {
+    return
+  }
+  router.push({ name, params, query })
 }
 </script>
 

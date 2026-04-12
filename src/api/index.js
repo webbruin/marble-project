@@ -1,17 +1,15 @@
 import axios from 'axios';
 
-// const http = 'http://139.224.246.134:6180';  // test
-const http = 'https://pinball.ayowi.vip:6188/prod-api';  // prd
-
 // 1. 创建一个 axios 实例，配置基础地址和超时时间
 const api = axios.create({
-  baseURL: http + '/pinball', // 你的接口基础地址
+  baseURL: import.meta.env.VITE_API_BASE_URL + '/pinball',
   timeout: 15000,
 });
 
 // 2. 请求拦截器（例如：统一添加 Token）
 api.interceptors.request.use(
   (config) => {
+
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.token = token;

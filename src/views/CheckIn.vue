@@ -98,6 +98,10 @@ const clickCheckIn = () => {
     top: 0;
   }
 
+  .header {
+    background-color: transparent;
+  }
+
   .body {
     flex: 1;
     overflow: auto;

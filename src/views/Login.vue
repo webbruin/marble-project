@@ -33,10 +33,14 @@
           <Button :disabled="!(formdata.mobile && (loginType === 'msgCode' ? formdata.msgCode : formdata.password))"
             buttonText="立即登录" @click="clickLogin"></Button>
         </div>
-        <div class="aggrement" @click="isAggre = !isAggre">
-          <i class="select" :class="{ 'selected': isAggre }"></i>
-          <div class="text">为注册手机号将自动注册，勾选代表您已阅读并同意<span class="bold" @click.stop="clickAggrement1">《用户协议》</span>和<span
-              class="bold" @click.stop="clickAggrement2">《隐私协议》</span></div>
+        <div class="aggrement" @click="isAgree = !isAgree">
+          <i class="select" :class="{ 'selected': isAgree }"></i>
+          <div class="text">
+            为注册手机号将自动注册，勾选代表您已阅读并同意
+            <span class="bold" @click.stop="clickAggrement('yhxy')">《用户协议》</span>
+            和
+            <span class="bold" @click.stop="clickAggrement('ysxy')">《隐私协议》</span>
+          </div>
         </div>
       </div>
     </div>
@@ -65,7 +69,7 @@ const formdata = ref({
   msgCode: '',
   password: '',
 })
-const isAggre = ref(false)
+const isAgree = ref(false)
 
 onMounted(() => {
 
@@ -80,11 +84,11 @@ const clickForgetPassword = () => {
 }
 
 const clickLogin = async () => {
-  if (!isAggre.value) {
+  if (!isAgree.value) {
     $modal.show({
       content: '您是否已阅读并同意《用户协议》和《隐私协议》',
       onConfirm: () => {
-        isAggre.value = true
+        isAgree.value = true
         clickLogin()
       }
     })
@@ -119,11 +123,8 @@ const clickLogin = async () => {
   }
 }
 
-const clickAggrement1 = () => {
-  router.push({ name: 'aggrement1' });
-}
-const clickAggrement2 = () => {
-  router.push({ name: 'aggrement1' });
+const clickAggrement = (type) => {
+  router.push({ name: 'aggrement', params: { type } })
 }
 </script>
 

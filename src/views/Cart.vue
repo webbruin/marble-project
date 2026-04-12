@@ -14,41 +14,45 @@
         </div>
       </div>
       <div class="cart-list">
-        <template v-for="(item, index) in cartList" :key="index">
-          <div class="item">
-            <div class="check">
-              <i class="select" :class="{ 'selected': item.selected }"></i>
-            </div>
-            <div class="module">
-              <div class="cover">
-                <img src="@/assets/images/shop/cover.png" alt="">
+        <InfiniteScroll :loading="loading" :loadOver="loadOver" @load="loadMore">
+          <template #content>
+            <div class="item" v-for="(item, index) in cartList" :key="index">
+              <div class="check">
+                <i class="select" :class="{ 'selected': item.selected }" @click="item.selected = !item.selected"></i>
               </div>
-              <div class="info">
-                <p class="name">​​反骨糯米糍​​</p>
-                <p class="desc">规格：500克</p>
-                <p class="point">积分 554.00</p>
+              <div class="module">
+                <div class="cover">
+                  <img src="@/assets/images/shop/cover.png" alt="">
+                </div>
+                <div class="info">
+                  <p class="name">​​反骨糯米糍​​</p>
+                  <p class="desc">规格：500克</p>
+                  <p class="point">积分 {{ formatNumberWithCommas(item.point) }}</p>
+                </div>
+              </div>
+              <div class="option">
+                <i class="sub" :class="{ 'disabled': item.count <= 1 }" @click="item.count--"></i>
+                <div class="count">
+                  <input type="number" v-model="item.count" @input="countChange($event, item)">
+                </div>
+                <i class="plus" :class="{ 'disabled': item.count >= item.maxCount }" @click="item.count++"></i>
               </div>
             </div>
-            <div class="option">
-              <i class="sub" :class="{ 'disabled': false }"></i>
-              <span class="count">1</span>
-              <i class="plus" :class="{ 'disabled': false }"></i>
-            </div>
-          </div>
-        </template>
+          </template>
+        </InfiniteScroll>
       </div>
     </div>
     <div class="footer">
-      <div class="select-all">
-        <i class="icon"></i>
+      <div class="select-all" @click="clickAll">
+        <i class="icon" :class="{ 'selected': cartListIsAll }"></i>
         <span class="text">全选</span>
       </div>
       <div class="point">
         <p class="text">合计积分</p>
-        <p class="count">5,213.00</p>
+        <p class="count">{{ formatNumberWithCommas(selectedItemPoint) }}</p>
       </div>
-      <div class="checkout">
-        <span class="text">去结算（3）</span>
+      <div class="checkout" :class="{ 'disabled': !selectedItemCount }" @click="clickSettlement">
+        <span class="text">去结算({{ selectedItemCount }})</span>
       </div>
     </div>
   </main>
@@ -57,13 +61,83 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import { formatNumberWithCommas } from '@/utils'
 
-const cartList = ref([{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}])
+const router = useRouter()
+
+const cartList = ref([
+  { selected: false, count: 1, maxCount: 10, point: 1000 },
+  { selected: false, count: 1, maxCount: 10, point: 100 },
+  { selected: false, count: 1, maxCount: 10, point: 100 },
+  { selected: false, count: 1, maxCount: 10, point: 100 },
+  { selected: false, count: 1, maxCount: 10, point: 100 },
+  { selected: false, count: 1, maxCount: 10, point: 100 },
+  { selected: false, count: 1, maxCount: 10, point: 100 },
+])
+const loading = ref(false)
+const loadOver = ref(false)
 
 onMounted(() => {
 
 })
 
+const selectedCartList = computed(() => {
+  return cartList.value.filter(item => item.selected)
+})
+
+const selectedItemCount = computed(() => {
+  if (selectedCartList.value.length) {
+    return selectedCartList.value
+      .map(item => item.count)
+      .reduce((a, b) => (a || 0) + (b || 0))
+  }
+  return 0
+})
+
+const selectedItemPoint = computed(() => {
+  if (selectedCartList.value.length) {
+    return selectedCartList.value
+      .map(item => item.count * item.point)
+      .reduce((a, b) => (a || 0) + (b || 0))
+  }
+  return 0
+})
+
+const cartListIsAll = computed(() => {
+  return cartList.value.every(item => item.selected)
+})
+
+const countChange = (event, item) => {
+  const min = 1
+  const max = item.maxCount
+  const count = +event.target.value
+  item.count = Math.min(Math.max(count, min), max)
+}
+
+const loadMore = () => {
+  loading.value = true
+  const timer = setTimeout(() => {
+    clearTimeout(timer)
+    loading.value = false
+    loadOver.value = true
+    cartList.value = [...cartList.value, ...cartList.value]
+  }, 1000)
+}
+
+const clickAll = () => {
+  cartList.value = cartList.value.map(item => {
+    return {
+      ...item,
+      selected: !cartListIsAll.value
+    }
+  })
+}
+
+const clickSettlement = () => {
+  // console.log(111, selectedCartList.value)
+  router.push({ name: 'settlement' })
+}
 </script>
 
 <style scoped lang="less">
@@ -162,11 +236,14 @@ onMounted(() => {
           .cover {
             width: .vw(56)[];
             height: .vw(56)[];
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-right: .vw(8)[];
 
             img {
-              width: 100%;
-              height: 100%;
+              max-width: 100%;
+              max-height: 100%;
             }
           }
 
@@ -178,7 +255,7 @@ onMounted(() => {
               line-height: .vw(14)[];
               font-weight: 500;
               font-style: normal;
-              margin-bottom: .vw(4)[];
+              margin-bottom: .vw(6)[];
             }
 
             .desc {
@@ -239,15 +316,26 @@ onMounted(() => {
 
           .count {
             min-width: .vw(30)[];
+            width: .vw(30)[];
             height: .vw(18)[];
-            color: var(--light-text--);
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
-            font-weight: 500;
-            font-style: normal;
+            display: flex;
+            align-items: center;
             border-left: .vw(1.5)[] solid #EDEDF0;
             border-right: .vw(1.5)[] solid #EDEDF0;
+
+            input {
+              width: 100%;
+              height: .vw(14)[];
+              color: var(--light-text--);
+              font-family: "PingFang SC";
+              font-size: .vw(12)[];
+              line-height: .vw(12)[];
+              font-weight: 500;
+              font-style: normal;
+              text-align: center;
+              outline: none;
+              border: none;
+            }
           }
         }
       }
@@ -291,7 +379,8 @@ onMounted(() => {
     }
 
     .point {
-      margin-left: .vw(50)[];
+      margin-left: .vw(30)[];
+      margin-right: .vw(10)[];
 
       .text {
         color: var(--light-text--);
@@ -314,9 +403,13 @@ onMounted(() => {
     }
 
     .checkout {
+      width: .vw(130)[];
+      height: .vw(48)[];
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border-radius: .vw(45)[];
-      background: var(--Warning-Warning4-Hover, #FFB169);
-      padding: .vw(12)[] .vw(24)[];
+      background-color: #FFB169;
 
       .text {
         color: var(--light-text--);
@@ -325,6 +418,11 @@ onMounted(() => {
         line-height: .vw(16)[];
         font-weight: 500;
         font-style: normal;
+      }
+
+      &.disabled {
+        pointer-events: none;
+        background-color: rgba(#FFB169, 0.75);
       }
     }
   }
