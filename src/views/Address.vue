@@ -18,7 +18,7 @@
               <img src="@/assets/images/address/edit.png" alt="" class="icon">
               <span class="text">编辑</span>
             </div>
-            <div class="button">
+            <div class="button" @click="clickRemoveAddress(item)">
               <img src="@/assets/images/address/remove.png" alt="" class="icon">
               <span class="text">删除</span>
             </div>
@@ -51,6 +51,15 @@ onMounted(() => {
 
 const clickEditAddress = (type) => {
   router.push({ name: 'edit-address', params: { type } })
+}
+
+const clickRemoveAddress = (item) => {
+  $modal.show({
+    content: '确认删除该地址吗？',
+    onConfirm: () => {
+      console.log(111, item);
+    }
+  })
 }
 </script>
 

@@ -52,7 +52,6 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Input from '@/components/FormData/Input.vue'
 import Button from '@/components/FormData/Button.vue'
-import { passwordRegExp } from '@/utils'
 import { encrypt } from '@/utils/aes';
 
 const route = useRoute()
@@ -94,10 +93,6 @@ const clickLogin = async () => {
     })
     return
   }
-  // if (loginType.value === 'password' && !passwordRegExp.test(formdata.value.password)) {
-  //   $modal.show({ content: '密码必须8-20位，包含字母、数字、特殊字符', showCancel: false })
-  //   return
-  // }
   const { mobile, msgCode, password } = formdata.value;
   let url = ''
   let body = {}

@@ -110,7 +110,7 @@ const clickConfirm = () => {
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
-      background-image: url(../@/assets/images/close.png);
+      background-image: url(@/assets/images/close.png);
       position: absolute;
       right: .vw(16)[];
       top: .vw(16)[];
@@ -126,7 +126,7 @@ const clickConfirm = () => {
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url(../@/assets/images/warning-icon.png);
+        background-image: url(@/assets/images/warning-icon.png);
         margin-right: .vw(6)[];
       }
 
