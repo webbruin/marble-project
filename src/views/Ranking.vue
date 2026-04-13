@@ -3,39 +3,41 @@
     <Header title="排行榜"></Header>
     <div class="top">
       <div class="tabbar">
-        <i class="selected" :style="{ 'transform': `translateX(calc(86 / 375 * 100vw * ${tabIndex}))` }"></i>
-        <div class="item" v-for="(item, index) in tabList" :key="index" @click="clickTab(index)">{{ item }}</div>
+        <i class="selected" :style="{ 'transform': `translateX(calc(86 / 375 * 100vw * ${tabType - 1}))` }"></i>
+        <div class="item" v-for="(item, index) in tabList" :key="index" @click="clickTab(item.type)">
+          {{ item.name }}
+        </div>
       </div>
       <div class="rank-level">
-        <div class="user" v-if="userList.length">
+        <div class="user" v-if="rankList.length">
           <div class="item second">
             <div class="avatar">
               <img src="@/assets/images/avatar.png" alt="">
             </div>
-            <p class="name">{{ userList[1].name }}</p>
+            <p class="name">{{ rankList[1].nickName }}</p>
             <p class="point">
               <i class="icon"></i>
-              <span class="text">X{{ userList[1].point }}</span>
+              <span class="text">X{{ rankList[1].totalAmount }}</span>
             </p>
           </div>
           <div class="item first">
             <div class="avatar">
               <img src="@/assets/images/avatar.png" alt="">
             </div>
-            <p class="name">{{ userList[0].name }}</p>
+            <p class="name">{{ rankList[0].nickName }}</p>
             <p class="point">
               <i class="icon"></i>
-              <span class="text">X{{ userList[0].point }}</span>
+              <span class="text">X{{ rankList[0].totalAmount }}</span>
             </p>
           </div>
           <div class="item third">
             <div class="avatar">
               <img src="@/assets/images/avatar.png" alt="">
             </div>
-            <p class="name">{{ userList[2].name }}</p>
+            <p class="name">{{ rankList[2].nickName }}</p>
             <p class="point">
               <i class="icon"></i>
-              <span class="text">X{{ userList[2].point }}</span>
+              <span class="text">X{{ rankList[2].totalAmount }}</span>
             </p>
           </div>
         </div>
@@ -45,15 +47,15 @@
       </div>
     </div>
     <div class="list">
-      <div class="user" v-for="(item, index) in userList.slice(3)" :key="index">
+      <div class="user" v-for="(item, index) in rankList.slice(3)" :key="index">
         <div class="index">{{ (index + 3) >= 10 ? (index + 3) : `0${index + 3}` }}</div>
         <div class="avatar">
           <img src="@/assets/images/avatar.png" alt="">
         </div>
-        <div class="name">{{ item.name }}</div>
+        <div class="name">{{ item.nickName }}</div>
         <div class="point">
           <i class="icon"></i>
-          <span class="text">X{{ item.point }}</span>
+          <span class="text">X{{ item.totalAmount }}</span>
         </div>
       </div>
     </div>
@@ -75,43 +77,34 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import Header from '@/components/Header.vue'
 
-const tabList = ref(['日榜', '周榜', '月榜'])
-const tabIndex = ref(0)
-const userList = ref([
-  { avatar: '', name: '王子汛', point: 999 },
-  { avatar: '', name: '王子汛', point: 888 },
-  { avatar: '', name: '王子汛', point: 777 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
-  { avatar: '', name: '艾斯君', point: 123 },
+const tabList = ref([
+  { name: '日榜', type: 1 },
+  { name: '周榜', type: 2 },
+  { name: '月榜', type: 3 },
 ])
+const tabType = ref(1)
+const rankList = ref([])
 
 onMounted(() => {
-
+  getRankList()
 })
 
 const clickTab = (index) => {
-  tabIndex.value = index
+  tabType.value = index
+  getRankList()
+}
+
+const getRankList = async () => {
+  $toast.loading()
+  const res = await api.post('/ranking/pointCard', tabType.value)
+  if (res.code === 200) {
+    $toast.close()
+    rankList.value = res.data
+  } else {
+    $toast.info(res.message)
+  }
 }
 </script>
 

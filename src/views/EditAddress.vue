@@ -30,6 +30,12 @@
           </template>
         </Input>
       </div>
+      <div class="item">
+        <div class="default-address">
+          <span class="text">设为默认地址</span>
+          <i class="switch" :class="{ 'off': formdata.default }" @click="formdata.default = !formdata.default"></i>
+        </div>
+      </div>
     </div>
     <div class="edit-address">
       <Button buttonText="保存地址" @click="clickSaveAddress"></Button>
@@ -55,6 +61,7 @@ const formdata = ref({
   mobile: '',
   area: '',
   address: '',
+  default: false,
 })
 const showAreaPicker = ref(false)
 
@@ -106,6 +113,37 @@ const clickSaveAddress = () => {
         font-weight: 400;
         font-style: normal;
         margin-right: .vw(10)[];
+      }
+
+      .default-address {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: .vw(14)[];
+        background-color: #EFEFEF;
+        padding: .vw(10)[] .vw(16)[];
+
+        .text {
+          color: #50525C;
+          font-family: "PingFang SC";
+          font-size: .vw(16)[];
+          line-height: .vw(27)[];
+          font-weight: 400;
+          font-style: normal;
+        }
+
+        .switch {
+          width: .vw(32)[];
+          height: .vw(20)[];
+          background-size: 100%;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-image: url(@/assets/images/address/switch-on.png);
+
+          &.off {
+            background-image: url(@/assets/images/address/switch-off.png);
+          }
+        }
       }
     }
   }

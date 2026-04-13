@@ -80,7 +80,8 @@ onMounted(() => {
   .text {
     color: var(--white--);
     font-size: .vw(14)[];
-    text-align: justify;
+    // text-align: justify;
+    text-align: center;
   }
 }
 

@@ -6,7 +6,7 @@
         <div class="left">
           <p class="text">弹珠数量</p>
           <p class="count">15.0</p>
-          <div class="button" @click="clickCheckIn">立即签到</div>
+          <div class="button" :class="{ 'disabled': true }" @click="clickCheckIn">立即签到</div>
         </div>
         <div class="right">
           <img src="@/assets/images/check-in-icon.png" alt="" class="icon">
@@ -14,7 +14,8 @@
       </div>
       <div class="module2">
         <div class="list">
-          <div :class="{ 'big': item.bigSize, 'item': !item.bigSize }" v-for="(item, index) in rankList" :key="index">
+          <div :class="{ 'big': item.bigSize, 'item': !item.bigSize }" v-for="(item, index) in checkInList"
+            :key="index">
             <span class="text">{{ item.name }}</span>
             <div class="icon" :class="{ 'check': index < 2 }">
               <img src="@/assets/images/ball.png" alt="">
@@ -40,7 +41,8 @@
       </div>
     </div>
   </div>
-  <BallSuccess :show="showBallSuccess" :ball="10" @toggleShow="showBallSuccess = $event"></BallSuccess>
+  <BallSuccess :show="showBallSuccess" :ball="checkInBallInfo.rewardMarble" @toggleShow="showBallSuccess = $event">
+  </BallSuccess>
 </template>
 
 <script setup>
@@ -48,7 +50,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BallSuccess from '@/components/BallSuccess.vue'
 
-const rankList = ref([
+const checkInList = ref([
   { name: '第一天', ball: 3 },
   { name: '第二天', ball: 3 },
   { name: '第三天', ball: 3 },
@@ -65,13 +67,50 @@ const taskList = ref([
   { name: '玩10局游戏', ball: 50, done: false },
 ])
 const showBallSuccess = ref(false)
+const checkInBallInfo = ref({})
 
 onMounted(() => {
-
+  init()
 })
 
-const clickCheckIn = () => {
-  showBallSuccess.value = true
+const init = async () => {
+  $toast.loading()
+  await Promise.all([getCalendar(), getStatus()])
+  $toast.close()
+}
+
+const getCalendar = async () => {
+
+  const res = await api.post('/signIn/getCalendar')
+  if (res.code === 200) {
+    console.log(111, res.data);
+    // checkInList.value = res.data
+  } else {
+    $toast.info(res.message)
+  }
+}
+
+const getStatus = async () => {
+  const res = await api.post('/signIn/getStatus')
+  if (res.code === 200) {
+    console.log(222, res.data);
+    // taskList.value = res.data
+  } else {
+    $toast.info(res.message)
+  }
+}
+
+const clickCheckIn = async () => {
+  $toast.loading('签到中')
+  const res = await api.post('/signIn/doSignIn')
+  $toast.close()
+  if (res.code === 200) {
+    console.log(333, res.data);
+    showBallSuccess.value = true
+    checkInBallInfo.value = res.data
+  } else {
+    $toast.info(res.message)
+  }
 }
 </script>
 
@@ -152,6 +191,12 @@ const clickCheckIn = () => {
           border: .vw(1)[] solid #FF3A64;
           background: linear-gradient(90deg, #FD689A 0%, #FFAB2D 100%);
           padding: .vw(8)[] .vw(18)[];
+
+          &.disabled {
+            pointer-events: none;
+            background: #E3E3E4;
+            border: .vw(1)[] solid transparent;
+          }
         }
       }
 
