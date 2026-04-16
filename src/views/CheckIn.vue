@@ -6,7 +6,9 @@
         <div class="left">
           <p class="text">弹珠数量</p>
           <p class="count">15.0</p>
-          <div class="button" :class="{ 'disabled': true }" @click="clickCheckIn">立即签到</div>
+          <div class="button" :class="{ 'disabled': checkInData.signedToday }" @click="clickCheckIn">
+            {{ checkInData.signedToday ? '已签到' : '立即签到' }}
+          </div>
         </div>
         <div class="right">
           <img src="@/assets/images/check-in-icon.png" alt="" class="icon">
@@ -50,6 +52,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BallSuccess from '@/components/BallSuccess.vue'
 
+const checkInData = ref({})
 const checkInList = ref([
   { name: '第一天', ball: 3 },
   { name: '第二天', ball: 3 },
@@ -75,26 +78,24 @@ onMounted(() => {
 
 const init = async () => {
   $toast.loading()
-  await Promise.all([getCalendar(), getStatus()])
+  await Promise.all([getStatus(), getCalendar()])
   $toast.close()
-}
-
-const getCalendar = async () => {
-
-  const res = await api.post('/signIn/getCalendar')
-  if (res.code === 200) {
-    console.log(111, res.data);
-    // checkInList.value = res.data
-  } else {
-    $toast.info(res.message)
-  }
 }
 
 const getStatus = async () => {
   const res = await api.post('/signIn/getStatus')
   if (res.code === 200) {
+    checkInData.value = res.data
+  } else {
+    $toast.info(res.message)
+  }
+}
+
+const getCalendar = async () => {
+  const res = await api.post('/signIn/getCalendar')
+  if (res.code === 200) {
     console.log(222, res.data);
-    // taskList.value = res.data
+    // checkInList.value = res.data
   } else {
     $toast.info(res.message)
   }

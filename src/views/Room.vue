@@ -178,11 +178,11 @@ onMounted(() => {
   // console.log(111, route.params);
   // console.log(222, route.query);
 
-  // const sdkAppId = 1600135086
-  // const userId = '10000'
-  // const sdkSecretKey = 'b547fb92700e3db845340995784b11fa0327534e0993af6577b046a82d739a12'
-  // const roomId = 10000001
-  // createRoom(sdkAppId, userId, sdkSecretKey, roomId)
+  const sdkAppId = 1600137711
+  const userId = '10000'
+  const sdkSecretKey = '46d4f2ecbf0e69bd53f7403056d9c0fe9319bc69e8bdadc2ea529de8ca051ec7'
+  const roomId = 10000001
+  createRoom(sdkAppId, userId, sdkSecretKey, roomId)
 })
 
 // 创建房间
@@ -292,6 +292,10 @@ const clickBluetoothConnect = async () => {
     height: 100%;
     position: relative;
     z-index: 1;
+
+    .header {
+      background-color: transparent;
+    }
 
     .tabbar {
       display: flex;

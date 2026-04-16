@@ -2,36 +2,29 @@
   <main class="record">
     <Header title="奖励卡记录"></Header>
     <div class="tab">
-      <div class="item" :class="{ 'selected': tab === item.type }" v-for="(item, index) in tabList" :key="index"
-        @click="clickTab(item)">
+      <div class="item" :class="{ 'selected': params.changeType === item.type }" v-for="(item, index) in tabList"
+        :key="index" @click="clickTab(item.type)">
         {{ item.name }}
       </div>
     </div>
     <div class="body">
-      <InfiniteScroll :loading="loading" :loadOver="loadOver" @load="loadMore">
+      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="!recordList.length" @load="loadMore">
         <template #content>
-          <div class="record-list">
-            <div class="item">
-              <div class="info">
-                <p class="status">
-                  <img src="@/assets/images/record/game-icon.png" alt="" class="icon">
-                  <span class="text">游戏奖励</span>
-                </p>
-                <p class="date">2025-15-21 15:21:21</p>
-              </div>
-              <div class="count">+50,856.00</div>
-            </div>
+          <div class="record-list" v-if="recordList.length">
             <div class="item" v-for="(item, index) in recordList" :key="index">
               <div class="info">
                 <p class="status">
                   <img src="@/assets/images/record/shop-icon.png" alt="" class="icon">
-                  <span class="text">商品购物</span>
+                  <span class="text">{{ item.remark }}</span>
                 </p>
-                <p class="date">2025-15-21 15:21:21</p>
+                <p class="date">{{ item.createTime }}</p>
               </div>
-              <div class="count" :class="{ 'red': true }">-50,856.00</div>
+              <div class="count" :class="{ 'red': true }">
+                {{ item.changeType === 1 ? '+' : '-' }}{{ item.changeAmount }}
+              </div>
             </div>
           </div>
+          <div class="empty" v-else>空数据</div>
         </template>
       </InfiniteScroll>
     </div>
@@ -43,39 +36,55 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
 
-const tab = ref('all')
+const params = ref({
+  changeType: '',  // null-全部，1-收入，2-支出
+  current: 1,
+  pageSize: 20,
+})
 const tabList = ref([
-  { name: '全部', type: 'all' },
-  { name: '收入', type: 'add' },
-  { name: '支出', type: 'sub' },
+  { name: '全部', type: '' },
+  { name: '收入', type: 1 },
+  { name: '支出', type: 2 },
 ])
-const recordList = ref([
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-])
+const recordList = ref([])
 const loading = ref(false)
 const loadOver = ref(false)
 
 onMounted(() => {
-
+  getRecordList(true)
 })
 
-const clickTab = (item) => {
-  tab.value = item.type
+const getRecordList = async (init) => {
+  if (init) {
+    params.value.current = 1
+    recordList.value = []
+    loadOver.value = false
+  }
+  try {
+    loading.value = true
+    const res = await api.post('/user/account/pagePointCardLog', params.value)
+    loading.value = false
+    if (res.code === 200) {
+      const list = res.data.data || []
+      recordList.value = [...recordList.value, ...list]
+      params.value.current++
+      // 加载完毕
+      loadOver.value = recordList.value.length >= res.data.total
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+    loading.value = false
+  }
 }
 
-const loadMore = () => {
-  loading.value = true
-  const timer = setTimeout(() => {
-    clearTimeout(timer)
-    loading.value = false
-    // loadOver.value = true
-    recordList.value = [...recordList.value, ...[{}, {}, {}, {}, {}]]
-  }, 1000)
+const clickTab = (type) => {
+  if (params.value.changeType === type) {
+    return
+  }
+  params.value.changeType = type
+  getRecordList(true)
 }
 </script>
 
@@ -201,6 +210,19 @@ const loadMore = () => {
           }
         }
       }
+    }
+
+    .empty {
+      height: .vw(400)[];
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text--);
+      font-family: "PingFang SC";
+      font-size: .vw(16)[];
+      line-height: .vw(16)[];
+      font-weight: 500;
+      font-style: normal;
     }
   }
 }

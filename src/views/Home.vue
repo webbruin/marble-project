@@ -171,8 +171,8 @@ const clickFilter = (item) => {
 
 const clickRoom = (item) => {
   if (item.useStatus !== 0) {
-    $toast.info(`该房间目前处于${roomUseStatusEnum[item.useStatus]}中`)
-    return
+    // $toast.info(`该房间目前处于${roomUseStatusEnum[item.useStatus]}中`)
+    // return
   }
   const { id, cameraDeviceId, machineCode } = item
   router.push({ name: 'room', params: { id }, query: { cameraDeviceId, machineCode } });

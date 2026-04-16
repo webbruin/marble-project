@@ -1,6 +1,6 @@
 <template>
   <slot name="content" />
-  <div ref="load" class="load">{{ loadOver ? '到底了' : '加载中...' }}</div>
+  <div ref="load" class="load" :class="{ 'empty': empty }">{{ loadOver ? '到底了' : '加载中...' }}</div>
 </template>
 
 <script setup>
@@ -12,6 +12,10 @@ const props = defineProps({
     default: false
   },
   loadOver: {
+    type: Boolean,
+    default: false
+  },
+  empty: {
     type: Boolean,
     default: false
   },
@@ -64,5 +68,9 @@ onUnmounted(() => {
   font-weight: 400;
   font-style: normal;
   text-align: center;
+
+  &.empty {
+    opacity: 0;
+  }
 }
 </style>
