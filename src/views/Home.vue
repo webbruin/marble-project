@@ -2,10 +2,10 @@
   <main class="home">
     <div class="title">弹珠潮玩</div>
     <div class="room-tab">
-      <div class="item" :class="{ 'light': roomParams.roomLevel === item.level }" v-for="(item, index) in roomLevelList"
+      <div class="item" :class="{ 'light': params.roomTypeId === item.level }" v-for="(item, index) in roomLevelList"
         :key="index" @click="clickRoomTab(item)">
         <img class="icon" :src="item.icon" alt="">
-        <span class="text" :class="{ light: roomParams.roomLevel == item.level }">{{ item.name }}</span>
+        <span class="text" :class="{ light: params.roomTypeId == item.level }">{{ item.name }}</span>
       </div>
       <div class="more" @click="moreRoomTab">更多</div>
     </div>
@@ -34,36 +34,40 @@
       </div>
     </div>
     <div class="filter">
-      <div class="item" :class="{ light: roomParams.sortType === item.type }" v-for="(item, index) in sortTypeList"
+      <div class="item" :class="{ light: params.sortType === item.type }" v-for="(item, index) in sortTypeList"
         :key="index">
         <span @click="clickFilter(item)">{{ item.name }}</span>
         <template v-if="item.sort">
-          <div class="sort" :class="{ 'low': roomParams.order === 'low', 'hight': roomParams.order === 'hight' }"></div>
+          <div class="sort" :class="{ 'low': params.order === 'low', 'hight': params.order === 'hight' }"></div>
         </template>
       </div>
     </div>
-    <div class="room-list">
-      <div class="item" v-for="(item, index) in roomList" :key="index" @click="clickRoom(item)">
-        <div class="status">
-          <img v-if="item.useStatus === 1" class="icon" src="@/assets/images/home/room-gaming.png" alt="">
-          <img v-else class="icon" src="@/assets/images/home/room-idle.png" alt="">
-          <span class="text">{{ roomUseStatusEnum[item.useStatus] }}</span>
-        </div>
-        <div class="user-list" v-if="item.currentPlayerCount">
-          <div class="user" v-for="userIndex in Math.min(item.currentPlayerCount, 3)" :key="userIndex">
-            <img class="avatar" src="@/assets/images/avatar.png" alt="">
+    <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
+      <template #content>
+        <div class="room-list">
+          <div class="item" v-for="(item, index) in roomList" :key="index" @click="clickRoom(item)">
+            <div class="status">
+              <img v-if="item.useStatus === 1" class="icon" src="@/assets/images/home/room-gaming.png" alt="">
+              <img v-else class="icon" src="@/assets/images/home/room-idle.png" alt="">
+              <span class="text">{{ roomUseStatusEnum[item.useStatus] }}</span>
+            </div>
+            <div class="user-list" v-if="item.currentPlayerCount">
+              <div class="user" v-for="userIndex in Math.min(item.currentPlayerCount, 3)" :key="userIndex">
+                <img class="avatar" src="@/assets/images/avatar.png" alt="">
+              </div>
+              <div class="user">
+                <span class="count">{{ item.currentPlayerCount }}</span>
+              </div>
+            </div>
+            <div class="room-name">{{ item.roomName }}</div>
+            <div class="room-ball">
+              <img class="icon" src="@/assets/images/ball.png" alt="">
+              <span class="count">X{{ item.entryFee }} 起</span>
+            </div>
           </div>
-          <div class="user">
-            <span class="count">{{ item.currentPlayerCount }}</span>
-          </div>
         </div>
-        <div class="room-name">{{ item.roomName }}</div>
-        <div class="room-ball">
-          <img class="icon" src="@/assets/images/ball.png" alt="">
-          <span class="count">X{{ item.entryFee }} 起</span>
-        </div>
-      </div>
-    </div>
+      </template>
+    </InfiniteScroll>
     <RechargeDialog :show="showRechargeDialog" @toggleShow="showRechargeDialog = $event"></RechargeDialog>
   </main>
 
@@ -73,6 +77,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import RechargeDialog from '@/components/RechargeDialog.vue'
+import InfiniteScroll from '@/components/InfiniteScroll.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -109,40 +114,69 @@ const sortTypeList = ref([
   { name: '价格', type: 'price', sort: true },
 ])
 
-const roomParams = ref({
-  roomLevel: 1,  // 房间等级：1-初级，2-中级，3-高级
+const params = ref({
+  current: 1,
+  pageSize: 20,
+  roomTypeId: 1,  // 房间等级：1-初级，2-中级，3-高级
   sortType: 'recommend',  // 推荐-recommend 热度-hot 空闲-idle 价格-price
   order: '',  // 低到高-low 高到低-hight
 })
 // 房间列表
 const roomList = ref([])
-// 
+const loading = ref(false)
+const loadOver = ref(false)
+const isEmpty = ref(false)
+// 充值弹窗
 const showRechargeDialog = ref(false)
 
 onMounted(() => {
-  getRoomList()
+  getRoomList(true)
 })
 
-watch(
-  () => roomParams.value, (newData, oldData) => {
-    getRoomList()
-  },
-  {
-    deep: true
+const getRoomList = async (init) => {
+  if (init) {
+    params.value.current = 1
+    roomList.value = []
+    loadOver.value = false
+    isEmpty.value = false
   }
-)
-
-const getRoomList = async () => {
-  const res = await api.post('/homepage/listRooms', roomParams.value)
-  if (res.code === 200) {
-    roomList.value = res.data
-  } else {
-    $toast.info(res.message)
+  try {
+    loading.value = true
+    const res = await api.post('/homepage/listRooms', params.value)
+    loading.value = false
+    if (res.code === 200) {
+      const list = res.data.data || []
+      roomList.value = [...roomList.value, ...list]
+      params.value.current++
+      // 加载完毕
+      loadOver.value = roomList.value.length >= res.data.total
+      // 空列表
+      isEmpty.value = loadOver.value && roomList.value.length === 0
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+    loading.value = false
   }
 }
 
 const clickRoomTab = (item) => {
-  roomParams.value.roomLevel = item.level
+  params.value.roomTypeId = item.level
+  getRoomList(true)
+}
+
+const clickFilter = (item) => {
+  params.value.sortType = item.type
+  // 价格排序
+  if (params.value.sortType === 'price') {
+    if (params.value.order === 'low') {
+      params.value.order = 'hight'
+    } else {
+      params.value.order = 'low'
+    }
+  }
+  getRoomList(true)
 }
 
 const moreRoomTab = () => {
@@ -157,25 +191,13 @@ const clickRanking = () => {
   router.push({ name: 'ranking' });
 }
 
-const clickFilter = (item) => {
-  roomParams.value.sortType = item.type
-  // 价格排序
-  if (roomParams.value.sortType === 'price') {
-    if (roomParams.value.order === 'low') {
-      roomParams.value.order = 'hight'
-    } else {
-      roomParams.value.order = 'low'
-    }
-  }
-}
-
 const clickRoom = (item) => {
-  if (item.useStatus !== 0) {
-    // $toast.info(`该房间目前处于${roomUseStatusEnum[item.useStatus]}中`)
-    // return
+  if (item.useStatus === 10 || item.useStatus === 11) {
+    $toast.info(`该房间目前处于${roomUseStatusEnum[item.useStatus]}中`)
+    return
   }
-  const { id, cameraDeviceId, machineCode } = item
-  router.push({ name: 'room', params: { id }, query: { cameraDeviceId, machineCode } });
+  const { id, tencentRoomId } = item
+  router.push({ name: 'room', params: { id }, query: { tencentRoomId } });
 }
 </script>
 

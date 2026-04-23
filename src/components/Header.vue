@@ -19,6 +19,10 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  disabledBack: {
+    type: Boolean,
+    default: false
+  },
   title: String,
 })
 
@@ -27,6 +31,9 @@ onMounted(() => {
 })
 
 const back = () => {
+  if (props.disabledBack) {
+    return
+  }
   router.back()
 }
 </script>

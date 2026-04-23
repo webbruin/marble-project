@@ -8,9 +8,9 @@
       </div>
     </div>
     <div class="body">
-      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="!recordList.length" @load="loadMore">
+      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
         <template #content>
-          <div class="record-list" v-if="recordList.length">
+          <div class="record-list">
             <div class="item" v-for="(item, index) in recordList" :key="index">
               <div class="info">
                 <p class="status">
@@ -24,7 +24,6 @@
               </div>
             </div>
           </div>
-          <div class="empty" v-else>空数据</div>
         </template>
       </InfiniteScroll>
     </div>
@@ -49,6 +48,7 @@ const tabList = ref([
 const recordList = ref([])
 const loading = ref(false)
 const loadOver = ref(false)
+const isEmpty = ref(false)
 
 onMounted(() => {
   getRecordList(true)
@@ -59,6 +59,7 @@ const getRecordList = async (init) => {
     params.value.current = 1
     recordList.value = []
     loadOver.value = false
+    isEmpty.value = false
   }
   try {
     loading.value = true
@@ -70,6 +71,8 @@ const getRecordList = async (init) => {
       params.value.current++
       // 加载完毕
       loadOver.value = recordList.value.length >= res.data.total
+      // 空列表
+      isEmpty.value = loadOver.value && recordList.value.length === 0
     } else {
       $toast.info(res.message)
     }
@@ -212,18 +215,6 @@ const clickTab = (type) => {
       }
     }
 
-    .empty {
-      height: .vw(400)[];
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text--);
-      font-family: "PingFang SC";
-      font-size: .vw(16)[];
-      line-height: .vw(16)[];
-      font-weight: 500;
-      font-style: normal;
-    }
   }
 }
 </style>

@@ -2,14 +2,15 @@
   <main class="room">
     <div ref="live-stream" class="live-stream"></div>
     <div class="body">
-      <Header></Header>
+      <Header :disabledBack="true" @click="back"></Header>
       <div class="tabbar">
         <div class="status">
-          <img class="icon" src="@/assets/images/avatar.png" alt="">
-          <span class="text">正在游戏中</span>
+          <img :src="userInfo.avatar" alt="" class="icon" v-if="userInfo.avatar">
+          <img class="icon" src="@/assets/images/avatar.png" alt="" v-else>
+          <span class="text">{{ roomUseStatusEnum[roomInfo.useStatus] }}</span>
         </div>
-        <div class="status" v-if="false">
-          <span class="text">倒计时：45S</span>
+        <div class="status" v-if="countdown">
+          <span class="text">倒计时：{{ countdown }}S</span>
         </div>
         <div class="audience-list" v-if="audiences.length">
           <div class="user" v-for="(item, index) in audiences.slice(0, 3)" :key="index">
@@ -84,9 +85,9 @@
             <i class="point"></i>
             <span class="count">X1,715</span>
           </div>
-          <div class="magnification">4倍</div>
+          <div class="magnification" v-if="gameInfo.multiplier">{{ gameInfo.multiplier }}倍</div>
         </div>
-        <div class="gaming" :class="{ 'left-hand': handIsLeft }" v-if="isGaming">
+        <div class="gaming" :class="{ 'left-hand': handIsLeft }" v-if="isStartGame">
           <div class="left">
             <p class="desc">已投入5枚弹珠，预计可获得5枚</p>
             <div class="buttons">
@@ -96,7 +97,7 @@
               <div class="item" @click="changeBall(50)">
                 <span>+50</span>
               </div>
-              <div class="item" @click="changeBall(9999)">
+              <div class="item" @click="changeBall(userInfo.marbleAmount)">
                 <span>+满</span>
               </div>
               <div class="item" @click="changeBall(-stepBall)">
@@ -135,10 +136,14 @@
     </div>
   </div>
 
-  <WarnningDialog :show="showWarnningDialog" :level="'初级'" :ball="10" @toggleShow="showWarnningDialog = $event">
+  <WarnningDialog :show="showWarnningDialog" :level="roomTypeEnum[roomInfo.roomTypeId]" :ball="roomInfo.entryFee"
+    @toggleShow="closeWarnningDialog">
   </WarnningDialog>
-  <ConfirmDialog :show="showConfirmDialog" :level="'初级'" @toggleShow="showConfirmDialog = $event"></ConfirmDialog>
-  <BallSuccess :show="showBallSuccess" :ball="10" @toggleShow="showBallSuccess = $event"></BallSuccess>
+  <ConfirmDialog :show="showConfirmDialog" :level="roomInfo.roomName" :ball="roomInfo.entryFee"
+    :marbleAmount="userInfo.marbleAmount" @close="closeConfirmDialog" @confirm="clickConfirmDialog"></ConfirmDialog>
+  <BallSuccess :show="showBallSuccess"
+    :ball="launchInfo.winPointCard > 0 ? launchInfo.winPointCard : launchInfo.winMarble"
+    :type="launchInfo.winPointCard > 0 ? 2 : 1" @toggleShow="showBallSuccess = $event"></BallSuccess>
 </template>
 
 <script setup>
@@ -155,13 +160,33 @@ import genTestUserSig from '../trtc/generateTestUserSig'
 const route = useRoute()
 const router = useRouter()
 
+// 房间使用状态枚举：0-空闲，1-使用中，10-故障，11-下线
+const roomUseStatusEnum = {
+  0: '空闲',
+  1: '使用中',
+  10: '故障',
+  11: '下线'
+}
+
+// 房间使用状态枚举：1-初级房间，2-中级房间，3-高级房间
+const roomTypeEnum = {
+  1: '初级房间',
+  2: '中级房间',
+  3: '高级房间'
+}
+
+const SDK_APP_ID = 1600137711
+const USER_ID = '10000'
+const SDK_SECRET_KEY = '46d4f2ecbf0e69bd53f7403056d9c0fe9319bc69e8bdadc2ea529de8ca051ec7'
+
+const roomId = ref(null)
+const tencentRoomId = ref(null)
+const userInfo = ref({})
 const audiences = ref([1, 2, 3, 4, 5, 6, 7, 8])
 const collapse = ref(false)
-const isGaming = ref(false)
-const ball = ref(20)
+const isStartGame = ref(false)
+const ball = ref(0)
 const stepBall = ref(5)
-const minBall = ref(0)
-const maxBall = ref(100)
 const handIsLeft = ref(false)
 const isMoveStick = ref(false)
 const stickMovePercent = ref(0)
@@ -171,30 +196,74 @@ const showWarnningDialog = ref(false)
 const showConfirmDialog = ref(false)
 const showBallSuccess = ref(false)
 const showBluetoothConnect = ref(false)
+const gaming = ref(false)
+// // 创建 TRTC 实例
 const liveStream = useTemplateRef('live-stream')
-const trtc = TRTC.create()  // 创建 TRTC 实例
+const trtc = TRTC.create()
+
+const roomInfo = ref({})
+const gameInfo = ref({})
+const launchInfo = ref({})
+const countdown = ref(0)
+const danmakuList = ref([])  // 弹幕列表
+const danmakuScrollIndex = ref(0)  // 记录弹幕滚动位置
 
 onMounted(() => {
-  // console.log(111, route.params);
-  // console.log(222, route.query);
-
-  const sdkAppId = 1600137711
-  const userId = '10000'
-  const sdkSecretKey = '46d4f2ecbf0e69bd53f7403056d9c0fe9319bc69e8bdadc2ea529de8ca051ec7'
-  const roomId = 10000001
-  createRoom(sdkAppId, userId, sdkSecretKey, roomId)
+  roomId.value = +route.params.id
+  tencentRoomId.value = +route.query.tencentRoomId
+  userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+  init()
 })
 
+onBeforeUnmount(() => {
+  unlockRoom()
+})
+
+const back = () => {
+  $modal.show({
+    content: '确认退出房间吗？',
+    onConfirm: () => {
+      router.back()
+    }
+  })
+}
+
+const init = async () => {
+  $toast.loading()
+  await Promise.all([getRoomDetail(), createRoom()])
+  $toast.close()
+}
+
+// 获取房间详情
+const getRoomDetail = async () => {
+  try {
+    const res = await api.post('/room/getRoomDetail', { roomId: roomId.value })
+    if (res.code === 200) {
+      roomInfo.value = res.data
+      showWarnningDialog.value = true
+      queryDanmaku()
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
 // 创建房间
-const createRoom = async (sdkAppId, userId, sdkSecretKey, roomId) => {
+const createRoom = async () => {
+  const sdkAppId = SDK_APP_ID
+  const userId = USER_ID
+  const sdkSecretKey = SDK_SECRET_KEY
+  const id = tencentRoomId.value
   try {
     const { userSig } = genTestUserSig({ sdkAppId, userId, sdkSecretKey })
     const options = {
       enableAutoPlayDialog: false  // 关闭音频
     }
-    await trtc.enterRoom({ sdkAppId, userId, userSig, roomId, ...options })
+    await trtc.enterRoom({ sdkAppId, userId, userSig, roomId: id, ...options })
   } catch (error) {
-    // console.error('failed to enter room ' + error);
+    // toast.info('failed to enter room ' + error);
     $toast.info('加入直播间失败')
   }
   // 在进入房间之前，监听 TRTC.EVENT.REMOTE_VIDEO_AVAILABLE 事件，以接收所有远端用户视频发布事件。
@@ -203,23 +272,165 @@ const createRoom = async (sdkAppId, userId, sdkSecretKey, roomId) => {
   })
 }
 
+// 确认订单&锁房
+const startGame = async () => {
+  try {
+    $toast.loading()
+    const res = await api.post('/room/startGame', { roomId: roomId.value })
+    $toast.close()
+    if (res.code === 200) {
+      gameInfo.value = res.data
+      isStartGame.value = true
+      countdown.value = res.data.lockCountdown
+      setCountdown()
+      nextTick(() => {
+        initStickEvent()
+      })
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 弹珠加投
+const addMarble = async (marbleCount) => {
+  try {
+    const res = await api.post('/room/addMarble', {
+      roomId: roomId.value,
+      marbleCount,
+      orderId: gameInfo.value.orderId
+    })
+    if (res.code === 200) {
+      ball.value = res.data.actualMarble
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 发射弹珠
+const launchBall = async () => {
+  try {
+    gaming.value = true
+    // 力度
+    const powerLevel = parseInt(stickMovePercent.value / 10)
+    if (powerLevel <= 0) {
+      return
+    }
+    const res = await api.post('/room/launchBall', {
+      roomId: roomId.value,
+      powerLevel,
+      orderId: gameInfo.value.orderId
+    })
+    gaming.value = false
+    if (res.code === 200) {
+      if (res.data.winFlag === 1) {
+        showBallSuccess.value = true
+        launchInfo.value = res.data
+      } else {
+        $toast.info('很遗憾，未中奖')
+      }
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    gaming.value = false
+    $toast.info('系统错误')
+  }
+}
+
+// 查询弹幕消息列表
+const queryDanmaku = async () => {
+  try {
+    const res = await api.post('/room/queryDanmaku', {
+      roomId: roomId.value,
+      limit: 100,  // 查询条数（最大100）
+      sortType: 0  // 0-创建时间倒序（默认），1-创建时间正序
+    })
+    if (res.code === 200) {
+      danmakuList.value = res.data || []
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 发送弹幕消息
+const sendDanmaku = async (content) => {
+  if (!content) {
+    $toast.info('请输入弹幕')
+    return
+  }
+  try {
+    $toast.loading('发送中')
+    const res = await api.post('/room/sendDanmaku', {
+      roomId: roomId.value,
+      content
+    })
+    $toast.close()
+    if (res.code === 200) {
+      danmakuList.value = [...danmakuList.value, res.data]
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 中奖记录查询（瀑布式分页）
+const winRecordList = async () => {
+  try {
+    const res = await api.post('/room/winRecordList', {
+      roomId: roomId.value,
+      pageSize: 20,
+      lastOrderId: null  // 上一页最后一条记录的游戏订单ID（第一页传空）
+    })
+    if (res.code === 200) {
+      // ...
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 解锁
+const unlockRoom = async () => {
+  try {
+    const res = await api.post('/room/unlockRoom', {
+      roomId: roomId.value,
+    })
+    if (res.code === 200) {
+      // ...
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
 const changeBall = (value) => {
-  ball.value += value
-  ball.value = Math.max(minBall.value, ball.value)
-  ball.value = Math.min(maxBall.value, ball.value)
+  addMarble(value)
 }
 
 const ballChange = (event) => {
-  ball.value = +event.target.value;
-  ball.value = Math.max(minBall.value, ball.value)
-  ball.value = Math.min(maxBall.value, ball.value)
+  let value = +event.target.value
+  value = Math.max(0, value)
+  value = Math.min(userInfo.marbleAmount, value)
+  addMarble(value)
 }
 
 const clickStart = () => {
-  isGaming.value = true
-  nextTick(() => {
-    initStickEvent()
-  })
+  showConfirmDialog.value = true
 }
 
 const initStickEvent = () => {
@@ -244,14 +455,15 @@ const initStickEvent = () => {
       screenY = Math.max(screenY, 0)
       stickMovePercent.value = parseInt(screenY / max * 100)
     })
-    window.addEventListener('touchend', event => {
-      isMoveStick.value = false
-      stickMovePercent.value = 0
-      // 删除时间监听
-      stickRef.value.removeEventListener('touchstart', () => { })
-      window.removeEventListener('touchmove', () => { })
-      window.removeEventListener('touchend', () => { })
-    })
+  })
+  stickRef.value.addEventListener('touchend', event => {
+    launchBall()
+    isMoveStick.value = false
+    stickMovePercent.value = 0
+    // 删除时间监听
+    stickRef.value.removeEventListener('touchstart', () => { })
+    window.removeEventListener('touchmove', () => { })
+    stickRef.value.removeEventListener('touchend', () => { })
   })
 }
 
@@ -264,6 +476,36 @@ const clickRouter = (url) => {
 
 const clickBluetoothConnect = async () => {
   showBluetoothConnect.value = false
+}
+
+const closeWarnningDialog = (event) => {
+  showWarnningDialog.value = event
+}
+
+const closeConfirmDialog = (event) => {
+  showConfirmDialog.value = false
+}
+
+const clickConfirmDialog = (event) => {
+  showConfirmDialog.value = false
+  startGame()
+}
+
+const setCountdown = () => {
+  if (countdown.value === 0) {
+    return
+  }
+  let timer = null
+  if (timer) {
+    clearInterval(timer)
+  }
+  timer = setInterval(() => {
+    countdown.value--
+    if (countdown.value) {
+      return
+    }
+    clearInterval(timer)
+  }, 1000)
 }
 </script>
 
@@ -307,13 +549,12 @@ const clickBluetoothConnect = async () => {
       right: .vw(16)[];
 
       .status {
-        min-width: .vw(94)[];
         height: .vw(30)[];
         display: flex;
         align-items: center;
         border-radius: .vw(45)[];
         background-color: rgba(#272933, 0.75);
-        padding: .vw(3)[] .vw(4)[];
+        padding: .vw(3)[] .vw(10)[] .vw(3)[] .vw(4)[];
 
         .icon {
           width: .vw(24)[];

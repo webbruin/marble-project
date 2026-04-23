@@ -1,9 +1,10 @@
 <template>
   <div class="ball-success" v-if="show">
     <div class="body">
-      <img src="@/assets/images/ball.png" alt="">
+      <img src="@/assets/images/ball.png" alt="" v-if="type === 1">
+      <img src="@/assets/images/point.png" alt="" v-if="type === 2">
     </div>
-    <div class="close" @click="closeDialog">恭喜弹珠X{{ ball }}</div>
+    <div class="close" @click="closeDialog">恭喜{{ type === 1 ? '弹珠' : '积分卡' }}X{{ ball }}</div>
   </div>
 </template>
 
@@ -13,6 +14,10 @@ import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({
   show: Boolean,
+  type: {  // 1-弹珠 2-积分卡
+    type: Number,
+    default: 1
+  },
   ball: Number,
 })
 const emit = defineEmits(['toggleShow'])

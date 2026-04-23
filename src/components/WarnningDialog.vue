@@ -1,11 +1,11 @@
 <template>
   <div class="warnning-dialog" v-if="show">
     <div class="body">
-      <p class="text">本房间为{{ level }}房间</p>
+      <p class="text">本房间为{{ level }}</p>
       <p class="desc">单次消耗 {{ ball }} 枚弹珠</p>
       <div class="confirm" @click="confirmDialog">确认</div>
     </div>
-    <div class="close" @click="closeDialog"></div>
+    <!-- <div class="close" @click="closeDialog"></div> -->
   </div>
 </template>
 
@@ -24,7 +24,9 @@ onMounted(() => {
 
 })
 
-const confirmDialog = () => { }
+const confirmDialog = () => {
+  closeDialog()
+}
 
 const closeDialog = () => {
   emit('toggleShow', false)
@@ -121,7 +123,7 @@ const closeDialog = () => {
     background-position: center;
     background-repeat: no-repeat;
     background-image: url(@/assets/images/close.png);
-    margin-top: .vw(103)[];
+    margin-top: .vw(40)[];
   }
 }
 </style>

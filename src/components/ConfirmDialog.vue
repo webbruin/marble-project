@@ -1,24 +1,24 @@
 <template>
-  <div class="confirm-mask" v-if="show"></div>
+  <div class="confirm-mask" v-if="show" @click="clickClose"></div>
   <div class="confirm-dialog" :class="{ 'show': show }">
     <div class="body">
       <p class="title">确认</p>
-      <div class="room" @click="selectedRoom = !selectedRoom">
+      <div class="room">
         <img src="@/assets/images/home/room-bg.png" alt="" class="cover">
         <div class="info">
-          <p class="text">{{ level }}房间</p>
-          <p class="desc">投入弹珠：5枚</p>
+          <p class="text">{{ level }}</p>
+          <p class="desc">投入弹珠：{{ ball }}枚</p>
         </div>
-        <i class="select" :class="{ 'selected': selectedRoom }"></i>
+        <i class="select selected"></i>
       </div>
-      <div class="ball-count" @click="selectedBall = !selectedBall">
+      <div class="ball-count">
         <img src="@/assets/images/ball.png" alt="" class="ball">
-        <span class="text">弹珠支付（剩余：6）</span>
-        <i class="select" :class="{ 'selected': selectedBall }"></i>
+        <span class="text">弹珠支付（剩余：{{ marbleAmount }}）</span>
+        <i class="select selected"></i>
       </div>
     </div>
     <div class="footer">
-      <div class="text">小计：5枚弹珠</div>
+      <div class="text">小计：{{ ball }}枚弹珠</div>
       <div class="button" @click="clickConfirm">确认</div>
     </div>
   </div>
@@ -29,20 +29,29 @@ import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({
-  level: String,
   show: Boolean,
+  level: String,
+  ball: {
+    type: Number,
+    default: 0
+  },
+  marbleAmount: {
+    type: Number,
+    default: 0
+  },
 })
-const emit = defineEmits(['toggleShow'])
-
-const selectedRoom = ref(false)
-const selectedBall = ref(false)
+const emit = defineEmits(['close', 'confirm'])
 
 onMounted(() => {
 
 })
 
+const clickClose = () => {
+  emit('close')
+}
+
 const clickConfirm = () => {
-  emit('toggleShow', false)
+  emit('confirm')
 }
 </script>
 

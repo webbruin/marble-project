@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="footer">
-      <Button buttonText="退出登陆" @click="logout"></Button>
+      <Button buttonText="退出登陆" @click="loginConfirm"></Button>
     </div>
   </main>
 </template>
@@ -51,15 +51,30 @@ const clickRouter = (name, params = {}, query = {}) => {
   router.push({ name, params, query })
 }
 
+const loginConfirm = () => {
+  $modal.show({
+    content: '是否退出登陆',
+    onConfirm: () => {
+      logout()
+    }
+  })
+}
+
 const logout = async () => {
-  $toast.loading('退出中')
-  const res = await api.post('/user/auth/logout')
-  if (res.code === 200) {
-    $toast.info('退出登陆成功')
-    localStorage.removeItem('token')
-    router.replace({ name: 'login' })
-  } else {
-    $toast.info(res.message)
+  try {
+    $toast.loading()
+    const res = await api.post('/user/auth/logout')
+    $toast.close()
+    if (res.code === 200) {
+      // $toast.info('退出登陆成功')
+      localStorage.removeItem('token')
+      localStorage.removeItem('userInfo')
+      router.replace({ name: 'login' })
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
   }
 }
 </script>
