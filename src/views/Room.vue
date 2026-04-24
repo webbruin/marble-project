@@ -79,11 +79,11 @@
         <div class="ball-info">
           <div class="item">
             <i class="ball"></i>
-            <span class="count">X715</span>
+            <span class="count">X{{ formatNumberWithCommas(marbleAmount) }}</span>
           </div>
           <div class="item">
             <i class="point"></i>
-            <span class="count">X1,715</span>
+            <span class="count">X{{ formatNumberWithCommas(cardAmount) }}</span>
           </div>
           <div class="magnification" v-if="gameInfo.multiplier">{{ gameInfo.multiplier }}倍</div>
         </div>
@@ -97,7 +97,7 @@
               <div class="item" @click="changeBall(50)">
                 <span>+50</span>
               </div>
-              <div class="item" @click="changeBall(userInfo.marbleAmount)">
+              <div class="item" @click="changeBall(marbleAmount)">
                 <span>+满</span>
               </div>
               <div class="item" @click="changeBall(-stepBall)">
@@ -140,7 +140,7 @@
     @toggleShow="closeWarnningDialog">
   </WarnningDialog>
   <ConfirmDialog :show="showConfirmDialog" :level="roomInfo.roomName" :ball="roomInfo.entryFee"
-    :marbleAmount="userInfo.marbleAmount" @close="closeConfirmDialog" @confirm="clickConfirmDialog"></ConfirmDialog>
+    :marbleAmount="marbleAmount" @close="closeConfirmDialog" @confirm="clickConfirmDialog"></ConfirmDialog>
   <BallSuccess :show="showBallSuccess"
     :ball="launchInfo.winPointCard > 0 ? launchInfo.winPointCard : launchInfo.winMarble"
     :type="launchInfo.winPointCard > 0 ? 2 : 1" @toggleShow="showBallSuccess = $event"></BallSuccess>
@@ -153,6 +153,7 @@ import TRTC from 'trtc-sdk-v5';
 import WarnningDialog from '@/components/WarnningDialog.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import BallSuccess from '@/components/BallSuccess.vue'
+import { formatNumberWithCommas } from '@/utils'
 // TRTC资源包
 import '../trtc/lib-generate-test-usersig.min'
 import genTestUserSig from '../trtc/generateTestUserSig'
@@ -182,6 +183,8 @@ const SDK_SECRET_KEY = '46d4f2ecbf0e69bd53f7403056d9c0fe9319bc69e8bdadc2ea529de8
 const roomId = ref(null)
 const tencentRoomId = ref(null)
 const userInfo = ref({})
+const marbleAmount = ref(0)
+const cardAmount = ref(0)
 const audiences = ref([1, 2, 3, 4, 5, 6, 7, 8])
 const collapse = ref(false)
 const isStartGame = ref(false)
@@ -213,6 +216,7 @@ onMounted(() => {
   tencentRoomId.value = +route.query.tencentRoomId
   userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
   init()
+  updateCount()
 })
 
 onBeforeUnmount(() => {
@@ -232,6 +236,39 @@ const init = async () => {
   $toast.loading()
   await Promise.all([getRoomDetail(), createRoom()])
   $toast.close()
+}
+
+const updateCount = () => {
+  getUserMarbleAmount()
+  getPointCardAmount()
+}
+
+// 查询当前用户弹珠余额
+const getUserMarbleAmount = async () => {
+  try {
+    const res = await api.post('/user/account/getMarbleAmount')
+    if (res.code === 200) {
+      marbleAmount.value = +res.data
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 查询当前用户积分卡余额
+const getPointCardAmount = async () => {
+  try {
+    const res = await api.post('/user/account/getPointCardAmount')
+    if (res.code === 200) {
+      cardAmount.value = +res.data
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
 }
 
 // 获取房间详情
@@ -286,6 +323,7 @@ const startGame = async () => {
       nextTick(() => {
         initStickEvent()
       })
+      updateCount()
     } else {
       $toast.info(res.message)
     }
@@ -304,6 +342,7 @@ const addMarble = async (marbleCount) => {
     })
     if (res.code === 200) {
       ball.value = res.data.actualMarble
+      updateCount()
     } else {
       $toast.info(res.message)
     }
@@ -334,6 +373,7 @@ const launchBall = async () => {
       } else {
         $toast.info('很遗憾，未中奖')
       }
+      updateCount()
     } else {
       $toast.info(res.message)
     }
@@ -425,7 +465,7 @@ const changeBall = (value) => {
 const ballChange = (event) => {
   let value = +event.target.value
   value = Math.max(0, value)
-  value = Math.min(userInfo.marbleAmount, value)
+  value = Math.min(marbleAmount.value, value)
   addMarble(value)
 }
 

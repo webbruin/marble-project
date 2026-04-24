@@ -1,13 +1,15 @@
 <template>
   <main class="home">
     <div class="title">弹珠潮玩</div>
-    <div class="room-tab">
-      <div class="item" :class="{ 'light': params.roomTypeId === item.level }" v-for="(item, index) in roomLevelList"
-        :key="index" @click="clickRoomTab(item)">
-        <img class="icon" :src="item.icon" alt="">
-        <span class="text" :class="{ light: params.roomTypeId == item.level }">{{ item.name }}</span>
+    <div class="room-tab" v-if="roomLevelList.length">
+      <div class="item" :class="{ 'light': params.roomTypeId === item.roomTypeId }"
+        v-for="(item, index) in roomLevelList" :key="index" @click="clickRoomTab(item)">
+        <img class="icon" src="@/assets/images/home/low-icon.png" alt="" v-if="item.roomTypeId === '1'">
+        <img class="icon" src="@/assets/images/home/middle-icon.png" alt="" v-if="item.roomTypeId === '2'">
+        <img class="icon" src="@/assets/images/home/hight-icon.png" alt="" v-if="item.roomTypeId === '3'">
+        <span class="text" :class="{ light: params.roomTypeId == item.roomTypeId }">{{ item.roomTypeName }}</span>
       </div>
-      <div class="more" @click="moreRoomTab">更多</div>
+      <!-- <div class="more" @click="moreRoomTab">更多</div> -->
     </div>
     <div class="banner">
       <img src="@/assets/images/home/banner.png" alt="">
@@ -90,23 +92,7 @@ const roomUseStatusEnum = {
   11: '下线'
 }
 
-const roomLevelList = ref([
-  {
-    name: '初级房间',
-    level: 1,
-    icon: new URL(`@/assets/images/home/low-icon.png`, import.meta.url).href,
-  },
-  {
-    name: '中级房间',
-    level: 2,
-    icon: new URL(`@/assets/images/home/middle-icon.png`, import.meta.url).href,
-  },
-  {
-    name: '高级房间',
-    level: 3,
-    icon: new URL(`@/assets/images/home/hight-icon.png`, import.meta.url).href,
-  }
-])
+const roomLevelList = ref([])
 const sortTypeList = ref([
   { name: '推荐', type: 'recommend' },
   { name: '热度', type: 'hot' },
@@ -130,8 +116,27 @@ const isEmpty = ref(false)
 const showRechargeDialog = ref(false)
 
 onMounted(() => {
-  getRoomList(true)
+  init()
 })
+
+const init = async () => {
+  $toast.loading()
+  await Promise.all([getRoomType(), getRoomList(true)])
+  $toast.close()
+}
+
+const getRoomType = async () => {
+  try {
+    const res = await api.post('/homepage/listRoomTypes')
+    if (res.code === 200) {
+      roomLevelList.value = res.data || []
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
 
 const getRoomList = async (init) => {
   if (init) {
@@ -162,7 +167,7 @@ const getRoomList = async (init) => {
 }
 
 const clickRoomTab = (item) => {
-  params.value.roomTypeId = item.level
+  params.value.roomTypeId = item.roomTypeId
   getRoomList(true)
 }
 
@@ -242,12 +247,12 @@ const clickRoom = (item) => {
     margin-bottom: .vw(16)[];
 
     .item {
-      width: .vw(100)[];
+      width: .vw(110)[];
       height: .vw(42)[];
       display: flex;
       align-items: center;
       justify-content: center;
-      background-size: 100%;
+      background-size: 100% .vw(42)[];
       background-position: center;
       background-repeat: no-repeat;
 
