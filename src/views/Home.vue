@@ -70,6 +70,7 @@
         </div>
       </template>
     </InfiniteScroll>
+    <div class="ba">沪ICP备2026013317号-1</div>
     <RechargeDialog :show="showRechargeDialog" @toggleShow="showRechargeDialog = $event"></RechargeDialog>
   </main>
 
@@ -695,6 +696,17 @@ const clickRoom = (item) => {
         }
       }
     }
+  }
+
+  .ba {
+    height: .vw(48)[];
+    color: var(--light-text--);
+    font-family: "PingFang SC";
+    font-size: .vw(14)[];
+    line-height: .vw(48)[];
+    font-weight: 400;
+    text-align: center;
+    background-color: #D1CEBF;
   }
 }
 </style>

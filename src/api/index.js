@@ -25,25 +25,15 @@ api.interceptors.response.use(
     // 统一处理 401、500 等错误
     if (response.data?.code === 401) {
       // 跳转到登录页
-      setTimeout(() => {
+      const timer = setTimeout(() => {
+        clearTimeout(timer)
         localStorage.removeItem('token')
         location.href = '/login'
       }, 1000)
-    } else {
-      return response.data;
     }
+    return response.data;
   },
   (error) => Promise.reject(error)
-  // (error) => {
-  //   console.log(222, error);
-  //   // 统一处理 401、500 等错误
-  //   if (error.response?.code === 401) {
-  //     // 跳转到登录页
-  //     localStorage.removeItem('token');
-  //     location.href = '/login'
-  //   }
-  //   return Promise.reject(error);
-  // }
 );
 
 export default api;

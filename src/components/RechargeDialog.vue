@@ -10,9 +10,9 @@
             v-for="(item, index) in rechargeList" :key="index" @click="clickPackage(item)">
             <div class="ball">
               <i class="icon"></i>
-              <i class="count">X{{ item.marbleAmount + item.giftMarbleAmount }}</i>
+              <i class="count">X{{ Number(item.marbleAmount) + Number(item.giftMarbleAmount) }}</i>
             </div>
-            <div class="price">{{ item.payAmount }}</div>
+            <div class="price">{{ formatToTwoDecimals(item.payAmount) }}</div>
           </div>
         </div>
         <div class="payway">
@@ -47,6 +47,7 @@
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { formatToTwoDecimals } from '@/utils'
 
 const router = useRouter()
 
@@ -288,8 +289,8 @@ const closeRechargeSuccess = () => {
             margin-bottom: .vw(11)[];
 
             .icon {
-              width: .vw(30)[];
-              height: .vw(30)[];
+              width: .vw(24)[];
+              height: .vw(24)[];
               background-size: 100%;
               background-position: center;
               background-repeat: no-repeat;
@@ -300,7 +301,7 @@ const closeRechargeSuccess = () => {
             .count {
               color: var(--light-text--);
               font-family: "PingFang SC";
-              font-size: .vw(22)[];
+              font-size: .vw(18)[];
               line-height: .vw(22)[];
               font-weight: 900;
               font-style: normal;

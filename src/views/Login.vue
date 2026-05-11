@@ -113,6 +113,7 @@ const clickLogin = async () => {
     } else {
       router.push({ name: 'home' })
     }
+    getUserInfo()
   } else {
     $toast.info(res.message)
   }
@@ -120,6 +121,15 @@ const clickLogin = async () => {
 
 const clickAggrement = (type) => {
   router.push({ name: 'aggrement', params: { type } })
+}
+
+const getUserInfo = async () => {
+  const res = await api.post('/user/info/getUserInfo')
+  if (res.code === 200) {
+    localStorage.setItem('userInfo', JSON.stringify(res.data))
+  } else {
+    $toast.info(res.message)
+  }
 }
 </script>
 

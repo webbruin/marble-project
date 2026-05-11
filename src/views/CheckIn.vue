@@ -18,15 +18,15 @@
         <div class="list">
           <div :class="{ 'big': item.bigSize, 'item': !item.bigSize }" v-for="(item, index) in checkInList"
             :key="index">
-            <span class="text">{{ item.name }}</span>
-            <div class="icon" :class="{ 'check': index < 2 }">
+            <span class="text">第{{ item.dayIndex }}天</span>
+            <div class="icon" :class="{ 'check': item.signedFlag === 1 }">
               <img src="@/assets/images/ball.png" alt="">
             </div>
-            <span class="ball">X{{ item.ball }}</span>
+            <span class="ball">X{{ item.rewardMarble }}</span>
           </div>
         </div>
       </div>
-      <div class="module3">
+      <div class="module3" v-if="taskList.length">
         <div class="list">
           <div class="sub-title">新手任务</div>
           <div class="item" v-for="(item, index) in taskList" :key="index">
@@ -53,21 +53,13 @@ import { useRoute, useRouter } from 'vue-router'
 import BallSuccess from '@/components/BallSuccess.vue'
 
 const checkInData = ref({})
-const checkInList = ref([
-  { name: '第一天', ball: 3 },
-  { name: '第二天', ball: 3 },
-  { name: '第三天', ball: 3 },
-  { name: '第四天', ball: 3 },
-  { name: '第五天', ball: 3 },
-  { name: '第六天', ball: 3 },
-  { name: '第七天', ball: 15, bigSize: true },
-])
+const checkInList = ref([])
 const taskList = ref([
-  { name: '玩一局游戏', ball: 10, done: false },
-  { name: '玩三局游戏', ball: 20, done: false },
-  { name: '玩五局游戏', ball: 30, done: false },
-  { name: '兑换一次商品', ball: 10, done: true },
-  { name: '玩10局游戏', ball: 50, done: false },
+  // { name: '玩一局游戏', ball: 10, done: false },
+  // { name: '玩三局游戏', ball: 20, done: false },
+  // { name: '玩五局游戏', ball: 30, done: false },
+  // { name: '兑换一次商品', ball: 10, done: true },
+  // { name: '玩10局游戏', ball: 50, done: false },
 ])
 const showBallSuccess = ref(false)
 const checkInBallInfo = ref({})
@@ -94,8 +86,8 @@ const getStatus = async () => {
 const getCalendar = async () => {
   const res = await api.post('/signIn/getCalendar')
   if (res.code === 200) {
-    console.log(222, res.data);
-    // checkInList.value = res.data
+    checkInList.value = res.data.slice(0, 7)
+    checkInList.value[6].bigSize = true
   } else {
     $toast.info(res.message)
   }
@@ -106,9 +98,9 @@ const clickCheckIn = async () => {
   const res = await api.post('/signIn/doSignIn')
   $toast.close()
   if (res.code === 200) {
-    console.log(333, res.data);
     showBallSuccess.value = true
     checkInBallInfo.value = res.data
+    getCalendar()
   } else {
     $toast.info(res.message)
   }
