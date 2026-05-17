@@ -1,6 +1,6 @@
 <template>
   <slot name="content" />
-  <div ref="load" class="load" :class="{ 'empty': empty }">{{ loadOver ? '到底了' : '加载中...' }}</div>
+  <div ref="load" class="load" :class="{ 'hide': empty }">{{ loadOver ? '到底了' : '加载中...' }}</div>
   <div class="empty" v-if="empty">
     <img src="@/assets/images/empty.png" alt="" class="icon">
     <p class="text">暂无内容</p>
@@ -73,8 +73,10 @@ onUnmounted(() => {
   font-style: normal;
   text-align: center;
 
-  &.empty {
+  &.hide {
     opacity: 0;
+    visibility: hidden;
+    display: none;
   }
 }
 
@@ -89,7 +91,8 @@ onUnmounted(() => {
   line-height: .vw(16)[];
   font-weight: 500;
   font-style: normal;
-  margin-top: .vw(103)[];
+  margin-top: .vw(50)[];
+  margin-bottom: .vw(50)[];
 
   .icon {
     width: .vw(132)[];

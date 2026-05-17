@@ -64,7 +64,7 @@
             <div class="room-name">{{ item.roomName }}</div>
             <div class="room-ball">
               <img class="icon" src="@/assets/images/ball.png" alt="">
-              <span class="count">X{{ item.entryFee }} 起</span>
+              <span class="count">X{{ item.minMarble }} 起</span>
             </div>
           </div>
         </div>

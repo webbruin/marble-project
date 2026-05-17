@@ -9,7 +9,7 @@
           <img class="icon" src="@/assets/images/avatar.png" alt="" v-else>
           <span class="text">{{ roomUseStatusEnum[roomInfo.useStatus] }}</span>
         </div>
-        <div class="status" v-if="countdown">
+        <div class="status" v-if="countdown > 0">
           <span class="text">倒计时：{{ countdown }}S</span>
         </div>
         <div class="audience-list" v-if="audiences.length">
@@ -210,6 +210,8 @@ const launchInfo = ref({})
 const countdown = ref(0)
 const danmakuList = ref([])  // 弹幕列表
 const danmakuScrollIndex = ref(0)  // 记录弹幕滚动位置
+const isLockRoom = ref(false)
+const startTimer = ref(null)
 
 onMounted(() => {
   roomId.value = +route.params.id
@@ -220,7 +222,9 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  unlockRoom()
+  if (isLockRoom.value) {
+    unlockRoom()
+  }
 })
 
 const back = () => {
@@ -271,26 +275,10 @@ const getPointCardAmount = async () => {
   }
 }
 
-// 获取房间详情
-const getRoomDetail = async () => {
-  try {
-    const res = await api.post('/room/getRoomDetail', { roomId: roomId.value })
-    if (res.code === 200) {
-      roomInfo.value = res.data
-      showWarnningDialog.value = true
-      queryDanmaku()
-    } else {
-      $toast.info(res.message)
-    }
-  } catch (e) {
-    $toast.info('系统错误')
-  }
-}
-
 // 创建房间
 const createRoom = async () => {
   const sdkAppId = SDK_APP_ID
-  const userId = USER_ID
+  const userId = userInfo.value.userId
   const sdkSecretKey = SDK_SECRET_KEY
   const id = tencentRoomId.value
   try {
@@ -309,6 +297,41 @@ const createRoom = async () => {
   })
 }
 
+// 获取房间详情
+const getRoomDetail = async () => {
+  try {
+    const res = await api.post('/room/getRoomDetail', { roomId: roomId.value })
+    if (res.code === 200) {
+      roomInfo.value = res.data
+      queryDanmaku()
+      // 当前游戏人是否是本人：0-否，1-是
+      // if (res.data.self === 0) {
+      //   return
+      // }
+      // 存在已开局的游戏
+      if (res.data.pendingOrder) {
+        if (!isLockRoom.value) {
+          isLockRoom.value = true
+        }
+        isStartGame.value = true
+        gameInfo.value = res.data.pendingOrder
+        countdown.value = res.data.lockCountdown
+        setCountdown()
+        nextTick(() => {
+          initStickEvent()
+        })
+        updateCount()
+      } else {
+        showWarnningDialog.value = true
+      }
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
 // 确认订单&锁房
 const startGame = async () => {
   try {
@@ -316,8 +339,11 @@ const startGame = async () => {
     const res = await api.post('/room/startGame', { roomId: roomId.value })
     $toast.close()
     if (res.code === 200) {
-      gameInfo.value = res.data
+      if (!isLockRoom.value) {
+        isLockRoom.value = true
+      }
       isStartGame.value = true
+      gameInfo.value = res.data
       countdown.value = res.data.lockCountdown
       setCountdown()
       nextTick(() => {
@@ -360,20 +386,26 @@ const launchBall = async () => {
     if (powerLevel <= 0) {
       return
     }
+    $toast.loading('发射中...')
     const res = await api.post('/room/launchBall', {
       roomId: roomId.value,
       powerLevel,
       orderId: gameInfo.value.orderId
     })
+    $toast.close()
     gaming.value = false
     if (res.code === 200) {
       if (res.data.winFlag === 1) {
         showBallSuccess.value = true
         launchInfo.value = res.data
+        countdown.value = 0
       } else {
         $toast.info('很遗憾，未中奖')
       }
       updateCount()
+      // 重置订单信息
+      gameInfo.value = {}
+      isStartGame.value = false
     } else {
       $toast.info(res.message)
     }
@@ -535,16 +567,19 @@ const setCountdown = () => {
   if (countdown.value === 0) {
     return
   }
-  let timer = null
-  if (timer) {
-    clearInterval(timer)
+  if (startTimer.value) {
+    clearInterval(startTimer.value)
   }
-  timer = setInterval(() => {
+  startTimer.value = setInterval(() => {
     countdown.value--
     if (countdown.value) {
       return
     }
-    clearInterval(timer)
+    countdown.value = 0
+    clearInterval(startTimer.value)
+    // 重置订单信息
+    gameInfo.value = {}
+    isStartGame.value = false
   }, 1000)
 }
 </script>
