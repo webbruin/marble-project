@@ -37,6 +37,8 @@ const router = createRouter({
     { path: '/order/:type?', name: 'order', component: () => import('../views/Order.vue') },
     { path: '/address', name: 'address', component: () => import('../views/Address.vue') },
     { path: '/edit-address/:type', name: 'edit-address', component: () => import('../views/EditAddress.vue') },
+    { path: '/pay-success', name: 'pay-success', component: () => import('../views/PaySuccess.vue') },
+    { path: '/pay-fail', name: 'pay-fail', component: () => import('../views/PayFail.vue') },
     // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/404.vue') },
   ],
@@ -68,6 +70,8 @@ const needLoginPage = [
   'order',
   'address',
   'edit-address',
+  'pay-success',
+  'pay-fail',
 ];
 
 router.beforeEach((to, from, next) => {

@@ -121,7 +121,9 @@
           </div>
         </div>
         <div class="start" v-else>
-          <img src="@/assets/images/room/start-game.png" alt="" class="button" @click="clickStart">
+          <!-- 暂时无法游戏,其他人在游戏中 -->
+          <div v-if="watchGame" class="watch-game">暂时无法游戏,其他人在游戏中</div>
+          <img v-else src="@/assets/images/room/start-game.png" alt="" class="button" @click="clickStart">
         </div>
       </div>
     </div>
@@ -212,6 +214,7 @@ const danmakuList = ref([])  // 弹幕列表
 const danmakuScrollIndex = ref(0)  // 记录弹幕滚动位置
 const isLockRoom = ref(false)
 const startTimer = ref(null)
+const watchGame = ref(false)
 
 onMounted(() => {
   roomId.value = +route.params.id
@@ -304,10 +307,11 @@ const getRoomDetail = async () => {
     if (res.code === 200) {
       roomInfo.value = res.data
       queryDanmaku()
-      // 当前游戏人是否是本人：0-否，1-是
-      // if (res.data.self === 0) {
-      //   return
-      // }
+      // 当前是否观战
+      if (res.data.self === 0 && res.data.useStatus === 1) {
+        watchGame.value = true
+        return
+      }
       // 存在已开局的游戏
       if (res.data.pendingOrder) {
         if (!isLockRoom.value) {
@@ -386,13 +390,13 @@ const launchBall = async () => {
     if (powerLevel <= 0) {
       return
     }
-    $toast.loading('发射中...')
+    // $toast.loading('发射中...')
     const res = await api.post('/room/launchBall', {
       roomId: roomId.value,
       powerLevel,
       orderId: gameInfo.value.orderId
     })
-    $toast.close()
+    // $toast.close()
     gaming.value = false
     if (res.code === 200) {
       if (res.data.winFlag === 1) {
@@ -1053,6 +1057,16 @@ const setCountdown = () => {
         background: #FFD1AE;
         box-shadow: 0 0 0 .vw(8)[] #F7B058 inset;
         padding: .vw(12)[] 0;
+
+        .watch-game {
+          color: var(--light-text--);
+          font-size: .vw(18)[];
+          line-height: .vw(18)[];
+          font-weight: 400;
+          font-style: normal;
+          text-align: center;
+          padding: .vw(15)[] 0;
+        }
 
         .button {
           width: .vw(120)[];
