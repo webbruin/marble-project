@@ -386,7 +386,8 @@ const launchBall = async () => {
   try {
     gaming.value = true
     // 力度
-    const powerLevel = parseInt(stickMovePercent.value / 10)
+    // const powerLevel = parseInt(stickMovePercent.value / 10)
+    const powerLevel = parseInt(stickMovePercent.value / 5)
     if (powerLevel <= 0) {
       return
     }
