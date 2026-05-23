@@ -53,9 +53,10 @@
     </div>
   </main>
 
-  <DatePicker :visible="showDatePicker" :modelValue="formdata.birthday" @update:visible="birthdayVisible"
-    @change="birthdayChange">
-  </DatePicker>
+  <van-popup v-model:show="showDatePicker" round position="bottom">
+    <van-date-picker title="选择日期" :min-date="minDate" :max-date="maxDate" :value="formdata.birthday"
+      @cancel="birthdayVisible" @confirm="birthdayChange" />
+  </van-popup>
 </template>
 
 <script setup>
@@ -64,7 +65,6 @@ import { useRoute, useRouter } from 'vue-router'
 import Upload from '@/components/FormData/Upload.vue'
 import Input from '@/components/FormData/Input.vue'
 import Gender from '@/components/FormData/Gender.vue'
-import DatePicker from '@/components/FormData/DatePicker.vue'
 import Button from '@/components/FormData/Button.vue'
 
 const router = useRouter()
@@ -79,6 +79,8 @@ const formdata = ref({
 })
 const genderDisabled = ref(false)
 const showDatePicker = ref(false)
+const minDate = ref(new Date(1970, 0, 1))
+const maxDate = ref(new Date(2070, 0, 1))
 
 onBeforeMount(() => {
   // 展示当前用户个人信息
@@ -122,12 +124,13 @@ const clickBirthday = () => {
   showDatePicker.value = true
 }
 
-const birthdayVisible = (event) => {
-  showDatePicker.value = event
+const birthdayVisible = () => {
+  showDatePicker.value = false
 }
 
 const birthdayChange = (event) => {
-  formdata.value.birthday = event
+  birthdayVisible()
+  formdata.value.birthday = event.selectedValues.join('-')
 }
 
 

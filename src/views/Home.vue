@@ -1,6 +1,12 @@
 <template>
   <main class="home">
-    <div class="title">弹珠潮玩</div>
+    <div class="title">
+      <p class="text">弹珠潮玩</p>
+      <div class="ball-count" v-if="marbleAmount">
+        <img class="icon" src="@/assets/images/ball.png" alt="">
+        <span class="count">剩余：{{ formatNumberWithCommas(marbleAmount) }}</span>
+      </div>
+    </div>
     <div class="room-tab" v-if="roomLevelList.length">
       <div class="item" :class="{ 'light': params.roomTypeId === item.roomTypeId }"
         v-for="(item, index) in roomLevelList" :key="index" @click="clickRoomTab(item)">
@@ -81,6 +87,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import RechargeDialog from '@/components/RechargeDialog.vue'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import { formatNumberWithCommas } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -115,8 +122,10 @@ const loadOver = ref(false)
 const isEmpty = ref(false)
 // 充值弹窗
 const showRechargeDialog = ref(false)
+const marbleAmount = ref(0)
 
 onMounted(() => {
+  getUserMarbleAmount()
   init()
 })
 
@@ -205,6 +214,20 @@ const clickRoom = (item) => {
   const { id, tencentRoomId } = item
   router.push({ name: 'room', params: { id }, query: { tencentRoomId } });
 }
+
+// 查询当前用户弹珠余额
+const getUserMarbleAmount = async () => {
+  try {
+    const res = await api.post('/user/account/getMarbleAmount')
+    if (res.code === 200) {
+      marbleAmount.value = +res.data
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
 </script>
 
 <style scoped lang="less">
@@ -233,11 +256,36 @@ const clickRoom = (item) => {
   }
 
   .title {
-    color: var(--light-text--);
-    font-size: .vw(32)[];
-    line-height: .vw(32)[];
-    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: .vw(12)[] .vw(18)[] .vw(12)[] .vw(18)[];
+
+    .text {
+      color: var(--light-text--);
+      font-size: .vw(32)[];
+      line-height: .vw(32)[];
+      font-weight: 900;
+    }
+
+    .ball-count {
+      display: flex;
+      align-items: center;
+
+      .icon {
+        width: .vw(30)[];
+        height: .vw(30)[];
+        margin-right: .vw(12)[];
+      }
+
+      .count {
+        color: var(--light-text--);
+        font-family: "PingFang SC";
+        font-size: .vw(18)[];
+        line-height: .vw(18)[];
+        font-weight: 500;
+      }
+    }
   }
 
   .room-tab {

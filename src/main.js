@@ -7,11 +7,14 @@ import Header from './components/Header.vue'
 import { Toast } from './components/Toast'
 import { Modal } from './components/Modal'
 import api from './api'
+import Vant from 'vant'
+import 'vant/lib/index.css'
 
 const app = createApp(App)
 
 app.use(router)
 
+app.use(Vant)
 
 app.mount('#app')
 

@@ -4,20 +4,21 @@
     <div class="body">
       <Header :disabledBack="true" @click="back"></Header>
       <div class="tabbar">
-        <div class="status">
+        <div class="room-status">
           <img :src="userInfo.avatar" alt="" class="icon" v-if="userInfo.avatar">
           <img class="icon" src="@/assets/images/avatar.png" alt="" v-else>
           <span class="text">{{ roomUseStatusEnum[roomInfo.useStatus] }}</span>
         </div>
-        <div class="status" v-if="countdown > 0">
-          <span class="text">倒计时：{{ countdown }}S</span>
-        </div>
-        <div class="audience-list" v-if="audiences.length">
-          <div class="user" v-for="(item, index) in audiences.slice(0, 3)" :key="index">
+
+        <div class="status" v-if="sendStatus">{{ sendStatus }}</div>
+        <div class="status" v-else-if="countdown">倒计时：{{ countdown }}S</div>
+
+        <div class="audience-list" v-if="roomInfo.currentPlayerCount">
+          <div class="user" v-for="(item, index) in Math.min(roomInfo.currentPlayerCount, 3)" :key="index">
             <img class="icon" src="@/assets/images/avatar.png" alt="">
           </div>
           <div class="user">
-            <span class="count">{{ audiences.length }}</span>
+            <span class="count">{{ roomInfo.currentPlayerCount }}</span>
           </div>
         </div>
       </div>
@@ -26,13 +27,14 @@
           <i class="icon">
             <img src="@/assets/images/room/icon7.png" alt="">
           </i>
-          <span class="text">故障报告</span>
+          <img src="@/assets/images/room/text/gzbg.png" alt="" class="text-icon">
         </div>
         <div class="button" @click="showBluetoothConnect = true">
           <i class="icon">
             <img src="@/assets/images/room/icon8.png" alt="">
+            <i class="check" v-if="false"></i>
           </i>
-          <span class="text">连接手柄</span>
+          <img src="@/assets/images/room/text/ljsb.png" alt="" class="text-icon">
         </div>
       </div>
       <div class="right-button-list" :class="{ 'collapse': collapse }">
@@ -41,38 +43,56 @@
             <i class="icon">
               <img src="@/assets/images/room/icon1.png" alt="">
             </i>
-            <span class="text">游戏规则</span>
+            <img src="@/assets/images/room/text/yygz.png" alt="" class="text-icon">
           </div>
           <div class="button" @click="clickRouter('point-card-record')">
             <i class="icon">
               <img src="@/assets/images/room/icon2.png" alt="">
             </i>
-            <span class="text">中奖记录</span>
+            <img src="@/assets/images/room/text/zjjl.png" alt="" class="text-icon">
           </div>
-          <div class="button">
+          <div class="button" @click="toggleMusic">
             <i class="icon">
               <img src="@/assets/images/room/icon3.png" alt="">
             </i>
-            <span class="text">音乐：开</span>
+            <img src="@/assets/images/room/text/music-on.png" alt="" class="text-icon" v-if="musicOn">
+            <img src="@/assets/images/room/text/music-off.png" alt="" class="text-icon" v-else>
           </div>
           <div class="button">
             <i class="icon">
               <img src="@/assets/images/room/icon4.png" alt="">
             </i>
-            <span class="text">联系客服</span>
+            <img src="@/assets/images/room/text/lxkf.png" alt="" class="text-icon">
           </div>
-          <div class="button">
+          <div class="button" @click="init">
             <i class="icon">
               <img src="@/assets/images/room/icon5.png" alt="">
             </i>
-            <span class="text">刷新</span>
+            <img src="@/assets/images/room/text/sx.png" alt="" class="text-icon">
           </div>
         </template>
         <div class="button" @click="collapse = !collapse">
           <i class="icon">
-            <img src="@/assets/images/room/icon6.png" alt="">
+            <img src="@/assets/images/room/icon6.png" alt="" :class="{ 'rotate': collapse }">
           </i>
-          <span class="text">{{ collapse ? '展开' : '收起' }}</span>
+          <img src="@/assets/images/room/text/collapse-on.png" alt="" class="text-icon" v-if="collapse">
+          <img src="@/assets/images/room/text/collapse-off.png" alt="" class="text-icon" v-else>
+        </div>
+      </div>
+      <!-- 弹幕 -->
+      <div class="danmaku" :class="{ 'start-game': isStartGame }">
+        <div ref="danmaku-list" class="list" v-if="danmakuCollapse && danmakuList.length">
+          <div class="item" v-for="(item, index) in danmakuList" :key="index">
+            {{ item.content }}
+          </div>
+        </div>
+        <div class="send">
+          <div class="input">
+            <input type="text" placeholder="发点弹幕吧~" v-model="danmakuContent" @change="sendDanmaku" />
+          </div>
+          <span class="collapse" @click="danmakuCollapse = !danmakuCollapse">
+            {{ danmakuCollapse ? '收起' : '展开' }}
+          </span>
         </div>
       </div>
       <div class="footer">
@@ -179,7 +199,6 @@ const roomTypeEnum = {
 }
 
 const SDK_APP_ID = 1600137711
-const USER_ID = '10000'
 const SDK_SECRET_KEY = '46d4f2ecbf0e69bd53f7403056d9c0fe9319bc69e8bdadc2ea529de8ca051ec7'
 
 const roomId = ref(null)
@@ -187,7 +206,6 @@ const tencentRoomId = ref(null)
 const userInfo = ref({})
 const marbleAmount = ref(0)
 const cardAmount = ref(0)
-const audiences = ref([1, 2, 3, 4, 5, 6, 7, 8])
 const collapse = ref(false)
 const isStartGame = ref(false)
 const ball = ref(0)
@@ -211,17 +229,20 @@ const gameInfo = ref({})
 const launchInfo = ref({})
 const countdown = ref(0)
 const danmakuList = ref([])  // 弹幕列表
-const danmakuScrollIndex = ref(0)  // 记录弹幕滚动位置
+const danmakuCollapse = ref(true)
+const danmakuContent = ref('')
+const danmakuListRef = useTemplateRef('danmaku-list')
 const isLockRoom = ref(false)
 const startTimer = ref(null)
 const watchGame = ref(false)
+const sendStatus = ref('')
+const musicOn = ref(true)
 
 onMounted(() => {
   roomId.value = +route.params.id
   tencentRoomId.value = +route.query.tencentRoomId
   userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
   init()
-  updateCount()
 })
 
 onBeforeUnmount(() => {
@@ -241,6 +262,7 @@ const back = () => {
 
 const init = async () => {
   $toast.loading()
+  updateCount()
   await Promise.all([getRoomDetail(), createRoom()])
   $toast.close()
 }
@@ -281,8 +303,8 @@ const getPointCardAmount = async () => {
 // 创建房间
 const createRoom = async () => {
   const sdkAppId = SDK_APP_ID
-  const userId = userInfo.value.userId
   const sdkSecretKey = SDK_SECRET_KEY
+  const userId = userInfo.value.userId
   const id = tencentRoomId.value
   try {
     const { userSig } = genTestUserSig({ sdkAppId, userId, sdkSecretKey })
@@ -291,7 +313,6 @@ const createRoom = async () => {
     }
     await trtc.enterRoom({ sdkAppId, userId, userSig, roomId: id, ...options })
   } catch (error) {
-    // toast.info('failed to enter room ' + error);
     $toast.info('加入直播间失败')
   }
   // 在进入房间之前，监听 TRTC.EVENT.REMOTE_VIDEO_AVAILABLE 事件，以接收所有远端用户视频发布事件。
@@ -306,6 +327,7 @@ const getRoomDetail = async () => {
     const res = await api.post('/room/getRoomDetail', { roomId: roomId.value })
     if (res.code === 200) {
       roomInfo.value = res.data
+      // 查询弹幕列表
       queryDanmaku()
       // 当前是否观战
       if (res.data.self === 0 && res.data.useStatus === 1) {
@@ -386,26 +408,26 @@ const launchBall = async () => {
   try {
     gaming.value = true
     // 力度
-    // const powerLevel = parseInt(stickMovePercent.value / 10)
     const powerLevel = parseInt(stickMovePercent.value / 5)
     if (powerLevel <= 0) {
       return
     }
-    // $toast.loading('发射中...')
+    countdown.value = 0
+    sendStatus.value = '发射中'
     const res = await api.post('/room/launchBall', {
       roomId: roomId.value,
       powerLevel,
       orderId: gameInfo.value.orderId
     })
-    // $toast.close()
+    sendStatus.value = ''
     gaming.value = false
     if (res.code === 200) {
       if (res.data.winFlag === 1) {
         showBallSuccess.value = true
         launchInfo.value = res.data
-        countdown.value = 0
       } else {
         $toast.info('很遗憾，未中奖')
+        sendStatus.value = '未中奖'
       }
       updateCount()
       // 重置订单信息
@@ -430,6 +452,9 @@ const queryDanmaku = async () => {
     })
     if (res.code === 200) {
       danmakuList.value = res.data || []
+      nextTick(() => {
+        danmakuListRef.value.scrollTop = 99999999
+      })
     } else {
       $toast.info(res.message)
     }
@@ -439,8 +464,8 @@ const queryDanmaku = async () => {
 }
 
 // 发送弹幕消息
-const sendDanmaku = async (content) => {
-  if (!content) {
+const sendDanmaku = async () => {
+  if (!danmakuContent.value) {
     $toast.info('请输入弹幕')
     return
   }
@@ -448,11 +473,15 @@ const sendDanmaku = async (content) => {
     $toast.loading('发送中')
     const res = await api.post('/room/sendDanmaku', {
       roomId: roomId.value,
-      content
+      content: danmakuContent.value
     })
     $toast.close()
     if (res.code === 200) {
-      danmakuList.value = [...danmakuList.value, res.data]
+      danmakuList.value = [...danmakuList.value, res.data]//.splice(-5)
+      danmakuContent.value = ''
+      nextTick(() => {
+        danmakuListRef.value.scrollTop = 99999999
+      })
     } else {
       $toast.info(res.message)
     }
@@ -587,6 +616,10 @@ const setCountdown = () => {
     isStartGame.value = false
   }, 1000)
 }
+
+const toggleMusic = () => {
+  musicOn.value = !musicOn.value
+}
 </script>
 
 <style scoped lang="less">
@@ -628,7 +661,7 @@ const setCountdown = () => {
       left: .vw(16)[];
       right: .vw(16)[];
 
-      .status {
+      .room-status {
         height: .vw(30)[];
         display: flex;
         align-items: center;
@@ -652,6 +685,19 @@ const setCountdown = () => {
           font-style: normal;
           text-align: center;
         }
+      }
+
+      .status {
+        color: var(--white--);
+        font-family: "PingFang SC";
+        font-size: .vw(12)[];
+        line-height: .vw(30)[];
+        font-weight: 400;
+        font-style: normal;
+        text-align: center;
+        border-radius: .vw(45)[];
+        background-color: rgba(#272933, 0.75);
+        padding: .vw(0)[] .vw(12)[];
       }
 
       .audience-list {
@@ -719,11 +765,24 @@ const setCountdown = () => {
           justify-content: center;
           border-radius: 100%;
           background-color: rgba(0, 0, 0, 0.65);
+          position: relative;
           margin-bottom: .vw(4)[];
 
           img {
             width: .vw(36)[];
             height: .vw(36)[];
+          }
+
+          .check {
+            width: .vw(18)[];
+            height: .vw(18)[];
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-image: url(@/assets/images/check-icon.png);
+            position: absolute;
+            right: .vw(9)[];
+            bottom: .vw(6)[];
           }
         }
 
@@ -736,6 +795,10 @@ const setCountdown = () => {
           line-height: .vw(16)[];
           font-weight: 900;
           font-style: normal;
+        }
+
+        .text-icon {
+          height: .vw(18)[];
         }
       }
     }
@@ -763,6 +826,7 @@ const setCountdown = () => {
           margin-bottom: .vw(18)[];
         }
 
+
         .icon {
           width: .vw(48)[];
           height: .vw(48)[];
@@ -779,6 +843,10 @@ const setCountdown = () => {
           }
         }
 
+        .rotate {
+          transform: rotate(-180deg);
+        }
+
         .text {
           color: var(--white--);
           -webkit-text-stroke-width: .vw(1)[];
@@ -788,6 +856,78 @@ const setCountdown = () => {
           line-height: .vw(16)[];
           font-weight: 900;
           font-style: normal;
+        }
+
+        .text-icon {
+          height: .vw(18)[];
+        }
+      }
+    }
+
+    .danmaku {
+      position: fixed;
+      left: .vw(16)[];
+      bottom: .vw(148)[];
+
+      &.start-game {
+        bottom: .vw(210)[];
+      }
+
+      .list {
+        width: .vw(180)[];
+        max-height: .vw(110)[];
+        overflow-x: hidden;
+        overflow-y: auto;
+        margin-bottom: .vw(4)[];
+
+        .item {
+          width: 100%;
+          color: var(--white--);
+          font-family: "PingFang SC";
+          font-size: .vw(14)[];
+          line-height: .vw(22)[];
+          font-weight: 500;
+          font-style: normal;
+        }
+      }
+
+      .send {
+        width: .vw(180)[];
+        display: flex;
+        align-items: center;
+        border-radius: .vw(45)[];
+        background-color: rgba(0, 0, 0, 0.45);
+        padding: .vw(12)[] .vw(24)[];
+
+        .input {
+          flex: 1;
+
+          input {
+            width: 100%;
+            border: none;
+            outline: none;
+            color: #B7B9C1;
+            font-family: "PingFang SC";
+            font-size: .vw(14)[];
+            line-height: .vw(14)[];
+            font-weight: 400;
+            font-style: normal;
+            background-color: transparent;
+
+            &::placeholder {
+              color: #B7B9C1;
+            }
+          }
+        }
+
+        .collapse {
+          color: var(--white--);
+          font-family: "PingFang SC";
+          font-size: .vw(14)[];
+          line-height: .vw(14)[];
+          font-weight: 500;
+          font-style: normal;
+          margin-left: .vw(16)[];
         }
       }
     }
@@ -805,7 +945,7 @@ const setCountdown = () => {
         margin-bottom: .vw(10)[];
 
         .item {
-          min-width: .vw(100)[];
+          // min-width: .vw(100)[];
           display: flex;
           align-items: center;
           border-radius: .vw(45)[];

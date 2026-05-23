@@ -42,8 +42,10 @@
     </div>
   </main>
 
-  <AreaPicker :visible="showAreaPicker" :modelValue="formdata.area" @update:visible="areaVisible" @change="areaChange">
-  </AreaPicker>
+  <van-popup v-model:show="showAreaPicker" round position="bottom">
+    <van-cascader title="请选择所在地区" active-color="#FFB169" :value="cascaderValue" :options="options"
+      @close="areaVisible(false)" @finish="areaChange" />
+  </van-popup>
 </template>
 
 <script setup>
@@ -51,7 +53,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Input from '@/components/FormData/Input.vue'
 import Button from '@/components/FormData/Button.vue'
-import AreaPicker from '@/components/FormData/AreaPicker.vue'
+import { useCascaderAreaData } from '@vant/area-data';
 
 const route = useRoute()
 const router = useRouter()
@@ -64,6 +66,7 @@ const formdata = ref({
   default: false,
 })
 const showAreaPicker = ref(false)
+const options = useCascaderAreaData();
 
 onMounted(() => {
 
@@ -73,12 +76,14 @@ const areaVisible = (event) => {
   showAreaPicker.value = event
 }
 
-const areaChange = (fullPath, { province, city, district }) => {
-  formdata.value.area = fullPath
+const areaChange = (event) => {
+  areaVisible(false)
+  const { selectedOptions } = event
+  formdata.value.area = selectedOptions.map(item => item.text).join('/')
 }
 
 const clickSaveAddress = () => {
-  console.log(111, formdata.value);
+  console.log(222, formdata.value);
   // router.back()
 }
 </script>

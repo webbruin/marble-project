@@ -14,10 +14,12 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@vant/area-data": "^2.1.0",
     "axios": "^1.14.0",
     "crypto-js": "^4.2.0",
     "qrcode": "^1.5.4",
     "trtc-sdk-v5": "^5.16.0",
+    "vant": "^4.9.24",
     "vue": "^3.5.29",
     "vue-router": "^5.0.3"
   },
