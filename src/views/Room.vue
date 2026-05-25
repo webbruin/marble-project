@@ -55,8 +55,8 @@
             <i class="icon">
               <img src="@/assets/images/room/icon3.png" alt="">
             </i>
-            <img src="@/assets/images/room/text/music-on.png" alt="" class="text-icon" v-if="musicOn">
-            <img src="@/assets/images/room/text/music-off.png" alt="" class="text-icon" v-else>
+            <img src="@/assets/images/room/text/music-off.png" alt="" class="text-icon" v-if="musicOn">
+            <img src="@/assets/images/room/text/music-on.png" alt="" class="text-icon" v-else>
           </div>
           <div class="button">
             <i class="icon">
