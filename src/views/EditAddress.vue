@@ -3,14 +3,14 @@
     <Header :title="`${route.params.type === 'edit' ? '编辑' : '新增'}收货地址`"></Header>
     <div class="body">
       <div class="item">
-        <Input v-model="formdata.name" type="text" placeholder="请填写收货人姓名">
+        <Input v-model="formdata.recipientName" type="text" placeholder="请填写收货人姓名">
           <template #left>
             <span class="text">收货人</span>
           </template>
         </Input>
       </div>
       <div class="item">
-        <Input v-model="formdata.mobile" type="number" placeholder="请填写收货人手机号">
+        <Input v-model="formdata.recipientPhone" type="number" placeholder="请填写收货人手机号">
           <template #left>
             <span class="text">手机号</span>
           </template>
@@ -24,7 +24,7 @@
         </Input>
       </div>
       <div class="item">
-        <Input v-model="formdata.address" type="text" placeholder="请填写详细地址">
+        <Input v-model="formdata.detailAddress" type="text" placeholder="请填写详细地址">
           <template #left>
             <span class="text">详细地址</span>
           </template>
@@ -33,7 +33,8 @@
       <div class="item">
         <div class="default-address">
           <span class="text">设为默认地址</span>
-          <i class="switch" :class="{ 'off': formdata.default }" @click="formdata.default = !formdata.default"></i>
+          <van-switch v-model="formdata.isDefault" :active-value="1" :inactive-value="0" active-color="#FFB169"
+            inactive-color="#dcdee0" size="16px" />
         </div>
       </div>
     </div>
@@ -43,7 +44,7 @@
   </main>
 
   <van-popup v-model:show="showAreaPicker" round position="bottom">
-    <van-cascader title="请选择所在地区" active-color="#FFB169" :value="cascaderValue" :options="options"
+    <van-cascader title="请选择所在省市区" active-color="#FFB169" :value="formdata.area" :options="options"
       @close="areaVisible(false)" @finish="areaChange" />
   </van-popup>
 </template>
@@ -59,17 +60,27 @@ const route = useRoute()
 const router = useRouter()
 
 const formdata = ref({
-  name: '',
-  mobile: '',
+  addressId: route.query.addressId || '',
+  recipientName: '',
+  recipientPhone: '',
   area: '',
-  address: '',
-  default: false,
+  province: '',
+  city: '',
+  district: '',
+  detailAddress: '',
+  isDefault: 0,
 })
 const showAreaPicker = ref(false)
 const options = useCascaderAreaData();
 
 onMounted(() => {
-
+  if (route.params.type === 'edit') {
+    const addressData = JSON.parse(localStorage.getItem('select-edit-address'))
+    formdata.value = {
+      ...addressData,
+      area: `${addressData.province} ${addressData.city} ${addressData.district}`
+    }
+  }
 })
 
 const areaVisible = (event) => {
@@ -79,12 +90,52 @@ const areaVisible = (event) => {
 const areaChange = (event) => {
   areaVisible(false)
   const { selectedOptions } = event
-  formdata.value.area = selectedOptions.map(item => item.text).join('/')
+  formdata.value.area = selectedOptions.map(item => item.text).join(' ')
+  formdata.value.province = selectedOptions[0].text
+  formdata.value.city = selectedOptions[1].text
+  formdata.value.district = selectedOptions[2].text
 }
 
-const clickSaveAddress = () => {
-  console.log(222, formdata.value);
-  // router.back()
+const clickSaveAddress = async () => {
+  const body = {
+    addressId: formdata.value.addressId,
+    recipientName: formdata.value.recipientName,
+    recipientPhone: formdata.value.recipientPhone,
+    province: formdata.value.province,
+    city: formdata.value.city,
+    district: formdata.value.district,
+    detailAddress: formdata.value.detailAddress,
+    isDefault: formdata.value.isDefault,
+  }
+  if (!body.recipientName) {
+    $toast.info('请填写收货人姓名')
+    return
+  }
+  if (!body.recipientPhone) {
+    $toast.info('请填写收货人手机号')
+    return
+  }
+  if (!body.province || !body.city || !body.district) {
+    $toast.info('请选择省市区')
+    return
+  }
+  if (!body.district) {
+    $toast.info('请填写详细地址')
+    return
+  }
+
+  try {
+    $toast.loading()
+    const res = await api.post('/shop/address/save', body)
+    $toast.close()
+    if (res.code === 200) {
+      router.back()
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
 }
 </script>
 
@@ -137,18 +188,6 @@ const clickSaveAddress = () => {
           font-style: normal;
         }
 
-        .switch {
-          width: .vw(32)[];
-          height: .vw(20)[];
-          background-size: 100%;
-          background-position: center;
-          background-repeat: no-repeat;
-          background-image: url(@/assets/images/address/switch-on.png);
-
-          &.off {
-            background-image: url(@/assets/images/address/switch-off.png);
-          }
-        }
       }
     }
   }

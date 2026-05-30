@@ -15,7 +15,7 @@
         <img class="icon" src="@/assets/images/home/hight-icon.png" alt="" v-if="item.roomTypeId === '3'">
         <span class="text" :class="{ light: params.roomTypeId == item.roomTypeId }">{{ item.roomTypeName }}</span>
       </div>
-      <!-- <div class="more" @click="moreRoomTab">更多</div> -->
+      <div class="more" @click="moreRoomTab">更多</div>
     </div>
     <div class="banner">
       <img src="@/assets/images/home/banner.png" alt="">
@@ -146,6 +146,10 @@ const getRoomType = async () => {
   } catch (e) {
     $toast.info('系统错误')
   }
+}
+
+const loadMore = () => {
+  getRoomList()
 }
 
 const getRoomList = async (init) => {
@@ -296,7 +300,7 @@ const getUserMarbleAmount = async () => {
     margin-bottom: .vw(16)[];
 
     .item {
-      width: .vw(110)[];
+      width: .vw(100)[];
       height: .vw(42)[];
       display: flex;
       align-items: center;

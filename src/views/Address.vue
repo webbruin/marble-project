@@ -2,32 +2,40 @@
   <main class="address">
     <Header title="收货地址"></Header>
     <div class="body">
-      <div class="item" v-for="(item, index) in addressList" :key="index">
-        <div class="user">
-          <span class="text">王志华</span>
-          <span class="text">18595716778</span>
-        </div>
-        <div class="info">北京市 朝阳区 凤凰汇6栋1584市</div>
-        <div class="options">
-          <div class="default">
-            <i class="select" :class="{ 'selected': index === 0 }"></i>
-            <span class="text">默认地址</span>
+      <template v-if="addressList.length">
+        <div class="item" v-for="(item, index) in addressList" :key="index">
+          <div class="user">
+            <span class="text">{{ item.recipientName }}</span>
+            <span class="text">{{ item.recipientPhone }}</span>
           </div>
-          <div class="button-list">
-            <div class="button" @click="clickEditAddress('edit')">
-              <img src="@/assets/images/address/edit.png" alt="" class="icon">
-              <span class="text">编辑</span>
+          <div class="info">
+            {{ item.province }} {{ item.city }} {{ item.district }} {{ item.detailAddress }}
+          </div>
+          <div class="options">
+            <div class="default">
+              <i class="select" :class="{ 'selected': item.isDefault === 1 }"></i>
+              <span class="text">默认地址</span>
             </div>
-            <div class="button" @click="clickRemoveAddress(item)">
-              <img src="@/assets/images/address/remove.png" alt="" class="icon">
-              <span class="text">删除</span>
+            <div class="button-list">
+              <div class="button" @click="clickEditAddress(item)">
+                <img src="@/assets/images/address/edit.png" alt="" class="icon">
+                <span class="text">编辑</span>
+              </div>
+              <div class="button" @click="clickRemoveAddress(item)">
+                <img src="@/assets/images/address/remove.png" alt="" class="icon">
+                <span class="text">删除</span>
+              </div>
             </div>
           </div>
         </div>
+      </template>
+      <div class="empty" v-else>
+        <img src="@/assets/images/empty.png" alt="" class="icon">
+        <p class="text">暂无地址</p>
       </div>
     </div>
     <div class="new-address">
-      <Button buttonText="新增收货地址" @click="clickEditAddress('new')"></Button>
+      <Button buttonText="新增收货地址" @click="clickNewAddress()"></Button>
     </div>
   </main>
 </template>
@@ -40,24 +48,60 @@ import Button from '@/components/FormData/Button.vue'
 const route = useRoute()
 const router = useRouter()
 
-const addressList = ref([
-  {},
-  {},
-])
+const addressList = ref([])
 
 onMounted(() => {
-
+  init()
 })
 
-const clickEditAddress = (type) => {
-  router.push({ name: 'edit-address', params: { type } })
+const init = async () => {
+  $toast.loading()
+  await getAddressList()
+  $toast.close()
 }
 
-const clickRemoveAddress = (item) => {
+const getAddressList = async () => {
+  try {
+    const res = await api.post('/shop/address/list', {})
+    if (res.code === 200) {
+      addressList.value = res.data
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const deleteAddress = async (addressId) => {
+  try {
+    const res = await api.post('/shop/address/delete', { addressId })
+    if (res.code === 200) {
+      $toast.info('地址删除成功')
+      addressList.value = addressList.value.filter(item => item.addressId != addressId)
+      // getAddressList()
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const clickNewAddress = () => {
+  router.push({ name: 'edit-address', params: { type: 'new' } })
+}
+
+const clickEditAddress = (item) => {
+  router.push({ name: 'edit-address', params: { type: 'edit' }, query: { addressId: item.addressId } })
+  localStorage.setItem('select-edit-address', JSON.stringify(item))
+}
+
+const clickRemoveAddress = ({ addressId }) => {
   $modal.show({
     content: '确认删除该地址吗？',
     onConfirm: () => {
-      console.log(111, item);
+      deleteAddress(addressId)
     }
   })
 }
@@ -184,6 +228,36 @@ const clickRemoveAddress = (item) => {
             }
           }
         }
+      }
+    }
+
+    .empty {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      justify-content: center;
+      color: var(--text--);
+      font-family: "PingFang SC";
+      font-size: .vw(16)[];
+      line-height: .vw(16)[];
+      font-weight: 500;
+      font-style: normal;
+      margin-top: .vw(50)[];
+      margin-bottom: .vw(50)[];
+
+      .icon {
+        width: .vw(132)[];
+        height: .vw(132)[];
+        margin-bottom: .vw(11)[];
+      }
+
+      .text {
+        color: var(--text--);
+        font-family: "PingFang SC";
+        font-size: .vw(12)[];
+        line-height: .vw(12)[];
+        font-weight: 400;
+        font-style: normal;
       }
     }
   }

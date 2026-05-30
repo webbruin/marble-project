@@ -5,7 +5,7 @@
       <div class="module1">
         <div class="left">
           <p class="text">弹珠数量</p>
-          <p class="count">15.0</p>
+          <p class="count">{{ formatNumberWithCommas(marbleAmount) }}</p>
           <div class="button" :class="{ 'disabled': checkInData.signedToday }" @click="clickCheckIn">
             {{ checkInData.signedToday ? '已签到' : '立即签到' }}
           </div>
@@ -51,6 +51,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BallSuccess from '@/components/BallSuccess.vue'
+import { formatNumberWithCommas } from '@/utils'
 
 const checkInData = ref({})
 const checkInList = ref([])
@@ -63,8 +64,10 @@ const taskList = ref([
 ])
 const showBallSuccess = ref(false)
 const checkInBallInfo = ref({})
+const marbleAmount = ref(0)
 
 onMounted(() => {
+  getUserMarbleAmount()
   init()
 })
 
@@ -100,9 +103,23 @@ const clickCheckIn = async () => {
   if (res.code === 200) {
     showBallSuccess.value = true
     checkInBallInfo.value = res.data
-    getCalendar()
+    getUserMarbleAmount()
   } else {
     $toast.info(res.message)
+  }
+}
+
+// 查询当前用户弹珠余额
+const getUserMarbleAmount = async () => {
+  try {
+    const res = await api.post('/user/account/getMarbleAmount')
+    if (res.code === 200) {
+      marbleAmount.value = +res.data
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
   }
 }
 </script>

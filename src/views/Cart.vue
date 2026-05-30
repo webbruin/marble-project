@@ -2,15 +2,15 @@
   <main class="cart">
     <Header :show-back="false" title="背包">
       <template #right>
-        <span class="address-edit">地址管理</span>
+        <span class="address-edit" @click="toAddress">地址管理</span>
       </template>
     </Header>
     <div class="body">
       <div class="tag">
-        <div class="all-count">购物车总共15件</div>
+        <div class="all-count">背包总共15件</div>
         <div class="trash-cart">
           <i class="icon"></i>
-          <span class="text">清空购物车</span>
+          <span class="text" @click="clearCart">清空背包</span>
         </div>
       </div>
       <div class="cart-list">
@@ -137,6 +137,19 @@ const clickAll = () => {
 const clickSettlement = () => {
   // console.log(111, selectedCartList.value)
   router.push({ name: 'settlement' })
+}
+
+const toAddress = () => {
+  router.push({ name: 'address' });
+}
+
+const clearCart = () => {
+  $modal.show({
+    content: '是否清空背包？',
+    onConfirm: () => {
+
+    }
+  })
 }
 </script>
 

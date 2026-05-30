@@ -4,49 +4,50 @@
       <div class="title">商城兑换</div>
       <div class="point">
         <p class="text">我的积分</p>
-        <p class="count">8,213</p>
+        <p class="count">{{ formatNumberWithCommas(8213) }}</p>
       </div>
     </div>
     <div class="body">
       <div class="tab">
-        <div class="item" v-for="(item, index) in tabs" :key="index" @click="clickTab(item)">
+        <div class="item" v-for="(item, index) in categorys" :key="index" @click="clickCategory(item)">
           <div class="icon">
             <img :src="item.icon" alt="">
           </div>
           <p class="text">{{ item.name }}</p>
+          <!-- <p class="text">{{ item.categoryName }}</p> -->
         </div>
       </div>
       <div class="banner">
         <img src="@/assets/images/home/banner.png" alt="">
       </div>
       <div class="filter">
-        <div class="item" :class="{ light: currentFilter === item.type }" v-for="(item, index) in sortTypeList"
+        <div class="item" :class="{ light: params.sortType === item.type }" v-for="(item, index) in sortTypeList"
           :key="index">
           <span @click="clickFilter(item)">{{ item.name }}</span>
           <template v-if="item.sort">
-            <div class="sort" :class="{ 'low': priceSort === 'low', 'hight': priceSort === 'hight' }"></div>
+            <div class="sort" :class="{ 'low': params.order === 'low', 'hight': params.order === 'hight' }"></div>
           </template>
         </div>
       </div>
-      <div class="products">
-        <InfiniteScroll :loading="loading" :loadOver="loadOver" @load="loadMore">
-          <template #content>
+      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
+        <template #content>
+          <div class="products">
             <template v-for="(item, index) in productList" :key="index">
-              <div v-if="item.vipEntry" class="entry" @click="clickProduct(item)"></div>
+              <div v-if="item.vipEntry" class="entry" @click="toVip"></div>
               <div v-else class="item" @click="clickProduct(item)">
                 <div class="cover">
-                  <img src="@/assets/images/shop/product.png" alt="">
+                  <img :src="item.mainImage" alt="">
                 </div>
-                <div class="text">可口可乐300ml</div>
+                <div class="text">{{ item.productName }}</div>
                 <div class="option">
-                  <span class="point">积分 854.00</span>
-                  <span class="add-cart"></span>
+                  <span class="point">积分 {{ formatNumberWithCommas(item.totalAmount) }}</span>
+                  <span class="add-cart" @click="addCart(item)"></span>
                 </div>
               </div>
             </template>
-          </template>
-        </InfiniteScroll>
-      </div>
+          </div>
+        </template>
+      </InfiniteScroll>
     </div>
   </main>
 </template>
@@ -55,8 +56,12 @@
 import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import { formatNumberWithCommas } from '@/utils'
 
-const tabs = ref([
+const route = useRoute()
+const router = useRouter()
+
+const categorys = ref([
   {
     name: '休闲零食',
     icon: new URL(`@/assets/images/shop/tab1.png`, import.meta.url).href,
@@ -88,52 +93,124 @@ const sortTypeList = ref([
   { name: '价格', type: 'price', sort: true },
 ])
 
-// 推荐-recommend 热度-hot 价格-price
-const currentFilter = ref('recommend')
-// 低到高-low 高到低-hight
-const priceSort = ref('')
+const params = ref({
+  current: 1,
+  pageSize: 20,
+  categoryId: '',  // 分类ID
+  productName: '',  // 商品名称（模糊查询）
+  status: 1,  // 状态：0-下架，1-上架
+  sortType: 'recommend',  // 推荐-recommend 热度-hot 价格-price
+  order: '',  // 低到高-low 高到低-hight
+})
 // 商品列表
-const productList = ref([{}, { vipEntry: true }])
+const productList = ref([])
 const loading = ref(false)
 const loadOver = ref(false)
+const isEmpty = ref(false)
+// 是否插入vip专区入口
+const hasVipEntry = ref(false)
 
 onMounted(() => {
-
+  init()
 })
 
-const loadMore = () => {
-  loading.value = true
-  const timer = setTimeout(() => {
-    clearTimeout(timer)
-    loading.value = false
-    // loadOver.value = true
-    productList.value = [...productList.value, ...[{}, {}, {}, {}]]
-  }, 1000)
+const init = async () => {
+  $toast.loading()
+  await getCategoryList()
+  $toast.close()
 }
 
-const clickTab = (item) => {
-  // router.push('');
+const loadMore = () => {
+  getProductList()
+}
+
+const getCategoryList = async () => {
+  try {
+    const res = await api.post('/shop/category/list', {})
+    if (res.code === 200) {
+      clickCategory(res.data[0])
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const getProductList = async (init) => {
+  if (init) {
+    params.value.current = 1
+    productList.value = []
+    loadOver.value = false
+    isEmpty.value = false
+  }
+  try {
+    loading.value = true
+    const res = await api.post('/shop/product/page', params.value)
+    loading.value = false
+    if (res.code === 200) {
+      const list = res.data.data || []
+      productList.value = [...productList.value, ...list]
+      params.value.current++
+      // 加载完毕
+      loadOver.value = productList.value.length >= res.data.total
+      // 空列表
+      isEmpty.value = loadOver.value && productList.value.length === 0
+      // 数组的第二个，插入vip专区入口
+      if (productList.value.length >= 1 && !hasVipEntry.value) {
+        hasVipEntry.value = true
+        productList.value.splice(1, 0, { vipEntry: true })
+      }
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+    loading.value = false
+  }
+}
+
+const clickCategory = (item) => {
+  if (!item.categoryId || item.status === 0) {
+    return
+  }
+  params.value.categoryId = item.categoryId
+  getProductList(true)
 }
 
 const clickFilter = (item) => {
-  currentFilter.value = item.type
+  params.value.sortType = item.type
   // 价格排序
-  if (currentFilter.value === 'price') {
-    if (priceSort.value === 'low') {
-      priceSort.value = 'hight'
+  if (params.value.sortType === 'price') {
+    if (params.value.order === 'low') {
+      params.value.order = 'hight'
     } else {
-      priceSort.value = 'low'
+      params.value.order = 'low'
     }
   }
+  getProductList(true)
+}
+
+const toVip = () => {
+  // router.push('');
 }
 
 const clickProduct = (item) => {
   // router.push('');
-  if (item.vipEntry) {
-    return;
-  }
 }
 
+const addCart = async ({ productId, skuId }) => {
+  try {
+    const res = await api.post('/shop/cart/add', { productId, skuId, quantity: 1 })
+    if (res.code === 200) {
+      $toast.info('加入购物车成功')
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
 </script>
 
 <style scoped lang="less">
