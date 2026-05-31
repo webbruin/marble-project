@@ -87,8 +87,14 @@ const router = useRouter()
 const userInfo = ref({})
 
 onMounted(() => {
-  getUserInfo()
+  init()
 })
+
+const init = async () => {
+  $toast.loading()
+  await getUserInfo()
+  $toast.close()
+}
 
 const getUserInfo = async () => {
   const res = await api.post('/user/info/getUserInfo')

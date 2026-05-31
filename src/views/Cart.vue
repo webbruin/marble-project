@@ -238,6 +238,7 @@ const clearCart = async () => {
     const res = await api.post('/shop/cart/clear', {})
     if (res.code === 200) {
       cartList.value = []
+      isEmpty.value = true
     } else {
       $toast.info(res.message)
     }
