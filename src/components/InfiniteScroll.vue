@@ -72,6 +72,7 @@ onUnmounted(() => {
   font-weight: 400;
   font-style: normal;
   text-align: center;
+  margin-top: .vw(10)[];
 
   &.hide {
     opacity: 0;

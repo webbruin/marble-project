@@ -3,7 +3,7 @@
     <Header title="收货地址"></Header>
     <div class="body">
       <template v-if="addressList.length">
-        <div class="item" v-for="(item, index) in addressList" :key="index">
+        <div class="item" v-for="(item, index) in addressList" :key="index" @click="clickAddress(item)">
           <div class="user">
             <span class="text">{{ item.recipientName }}</span>
             <span class="text">{{ item.recipientPhone }}</span>
@@ -79,12 +79,18 @@ const deleteAddress = async (addressId) => {
     if (res.code === 200) {
       $toast.info('地址删除成功')
       addressList.value = addressList.value.filter(item => item.addressId != addressId)
-      // getAddressList()
     } else {
       $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
+  }
+}
+
+const clickAddress = (item) => {
+  if (route.params.type === 'select') {
+    localStorage.setItem('selectAddress', JSON.stringify(item))
+    router.back()
   }
 }
 

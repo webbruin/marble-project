@@ -80,7 +80,7 @@ const init = async () => {
 const getStatus = async () => {
   const res = await api.post('/signIn/getStatus')
   if (res.code === 200) {
-    checkInData.value = res.data
+    checkInData.value = res.data || {}
   } else {
     $toast.info(res.message)
   }
@@ -89,7 +89,7 @@ const getStatus = async () => {
 const getCalendar = async () => {
   const res = await api.post('/signIn/getCalendar')
   if (res.code === 200) {
-    checkInList.value = res.data.slice(0, 7)
+    checkInList.value = res.data.slice(0, 7) || []
     checkInList.value[6].bigSize = true
   } else {
     $toast.info(res.message)
@@ -97,12 +97,17 @@ const getCalendar = async () => {
 }
 
 const clickCheckIn = async () => {
+  if (checkInData.value.signedToday === undefined) {
+    return
+  }
   $toast.loading('签到中')
   const res = await api.post('/signIn/doSignIn')
   $toast.close()
   if (res.code === 200) {
     showBallSuccess.value = true
     checkInBallInfo.value = res.data
+    checkInData.value.signedToday = true
+    // getStatus()
     getUserMarbleAmount()
   } else {
     $toast.info(res.message)

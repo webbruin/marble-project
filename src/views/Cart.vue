@@ -7,52 +7,54 @@
     </Header>
     <div class="body">
       <div class="tag">
-        <div class="all-count">背包总共15件</div>
-        <div class="trash-cart">
+        <div class="all-quantity">背包总共{{ cartList.length }}件</div>
+        <div class="trash-cart" v-if="cartList.length">
           <i class="icon"></i>
-          <span class="text" @click="clearCart">清空背包</span>
+          <span class="text" @click="clickClearCart">清空背包</span>
         </div>
       </div>
-      <div class="cart-list">
-        <InfiniteScroll :loading="loading" :loadOver="loadOver" @load="loadMore">
-          <template #content>
-            <div class="item" v-for="(item, index) in cartList" :key="index">
-              <div class="check">
-                <i class="select" :class="{ 'selected': item.selected }" @click="item.selected = !item.selected"></i>
-              </div>
-              <div class="module">
-                <div class="cover">
-                  <img src="@/assets/images/shop/cover.png" alt="">
+      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
+        <template #content>
+          <div class="cart-list">
+            <template v-for="(item, index) in cartList" :key="index">
+              <div class="item" v-if="item.quantity > 0">
+                <div class="check">
+                  <i class="select" :class="{ 'selected': item.selected === 1 }" @click="clickSelectCart(item)"></i>
                 </div>
-                <div class="info">
-                  <p class="name">​​反骨糯米糍​​</p>
-                  <p class="desc">规格：500克</p>
-                  <p class="point">积分 {{ formatNumberWithCommas(item.point) }}</p>
+                <div class="module">
+                  <div class="cover">
+                    <img :src="item.productImage" alt="">
+                  </div>
+                  <div class="info">
+                    <p class="name">{{ item.productName }}</p>
+                    <p class="desc">规格：{{ item.skuName }}</p>
+                    <p class="price">积分 {{ formatNumberWithCommas(item.price) }}</p>
+                  </div>
+                </div>
+                <div class="option">
+                  <i class="sub" :class="{ 'disabled': item.quantity < 1 }" @click="subQuantity(item)"></i>
+                  <div class="quantity">
+                    <input type="number" v-model="item.quantity" @input="quantityChange($event, item)">
+                  </div>
+                  <i class="plus" :class="{ 'disabled': item.quantity >= item.stock }" @click="plusQuantity(item)"></i>
                 </div>
               </div>
-              <div class="option">
-                <i class="sub" :class="{ 'disabled': item.count <= 1 }" @click="item.count--"></i>
-                <div class="count">
-                  <input type="number" v-model="item.count" @input="countChange($event, item)">
-                </div>
-                <i class="plus" :class="{ 'disabled': item.count >= item.maxCount }" @click="item.count++"></i>
-              </div>
-            </div>
-          </template>
-        </InfiniteScroll>
-      </div>
+            </template>
+          </div>
+        </template>
+      </InfiniteScroll>
     </div>
     <div class="footer">
       <div class="select-all" @click="clickAll">
         <i class="icon" :class="{ 'selected': cartListIsAll }"></i>
         <span class="text">全选</span>
       </div>
-      <div class="point">
+      <div class="price">
         <p class="text">合计积分</p>
-        <p class="count">{{ formatNumberWithCommas(selectedItemPoint) }}</p>
+        <p class="quantity">{{ formatNumberWithCommas(selectedItemPrice) }}</p>
       </div>
-      <div class="checkout" :class="{ 'disabled': !selectedItemCount }" @click="clickSettlement">
-        <span class="text">去结算({{ selectedItemCount }})</span>
+      <div class="checkout" :class="{ 'disabled': !selectedItemQuantity }" @click="clickSettlement">
+        <span class="text">去结算{{ selectedItemQuantity ? `(${selectedItemQuantity})` : '' }}</span>
       </div>
     </div>
   </main>
@@ -66,76 +68,129 @@ import { formatNumberWithCommas } from '@/utils'
 
 const router = useRouter()
 
-const cartList = ref([
-  { selected: false, count: 1, maxCount: 10, point: 1000 },
-  { selected: false, count: 1, maxCount: 10, point: 100 },
-  { selected: false, count: 1, maxCount: 10, point: 100 },
-  { selected: false, count: 1, maxCount: 10, point: 100 },
-  { selected: false, count: 1, maxCount: 10, point: 100 },
-  { selected: false, count: 1, maxCount: 10, point: 100 },
-  { selected: false, count: 1, maxCount: 10, point: 100 },
-])
+const params = ref({
+  current: 1,
+  pageSize: 20,
+})
+const cartList = ref([])
 const loading = ref(false)
 const loadOver = ref(false)
+const isEmpty = ref(false)
 
 onMounted(() => {
-
+  init()
 })
+
+const init = async () => {
+  $toast.loading()
+  await getCartList(true)
+  $toast.close()
+}
+
+const getCartList = async (init) => {
+  if (init) {
+    params.value.current = 1
+    cartList.value = []
+    loadOver.value = false
+    isEmpty.value = false
+  }
+  try {
+    loading.value = true
+    const res = await api.post('/shop/cart/list', params.value)
+    loading.value = false
+    if (res.code === 200) {
+      res.data = {
+        data: res.data,
+        total: 0
+      }
+      const list = res.data.data || []
+      cartList.value = [...cartList.value, ...list]
+      params.value.current++
+      // 加载完毕
+      loadOver.value = cartList.value.length >= res.data.total
+      // 空列表
+      isEmpty.value = loadOver.value && cartList.value.length === 0
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+    loading.value = false
+  }
+}
 
 const selectedCartList = computed(() => {
-  return cartList.value.filter(item => item.selected)
+  return cartList.value.filter(item => item.selected === 1)
 })
 
-const selectedItemCount = computed(() => {
+const selectedItemQuantity = computed(() => {
   if (selectedCartList.value.length) {
     return selectedCartList.value
-      .map(item => item.count)
+      .map(item => item.quantity)
       .reduce((a, b) => (a || 0) + (b || 0))
   }
   return 0
 })
 
-const selectedItemPoint = computed(() => {
+const selectedItemPrice = computed(() => {
   if (selectedCartList.value.length) {
     return selectedCartList.value
-      .map(item => item.count * item.point)
+      .map(item => item.quantity * item.price)
       .reduce((a, b) => (a || 0) + (b || 0))
   }
   return 0
 })
 
 const cartListIsAll = computed(() => {
-  return cartList.value.every(item => item.selected)
+  return cartList.value.length && cartList.value.every(item => item.selected === 1)
 })
 
-const countChange = (event, item) => {
+const clickSelectCart = (item) => {
+  item.selected = (item.selected ? 0 : 1)
+  updateCart(item)
+}
+
+const subQuantity = (item) => {
+  item.quantity--
+  if (item.quantity === 0) {
+    deleteCart(item)
+  } else {
+    updateCart(item)
+  }
+}
+
+const plusQuantity = (item) => {
+  item.quantity++
+  updateCart(item)
+}
+
+const quantityChange = (event, item) => {
   const min = 1
-  const max = item.maxCount
-  const count = +event.target.value
-  item.count = Math.min(Math.max(count, min), max)
+  const max = item.stock
+  const quantity = +event.target.value
+  item.quantity = Math.min(Math.max(quantity, min), max)
+  updateCart(item)
 }
 
 const loadMore = () => {
-  loading.value = true
-  const timer = setTimeout(() => {
-    clearTimeout(timer)
-    loading.value = false
-    loadOver.value = true
-    cartList.value = [...cartList.value, ...cartList.value]
-  }, 1000)
+  getCartList()
 }
 
 const clickAll = () => {
+  if (!cartList.value.length) {
+    return
+  }
   cartList.value = cartList.value.map(item => {
     return {
       ...item,
-      selected: !cartListIsAll.value
+      selected: !cartListIsAll.value ? 1 : 0
     }
   })
 }
 
 const clickSettlement = () => {
-  // console.log(111, selectedCartList.value)
+  localStorage.setItem('selectCart', JSON.stringify(selectedCartList.value))
+  localStorage.removeItem('selectAddress')
   router.push({ name: 'settlement' })
 }
 
@@ -143,13 +198,52 @@ const toAddress = () => {
   router.push({ name: 'address' });
 }
 
-const clearCart = () => {
+const clickClearCart = () => {
   $modal.show({
     content: '是否清空背包？',
     onConfirm: () => {
-
+      clearCart()
     }
   })
+}
+
+const updateCart = async ({ cartId, quantity, selected }) => {
+  try {
+    const res = await api.post('/shop/cart/update', { cartId, quantity, selected })
+    if (res.code === 200) {
+      // ...
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const deleteCart = async ({ cartId }) => {
+  try {
+    const res = await api.post('/shop/cart/delete', { cartId })
+    if (res.code === 200) {
+      cartList.value = cartList.value.filter(item => item.cartId != cartId)
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const clearCart = async () => {
+  try {
+    const res = await api.post('/shop/cart/clear', {})
+    if (res.code === 200) {
+      cartList.value = []
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
 }
 </script>
 
@@ -183,7 +277,7 @@ const clearCart = () => {
       justify-content: space-between;
       margin-bottom: .vw(8)[];
 
-      .all-count {
+      .all-quantity {
         color: var(--light-text--);
         font-family: "PingFang SC";
         font-size: .vw(14)[];
@@ -281,7 +375,7 @@ const clearCart = () => {
               margin-bottom: .vw(6)[];
             }
 
-            .point {
+            .price {
               color: var(--orange--);
               font-family: "PingFang SC";
               font-size: .vw(14)[];
@@ -327,7 +421,7 @@ const clearCart = () => {
             background-image: url(@/assets/images/plus.png);
           }
 
-          .count {
+          .quantity {
             min-width: .vw(30)[];
             width: .vw(30)[];
             height: .vw(18)[];
@@ -391,7 +485,7 @@ const clearCart = () => {
       }
     }
 
-    .point {
+    .price {
       margin-left: .vw(30)[];
       margin-right: .vw(10)[];
 
@@ -405,7 +499,7 @@ const clearCart = () => {
         margin-bottom: .vw(4)[];
       }
 
-      .count {
+      .quantity {
         color: var(--orange--);
         font-family: "PingFang SC";
         font-size: .vw(18)[];

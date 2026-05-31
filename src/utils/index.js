@@ -5,6 +5,15 @@
 // 密码校验
 const passwordRegExp = new RegExp(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{8,20}$/)
 
+// 手机号正则：中国大陆 1 开头的 11 位数字
+const phoneRegExp = /^1\d{10}$/
+
+// 校验手机号格式
+const validatePhone = (phone) => {
+  if (!phone) return false
+  return phoneRegExp.test(String(phone))
+}
+
 // 手机号中间四位机密
 const maskPhoneNumber = (phone) => {
   // 参数校验：必须为字符串或可转为字符串的类型
@@ -86,6 +95,8 @@ function formatToTwoDecimals(input) {
 
 export {
   passwordRegExp,
+  phoneRegExp,
+  validatePhone,
   maskPhoneNumber,
   formatNumberWithCommas,
   formatToTwoDecimals

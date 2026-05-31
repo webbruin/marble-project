@@ -35,10 +35,11 @@ const router = createRouter({
     { path: '/invitation', name: 'invitation', component: () => import('../views/Invitation.vue') },
     { path: '/settlement', name: 'settlement', component: () => import('../views/Settlement.vue') },
     { path: '/order/:type?', name: 'order', component: () => import('../views/Order.vue') },
-    { path: '/address', name: 'address', component: () => import('../views/Address.vue') },
+    { path: '/address/:type?', name: 'address', component: () => import('../views/Address.vue') },
     { path: '/edit-address/:type', name: 'edit-address', component: () => import('../views/EditAddress.vue') },
     { path: '/pay-success', name: 'pay-success', component: () => import('../views/PaySuccess.vue') },
     { path: '/pay-fail', name: 'pay-fail', component: () => import('../views/PayFail.vue') },
+    { path: '/product-detail/:productId', name: 'product-detail', component: () => import('../views/ProductDetail.vue') },
     // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/404.vue') },
   ],

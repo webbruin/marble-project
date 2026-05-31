@@ -34,7 +34,7 @@
         <div class="default-address">
           <span class="text">设为默认地址</span>
           <van-switch v-model="formdata.isDefault" :active-value="1" :inactive-value="0" active-color="#FFB169"
-            inactive-color="#dcdee0" size="16px" />
+            inactive-color="#dcdee0" size="20px" />
         </div>
       </div>
     </div>
@@ -55,6 +55,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Input from '@/components/FormData/Input.vue'
 import Button from '@/components/FormData/Button.vue'
 import { useCascaderAreaData } from '@vant/area-data';
+import { validatePhone } from '@/utils';
 
 const route = useRoute()
 const router = useRouter()
@@ -113,6 +114,10 @@ const clickSaveAddress = async () => {
   }
   if (!body.recipientPhone) {
     $toast.info('请填写收货人手机号')
+    return
+  }
+  if (!validatePhone(body.recipientPhone)) {
+    $toast.info('请输入正确的手机号')
     return
   }
   if (!body.province || !body.city || !body.district) {

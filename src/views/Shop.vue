@@ -4,17 +4,16 @@
       <div class="title">商城兑换</div>
       <div class="point">
         <p class="text">我的积分</p>
-        <p class="count">{{ formatNumberWithCommas(8213) }}</p>
+        <p class="count">{{ formatNumberWithCommas(cardAmount) }}</p>
       </div>
     </div>
     <div class="body">
       <div class="tab">
         <div class="item" v-for="(item, index) in categorys" :key="index" @click="clickCategory(item)">
           <div class="icon">
-            <img :src="item.icon" alt="">
+            <img :src="item.icon" alt="" v-if="item.icon">
           </div>
-          <p class="text">{{ item.name }}</p>
-          <!-- <p class="text">{{ item.categoryName }}</p> -->
+          <p class="text">{{ item.categoryName }}</p>
         </div>
       </div>
       <div class="banner">
@@ -40,8 +39,8 @@
                 </div>
                 <div class="text">{{ item.productName }}</div>
                 <div class="option">
-                  <span class="point">积分 {{ formatNumberWithCommas(item.totalAmount) }}</span>
-                  <span class="add-cart" @click="addCart(item)"></span>
+                  <span class="point">积分 {{ formatNumberWithCommas(item.minSkuPrice) }}</span>
+                  <span class="add-cart" @click.stop="addCart(item)"></span>
                 </div>
               </div>
             </template>
@@ -61,31 +60,32 @@ import { formatNumberWithCommas } from '@/utils'
 const route = useRoute()
 const router = useRouter()
 
+const cardAmount = ref(0)
 const categorys = ref([
-  {
-    name: '休闲零食',
-    icon: new URL(`@/assets/images/shop/tab1.png`, import.meta.url).href,
-  },
-  {
-    name: '酒水饮料',
-    icon: new URL(`@/assets/images/shop/tab2.png`, import.meta.url).href,
-  },
-  {
-    name: '儿童玩具',
-    icon: new URL(`@/assets/images/shop/tab3.png`, import.meta.url).href,
-  },
-  {
-    name: '电子数码',
-    icon: new URL(`@/assets/images/shop/tab4.png`, import.meta.url).href,
-  },
-  {
-    name: '数码产品',
-    icon: new URL(`@/assets/images/shop/tab5.png`, import.meta.url).href,
-  },
-  {
-    name: '美妆用品',
-    icon: new URL(`@/assets/images/shop/tab6.png`, import.meta.url).href,
-  },
+  // {
+  //   name: '休闲零食',
+  //   icon: new URL(`@/assets/images/shop/tab1.png`, import.meta.url).href,
+  // },
+  // {
+  //   name: '酒水饮料',
+  //   icon: new URL(`@/assets/images/shop/tab2.png`, import.meta.url).href,
+  // },
+  // {
+  //   name: '儿童玩具',
+  //   icon: new URL(`@/assets/images/shop/tab3.png`, import.meta.url).href,
+  // },
+  // {
+  //   name: '电子数码',
+  //   icon: new URL(`@/assets/images/shop/tab4.png`, import.meta.url).href,
+  // },
+  // {
+  //   name: '数码产品',
+  //   icon: new URL(`@/assets/images/shop/tab5.png`, import.meta.url).href,
+  // },
+  // {
+  //   name: '美妆用品',
+  //   icon: new URL(`@/assets/images/shop/tab6.png`, import.meta.url).href,
+  // },
 ])
 const sortTypeList = ref([
   { name: '推荐', type: 'recommend' },
@@ -111,6 +111,7 @@ const isEmpty = ref(false)
 const hasVipEntry = ref(false)
 
 onMounted(() => {
+  getPointCardAmount()
   init()
 })
 
@@ -118,6 +119,20 @@ const init = async () => {
   $toast.loading()
   await getCategoryList()
   $toast.close()
+}
+
+// 查询当前用户积分卡余额
+const getPointCardAmount = async () => {
+  try {
+    const res = await api.post('/user/account/getPointCardAmount')
+    if (res.code === 200) {
+      cardAmount.value = +res.data
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
 }
 
 const loadMore = () => {
@@ -128,7 +143,7 @@ const getCategoryList = async () => {
   try {
     const res = await api.post('/shop/category/list', {})
     if (res.code === 200) {
-      clickCategory(res.data[0])
+      categorys.value = res.data || []
     } else {
       $toast.info(res.message)
     }
@@ -171,7 +186,7 @@ const getProductList = async (init) => {
 }
 
 const clickCategory = (item) => {
-  if (!item.categoryId || item.status === 0) {
+  if (!item.categoryId || item.status === 0 || params.value.categoryId === item.categoryId) {
     return
   }
   params.value.categoryId = item.categoryId
@@ -195,13 +210,13 @@ const toVip = () => {
   // router.push('');
 }
 
-const clickProduct = (item) => {
-  // router.push('');
+const clickProduct = ({ productId }) => {
+  router.push({ name: 'product-detail', params: { productId } });
 }
 
-const addCart = async ({ productId, skuId }) => {
+const addCart = async ({ productId, minSkuId }) => {
   try {
-    const res = await api.post('/shop/cart/add', { productId, skuId, quantity: 1 })
+    const res = await api.post('/shop/cart/add', { productId, skuId: minSkuId, quantity: 1 })
     if (res.code === 200) {
       $toast.info('加入购物车成功')
     } else {

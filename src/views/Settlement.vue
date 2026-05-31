@@ -2,24 +2,43 @@
   <main class="settlement">
     <Header title="确认订单"></Header>
     <div class="body">
+      <div class="address">
+        <div class="title">收货地址</div>
+        <div class="item" @click="clickSelectAddress">
+          <div class="info">
+            <template v-if="params.addressId">
+              <div class="text">{{ address.recipientName }} {{ address.recipientPhone }}</div>
+              <div class="text">
+                {{ address.province }} {{ address.city }} {{ address.district }} {{ address.detailAddress }}
+              </div>
+            </template>
+            <template v-else>
+              <div class="desc">请选择地址</div>
+            </template>
+          </div>
+        </div>
+      </div>
       <div class="product-list">
         <div class="item" v-for="(item, index) in settlementList" :key="index">
           <div class="cover">
-            <img src="@/assets/images/shop/cover.png" alt="">
+            <img :src="item.productImage" alt="">
           </div>
           <div class="info">
-            <p class="name">​​反骨糯米糍​​</p>
-            <p class="desc">规格：500克</p>
-            <p class="point">积分 {{ formatNumberWithCommas(item.point) }}</p>
+            <p class="name">{{ item.productName }}</p>
+            <p class="desc">规格：{{ item.skuName }}</p>
+            <p class="point">积分 {{ formatNumberWithCommas(item.price) }}</p>
           </div>
-          <div class="count">X{{ item.count }}</div>
+          <div class="count">X{{ item.quantity }}</div>
         </div>
       </div>
       <div class="pay-list">
-        <div class="title">请选择支付方式</div>
+        <div class="title">支付方式</div>
         <div class="item" v-for="(item, index) in payList" :key="index" @click="clickPayType(item)">
           <img :src="item.icon" alt="" class="icon">
-          <span class="text">{{ item.name }}{{ item.count ? `（剩余：${item.count}）` : '' }}</span>
+          <span class="text">
+            {{ item.name }}
+            {{ item.type === 'point' ? `（剩余：${cardAmount}）` : '' }}
+          </span>
           <span class="select" :class="{ 'selected': payType === item.type }"></span>
         </div>
       </div>
@@ -36,7 +55,7 @@
     <div class="footer">
       <div class="info">
         <span class="text">共计：</span>
-        <span class="count">153张奖励卡</span>
+        <span class="count">{{ formatNumberWithCommas(selectedPrice) }}积分</span>
       </div>
       <div class="pay" @click="clickPay">确定支付</div>
     </div>
@@ -50,30 +69,80 @@ import { formatNumberWithCommas } from '@/utils'
 
 const router = useRouter()
 
-const settlementList = ref([
-  { count: 1, point: 1000 },
-  { count: 1, point: 1000 },
-  { count: 1, point: 1000 },
-])
+const params = ref({
+  addressId: '',
+  cartIds: [],
+  remark: ''
+})
+const settlementList = ref([])
 const payList = ref([
   {
     icon: new URL(`@/assets/images/point.png`, import.meta.url).href,
-    name: '奖励卡支付',
-    type: 'point',
-    count: 6
-  },
-  {
-    icon: new URL(`@/assets/images/alipay.png`, import.meta.url).href,
-    name: '支付宝支付',
-    type: 'alipay',
+    name: '积分支付',
+    type: 'point'
   },
 ])
-const payType = ref('')
+const address = ref({})
+const cardAmount = ref(0)
+const payType = ref('point')
 const isAgree = ref(false)
 
 onMounted(() => {
-
+  getPointCardAmount()
+  init()
 })
+
+const init = () => {
+  settlementList.value = JSON.parse(localStorage.getItem('selectCart')) || []
+  params.value.cartIds = settlementList.value.map(item => item.cartId)
+  if (localStorage.getItem('selectAddress')) {
+    address.value = JSON.parse(localStorage.getItem('selectAddress'))
+    params.value.addressId = address.value.addressId || ''
+  } else {
+    getDefaultAddress()
+  }
+}
+
+const getDefaultAddress = async () => {
+  try {
+    const res = await api.post('/shop/address/list', {})
+    if (res.code === 200) {
+      address.value = res.data.find(item => item.isDefault === 1) || {}
+      params.value.addressId = address.value.addressId || ''
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 查询当前用户积分余额
+const getPointCardAmount = async () => {
+  try {
+    const res = await api.post('/user/account/getPointCardAmount')
+    if (res.code === 200) {
+      cardAmount.value = +res.data
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const selectedPrice = computed(() => {
+  if (settlementList.value.length) {
+    return settlementList.value
+      .map(item => item.quantity * item.price)
+      .reduce((a, b) => (a || 0) + (b || 0))
+  }
+  return 0
+})
+
+const clickSelectAddress = () => {
+  router.push({ name: 'address', params: { type: 'select' } });
+}
 
 const clickPayType = (item) => {
   if (payType.value === item.type) {
@@ -87,6 +156,10 @@ const clickAggrement = (type) => {
 }
 
 const clickPay = () => {
+  if (!params.value.addressId) {
+    $toast.info('请选择收货地址')
+    return
+  }
   if (!payType.value) {
     $toast.info('请选择支付方式')
     return
@@ -101,7 +174,41 @@ const clickPay = () => {
     })
     return
   }
-  console.log(111, settlementList.value);
+  createByCart()
+}
+
+const createByCart = async () => {
+  $toast.loading('订单创建中')
+  try {
+    const res = await api.post('/shop/order/createByCart', params.value)
+    $toast.close()
+    if (res.code === 200) {
+      orderPay(res.data)
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const orderPay = async (orderId) => {
+  $toast.loading('订单支付中')
+  try {
+    const res = await api.post('/shop/order/pay', { orderId })
+    $toast.close()
+    if (res.code === 200) {
+      $toast.info('支付成功')
+      const timer = setTimeout(() => {
+        clearTimeout(timer)
+        router.push({ name: 'order' });
+      }, 1500)
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
 }
 </script>
 
@@ -122,6 +229,63 @@ const clickPay = () => {
     overflow-x: hidden;
     padding: .vw(12)[] .vw(16)[];
 
+    .address {
+      .title {
+        color: var(--light-text--);
+        font-family: "PingFang SC";
+        font-size: .vw(14)[];
+        line-height: .vw(14)[];
+        font-weight: 500;
+        font-style: normal;
+        margin-bottom: .vw(8)[];
+      }
+
+      .item {
+        display: flex;
+        align-items: center;
+        border-radius: .vw(12)[];
+        background-color: var(--white--);
+        padding: .vw(12)[];
+        margin-bottom: .vw(12)[];
+
+        &::after {
+          content: '';
+          width: .vw(14)[];
+          height: .vw(14)[];
+          background-size: 100%;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-image: url(@/assets/images/arrow-right.png);
+          margin-left: .vw(10)[];
+        }
+
+        .info {
+          flex: 1;
+
+          .desc {
+            color: var(--text--);
+            font-family: "PingFang SC";
+            font-size: .vw(14)[];
+            line-height: .vw(14)[];
+            font-weight: 400;
+          }
+
+          .text {
+            color: var(--light-text--);
+            font-family: "PingFang SC";
+            font-size: .vw(14)[];
+            line-height: .vw(14)[];
+            font-weight: 400;
+            font-style: normal;
+
+            &:not(:last-of-type) {
+              margin-bottom: .vw(10)[];
+            }
+          }
+        }
+      }
+    }
+
     .product-list {
       .item {
         display: flex;
@@ -129,7 +293,7 @@ const clickPay = () => {
         border-radius: .vw(6)[];
         background-color: var(--white--);
         padding: .vw(16)[];
-        margin-bottom: .vw(24)[];
+        margin-bottom: .vw(12)[];
 
         &:not(:last-of-type) {
           margin-bottom: .vw(8)[];

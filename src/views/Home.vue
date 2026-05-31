@@ -758,7 +758,7 @@ const getUserMarbleAmount = async () => {
     line-height: .vw(48)[];
     font-weight: 400;
     text-align: center;
-    background-color: #D1CEBF;
+    /* background-color: #D1CEBF; */
   }
 }
 </style>
