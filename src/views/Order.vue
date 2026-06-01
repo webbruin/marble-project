@@ -2,34 +2,43 @@
   <main class="order">
     <Header title="订单"></Header>
     <div class="tab">
-      <div class="item" :class="{ 'selected': tab === item.type }" v-for="(item, index) in tabList" :key="index"
-        @click="clickTab(item.type)">
+      <div class="item" :class="{ 'selected': params.orderStatus === item.orderStatus }"
+        v-for="(item, index) in tabList" :key="index" @click="clickTab(item.orderStatus)">
         {{ item.name }}
       </div>
     </div>
     <div class="body">
-      <InfiniteScroll :loading="loading" :loadOver="loadOver" @load="loadMore">
+      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
         <template #content>
           <div class="order-list">
-            <div class="item" v-for="(item, index) in orderList" :key="index">
+            <div class="item" v-for="(item, index) in orderList" :key="index" @click="toOrderDetail(item)">
               <div class="address">
-                <span class="text">北京市朝阳区凤凰汇6栋1584市</span>
+                <!-- <span class="text">北京市朝阳区凤凰汇6栋1584市</span> -->
+                <span class="text">{{ item.firstProductName }}</span>
                 <i class="arrow"></i>
               </div>
               <div class="product">
                 <div class="cover-list">
-                  <div class="cover" v-for="(item, index) in item.coverList" :key="index">
-                    <img src="@/assets/images/shop/cover.png" alt="">
+                  <div class="cover">
+                    <img :src="item.firstProductImage" alt="">
                   </div>
                 </div>
                 <div class="info">
-                  <p class="point">积分5,531</p>
-                  <p class="count">共1件</p>
+                  <p class="point">积分{{ formatNumberWithCommas(item.pointCardAmount) }}</p>
+                  <p class="count">共{{ item.totalQuantity }}件</p>
                 </div>
               </div>
               <div class="button-list">
-                <div class="button" :class="{ 'disabled': false }">待支付</div>
-                <div class="button" :class="{ 'disabled': true }">已完成</div>
+                <template v-if="item.orderStatus === 0">
+                  <div class="button" :class="{ 'disabled': false }">待支付</div>
+                </template>
+                <template v-if="item.orderStatus === 1"></template>
+                <template v-if="item.orderStatus === 2"></template>
+                <template v-if="item.orderStatus === 3"></template>
+                <template v-if="item.orderStatus === 4"></template>
+                <template v-if="item.orderStatus === 5 || item.orderStatus === 6">
+                  <div class="button" :class="{ 'disabled': true }">已完成</div>
+                </template>
               </div>
             </div>
           </div>
@@ -43,50 +52,99 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import { formatNumberWithCommas } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
 
-const tab = ref('all')
+const params = reactive({
+  current: 1,
+  pageSize: 20,
+  orderStatus: null,  // 0-待支付，1-已支付，2-已发货，3-已收货，4-退款中，5-已退款，6-已关闭
+  createTimeStart: '',  // 创建时间起（含）
+  createTimeEnd: '',  // 创建时间止（含）
+  orderId: '',  // 订单号（模糊查询）
+  recipientPhone: '',  // 收货人电话（模糊查询）
+})
 const tabList = ref([
-  { name: '全部', type: 'all' },
-  { name: '待付款', type: 'pending' },
-  { name: '进行中', type: 'shipment' },
-  { name: '待收货', type: 'beReceived' },
-  // { name: '已收货', type: 'received' },
-  { name: '退款/售后', type: 'refunded' },
+  { name: '全部', orderStatus: null },
+  { name: '待支付', orderStatus: 0 },
+  { name: '已支付', orderStatus: 1 },
+  { name: '已发货', orderStatus: 2 },
+  { name: '已收货', orderStatus: 3 },
+  { name: '退款中', orderStatus: 4 },
+  { name: '已退款', orderStatus: 5 },
+  { name: '已关闭', orderStatus: 6 },
 ])
 const orderList = ref([
-  { coverList: ['', '', '', '', '', '', '', ''] },
-  { coverList: ['', '', '', ''] },
-  { coverList: ['', '', '', ''] },
-  { coverList: ['', '', '', ''] },
-  { coverList: ['', '', '', ''] },
-  { coverList: ['', '', '', ''] },
-  { coverList: ['', '', '', ''] },
+  // { coverList: ['', '', '', '', '', '', '', ''] },
+  // { coverList: ['', '', '', ''] },
+  // { coverList: ['', '', '', ''] },
+  // { coverList: ['', '', '', ''] },
+  // { coverList: ['', '', '', ''] },
+  // { coverList: ['', '', '', ''] },
+  // { coverList: ['', '', '', ''] },
 ])
 const loading = ref(false)
 const loadOver = ref(false)
+const isEmpty = ref(false)
 
 onMounted(() => {
-  const type = route.params.type || 'all'
-  clickTab(type)
+  params.orderStatus = +route.params.status || null
+  init()
 })
 
-const clickTab = (type) => {
-  tab.value = type
+const init = async () => {
+  $toast.loading()
+  await getOrderList(true)
+  $toast.close()
+}
+
+const getOrderList = async (init) => {
+  if (init) {
+    params.current = 1
+    orderList.value = []
+    loadOver.value = false
+    isEmpty.value = false
+  }
+  try {
+    loading.value = true
+    const res = await api.post('/shop/order/page', params)
+    loading.value = false
+    if (res.code === 200) {
+      const list = res.data.data || []
+      orderList.value = [...orderList.value, ...list]
+      params.current++
+      // 加载完毕
+      loadOver.value = orderList.value.length >= res.data.total
+      // 空列表
+      isEmpty.value = loadOver.value && orderList.value.length === 0
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    console.log(222, e);
+    $toast.info('系统错误')
+    loading.value = false
+  }
+}
+
+const clickTab = (orderStatus) => {
+  if (params.orderStatus === orderStatus) {
+    return
+  }
+  params.orderStatus = orderStatus
   // 修改路由订单状态
-  router.replace({ name: 'order', params: { type: tab.value } })
+  router.replace({ name: 'order', params: { status: orderStatus } })
+  getOrderList(true)
 }
 
 const loadMore = () => {
-  loading.value = true
-  const timer = setTimeout(() => {
-    clearTimeout(timer)
-    loading.value = false
-    // loadOver.value = true
-    orderList.value = [...orderList.value, ...[{}, {}, {}, {}, {}]]
-  }, 1000)
+  getOrderList()
+}
+
+const toOrderDetail = (item) => {
+  console.log(111, item);
 }
 </script>
 
@@ -104,9 +162,13 @@ const loadMore = () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    overflow-y: hidden;
+    overflow-x: auto;
     padding: .vw(12)[] .vw(16)[] 0;
 
     .item {
+      width: .vw(72)[];
+      min-width: .vw(72)[];
       height: .vw(32)[];
       color: var(--text--);
       font-family: "PingFang SC";
@@ -115,6 +177,7 @@ const loadMore = () => {
       font-weight: 500;
       font-style: normal;
       text-align: center;
+      white-space: nowrap;
       position: relative;
 
       &.selected {
