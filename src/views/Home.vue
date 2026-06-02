@@ -10,12 +10,13 @@
     <div class="room-tab" v-if="roomLevelList.length">
       <div class="item" :class="{ 'light': params.roomTypeId === item.roomTypeId }"
         v-for="(item, index) in roomLevelList" :key="index" @click="clickRoomTab(item)">
-        <img class="icon" src="@/assets/images/home/low-icon.png" alt="" v-if="item.roomTypeId === '1'">
-        <img class="icon" src="@/assets/images/home/middle-icon.png" alt="" v-if="item.roomTypeId === '2'">
-        <img class="icon" src="@/assets/images/home/hight-icon.png" alt="" v-if="item.roomTypeId === '3'">
+        <img class="icon" src="@/assets/images/home/low-icon.png" alt="" v-if="index === 0">
+        <img class="icon" src="@/assets/images/home/middle-icon.png" alt="" v-else-if="index === 1">
+        <img class="icon" src="@/assets/images/home/hight-icon.png" alt="" v-else-if="index === 2">
+        <img class="icon" src="@/assets/images/home/other-icon.png" alt="" v-else>
         <span class="text" :class="{ light: params.roomTypeId == item.roomTypeId }">{{ item.roomTypeName }}</span>
       </div>
-      <div class="more" @click="moreRoomTab">更多</div>
+      <!-- <div class="more" @click="moreRoomTab">更多</div> -->
     </div>
     <div class="banner">
       <img src="@/assets/images/home/banner.png" alt="">
@@ -296,18 +297,27 @@ const getUserMarbleAmount = async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    overflow-y: hidden;
+    overflow-x: auto;
     padding: 0 .vw(16)[];
     margin-bottom: .vw(16)[];
 
     .item {
+      min-width: .vw(100)[];
       width: .vw(100)[];
       height: .vw(42)[];
+      white-space: nowrap;
       display: flex;
       align-items: center;
       justify-content: center;
       background-size: 100% .vw(42)[];
       background-position: center;
       background-repeat: no-repeat;
+      background-image: url(@/assets/images/home/room.png);
+
+      &:not(:last-of-type) {
+        margin-right: .vw(12)[];
+      }
 
       &:nth-of-type(1) {
         background-image: url(@/assets/images/home/low-room.png);
@@ -335,6 +345,8 @@ const getUserMarbleAmount = async () => {
       }
 
       &.light {
+        background-image: url(@/assets/images/home/room-selected.png);
+
         &:nth-of-type(1) {
           background-image: url(@/assets/images/home/low-room-selected.png);
         }
