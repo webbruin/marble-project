@@ -107,8 +107,8 @@ const clickCheckIn = async () => {
     showBallSuccess.value = true
     checkInBallInfo.value = res.data
     checkInData.value.signedToday = true
-    // getStatus()
     getUserMarbleAmount()
+    getCalendar()
   } else {
     $toast.info(res.message)
   }
