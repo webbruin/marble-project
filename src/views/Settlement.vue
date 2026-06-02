@@ -6,7 +6,7 @@
         <div class="title">收货地址</div>
         <div class="item" @click="clickSelectAddress">
           <div class="info">
-            <template v-if="params.addressId">
+            <template v-if="address.addressId">
               <div class="text">{{ address.recipientName }} {{ address.recipientPhone }}</div>
               <div class="text">
                 {{ address.province }} {{ address.city }} {{ address.district }} {{ address.detailAddress }}
@@ -67,11 +67,19 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { formatNumberWithCommas } from '@/utils'
 
+const route = useRoute()
 const router = useRouter()
 
 const params = ref({
   addressId: '',
   cartIds: [],
+  remark: ''
+})
+const paramsByDirect = ref({
+  addressId: '',
+  productId: '',
+  skuId: '',
+  quantity: '',
   remark: ''
 })
 const settlementList = ref([])
@@ -92,14 +100,26 @@ onMounted(() => {
   init()
 })
 
-const init = () => {
+const init = async () => {
   settlementList.value = JSON.parse(localStorage.getItem('selectCart')) || []
-  params.value.cartIds = settlementList.value.map(item => item.cartId)
+  if (route.params.source === 'cart') {
+    params.value.cartIds = settlementList.value.map(item => item.cartId)
+  }
+  if (route.params.source === 'product-detail') {
+    paramsByDirect.value.productId = settlementList.value[0].productId
+    paramsByDirect.value.skuId = settlementList.value[0].skuId
+    paramsByDirect.value.quantity = settlementList.value[0].quantity
+  }
   if (localStorage.getItem('selectAddress')) {
     address.value = JSON.parse(localStorage.getItem('selectAddress'))
-    params.value.addressId = address.value.addressId || ''
+    if (route.params.source === 'cart') {
+      params.value.addressId = address.value.addressId || ''
+    }
+    if (route.params.source === 'product-detail') {
+      paramsByDirect.value.addressId = address.value.addressId || ''
+    }
   } else {
-    getDefaultAddress()
+    await getDefaultAddress()
   }
 }
 
@@ -108,7 +128,12 @@ const getDefaultAddress = async () => {
     const res = await api.post('/shop/address/list', {})
     if (res.code === 200) {
       address.value = res.data.find(item => item.isDefault === 1) || {}
-      params.value.addressId = address.value.addressId || ''
+      if (route.params.source === 'cart') {
+        params.value.addressId = address.value.addressId || ''
+      }
+      if (route.params.source === 'product-detail') {
+        paramsByDirect.value.addressId = address.value.addressId || ''
+      }
     } else {
       $toast.info(res.message)
     }
@@ -156,7 +181,7 @@ const clickAggrement = (type) => {
 }
 
 const clickPay = () => {
-  if (!params.value.addressId) {
+  if (!params.value.addressId && !paramsByDirect.value.addressId) {
     $toast.info('请选择收货地址')
     return
   }
@@ -174,13 +199,33 @@ const clickPay = () => {
     })
     return
   }
-  createByCart()
+  if (route.params.source === 'cart') {
+    createByCart()
+  }
+  if (route.params.source === 'product-detail') {
+    createByDirect()
+  }
 }
 
 const createByCart = async () => {
   $toast.loading('订单创建中')
   try {
     const res = await api.post('/shop/order/createByCart', params.value)
+    $toast.close()
+    if (res.code === 200) {
+      orderPay(res.data)
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const createByDirect = async () => {
+  $toast.loading('订单创建中')
+  try {
+    const res = await api.post('/shop/order/createByDirect', paramsByDirect.value)
     $toast.close()
     if (res.code === 200) {
       orderPay(res.data)

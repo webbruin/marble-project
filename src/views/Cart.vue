@@ -191,7 +191,7 @@ const clickAll = () => {
 const clickSettlement = () => {
   localStorage.setItem('selectCart', JSON.stringify(selectedCartList.value))
   localStorage.removeItem('selectAddress')
-  router.push({ name: 'settlement' })
+  router.push({ name: 'settlement', params: { source: 'cart' } })
 }
 
 const toAddress = () => {

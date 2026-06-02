@@ -22,7 +22,7 @@
           <div class="sku-list" v-if="productData.skuList?.length">
             <template v-for="item, index in productData.skuList" :key="index">
               <div class="sku" :class="{ 'selected': item.skuId === selectSkuId }" @click="selectSkuId = item.skuId">
-                <div class="sku-img">
+                <div class="sku-img" v-if="item.image">
                   <img :src="item.image" alt="">
                 </div>
                 <span class="sku-name">{{ item.skuName }}</span>
@@ -30,10 +30,10 @@
             </template>
           </div>
         </div>
-        <div class="module module2">
+        <!-- <div class="module module2">
           <span class="desc">限制</span>
           <span class="text">不可使用优惠券丨每人每日限购15瓶</span>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="footer">
@@ -76,7 +76,7 @@ const getProductDetail = async () => {
     if (res.code === 200) {
       productData.value = {
         ...(res.data || {}),
-        images: JSON.parse(res.data.images) || []
+        images: res.data.images ? JSON.parse(res.data.images) : []
       }
       selectSkuId.value = res.data.skuList[0].skuId || {}
     } else {
@@ -96,11 +96,15 @@ const toCart = () => {
 }
 
 const toSettlement = () => {
-  // const selectCart = [{
-
-  // }]
-  // localStorage.setItem('selectCart', JSON.stringify(selectCart))
-  // router.push({ name: 'settlement' })
+  const selectCart = [{
+    ...selectSku.value,
+    productImage: productData.value.mainImage,
+    productName: productData.value.productName,
+    quantity: 1
+  }]
+  localStorage.setItem('selectCart', JSON.stringify(selectCart))
+  localStorage.removeItem('selectAddress')
+  router.push({ name: 'settlement', params: { source: 'product-detail' } })
 }
 </script>
 
@@ -212,6 +216,7 @@ const toSettlement = () => {
             display: flex;
             align-items: center;
             border-radius: .vw(3)[];
+            border: 1px solid transparent;
             background-color: #F2F2F2;
             padding: .vw(6)[] .vw(8)[];
 
