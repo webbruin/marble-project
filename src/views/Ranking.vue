@@ -79,31 +79,36 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import Header from '@/components/Header.vue'
 
+const url = ref('marble')  // marble-弹珠中奖排行榜  pointCard-积分卡中奖排行榜
 const tabList = ref([
   { name: '日榜', type: 1 },
   { name: '周榜', type: 2 },
   { name: '月榜', type: 3 },
 ])
-const tabType = ref(1)
+const tabType = ref(null)
 const rankList = ref([])
 
 onMounted(() => {
-  getRankList()
+  clickTab(1)
 })
 
 const clickTab = (index) => {
   tabType.value = index
-  getRankList()
+  getRankList('marble')
 }
 
 const getRankList = async () => {
   $toast.loading()
-  const res = await api.post('/ranking/pointCard', tabType.value)
-  if (res.code === 200) {
+  try {
+    const res = await api.post(`/ranking/${url.value}`, { type: tabType.value })
     $toast.close()
-    rankList.value = res.data
-  } else {
-    $toast.info(res.message)
+    if (res.code === 200) {
+      rankList.value = res.data
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
   }
 }
 </script>

@@ -10,12 +10,12 @@
         <div class="title">邀请好友</div>
         <div class="info">
           <div class="people">
-            <div class="count">40</div>
+            <div class="count">{{ inviteInfo.invitedCount }}</div>
             <div class="desc">已邀请人数</div>
           </div>
           <div class="price">
             <div class="count">
-              ￥1,135.00
+              ￥{{ formatNumberWithCommas(1135) }}
               <span class="withdrawal">提现</span>
             </div>
             <div class="desc">已奖励金额</div>
@@ -23,29 +23,33 @@
         </div>
         <div class="button" @click="clickShare">分享海报</div>
       </div>
-      <div class="invite-list" v-if="inviteList.length">
-        <div class="title">我的邀请</div>
-        <div class="invite-table">
-          <div class="header-row">
-            <div class="desc">好友</div>
-            <div class="desc">充值金额</div>
-            <div class="desc">邀请时间</div>
-          </div>
-          <div class="row" v-for="(item, index) in inviteList" :key="index">
-            <div class="user">
-              <div class="avatar">
-                <img src="@/assets/images/avatar.png" alt="">
+      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
+        <template #content>
+          <div class="invite-list">
+            <div class="title">我的邀请</div>
+            <div class="invite-table">
+              <div class="header-row">
+                <div class="desc">好友</div>
+                <div class="desc">充值金额</div>
+                <div class="desc">邀请时间</div>
               </div>
-              <div class="info">
-                <p class="name">王天成</p>
-                <p class="id">ID：156151</p>
+              <div class="row" v-for="(item, index) in inviteList" :key="index">
+                <div class="user">
+                  <div class="avatar">
+                    <img src="@/assets/images/avatar.png" alt="">
+                  </div>
+                  <div class="info">
+                    <p class="name">{{ item.inviteeNickName }}</p>
+                    <p class="id">ID：{{ item.inviteeUserId }}</p>
+                  </div>
+                </div>
+                <div class="price">￥{{ formatNumberWithCommas(84511) }}</div>
+                <div class="date">{{ item.inviteTime }}</div>
               </div>
             </div>
-            <div class="price">￥84,511</div>
-            <div class="date">2025.01.22</div>
           </div>
-        </div>
-      </div>
+        </template>
+      </InfiniteScroll>
     </div>
   </main>
 
@@ -91,39 +95,102 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { generateQRCode, getQRCodeDataURL } from '@/utils/qrcode'
+import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import { formatNumberWithCommas } from '@/utils'
 
+const route = useRoute()
 const router = useRouter()
 
-const inviteList = ref([
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-])
+const params = ref({
+  current: 1,
+  pageSize: 20,
+  activityId: '',  // 活动ID
+  recordStatus: '',  // 整体状态：1-进行中，2-成功，3-失败
+})
+const inviteInfo = ref({})
+const inviteList = ref([])
+const loading = ref(false)
+const loadOver = ref(false)
+const isEmpty = ref(false)
 const showRealNameAuth = ref(false)
 const showNewUser = ref(false)
 const showShareQrCode = ref(false)
 const shareQrCode = ref('')
 
-onMounted(async () => {
-
+onMounted(() => {
+  init()
 })
 
-const clickShare = () => {
-  if (true) {
-    showRealNameAuth.value = true
-    return
+const init = async () => {
+  $toast.loading()
+  await getInvitationSummary()
+  await getInvitationList(true)
+  $toast.close()
+}
+
+const loadMore = () => {
+  getInvitationList()
+}
+
+const getInvitationSummary = async () => {
+  try {
+    const { activityId } = params.value
+    const res = await api.post('/invitation/my/summary', { activityId })
+    if (res.code === 200) {
+      inviteInfo.value = res.data || {}
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
   }
-  // shareQrCode.value = await getQRCodeDataURL('https://docs.qq.com/doc/DYWZkeWdDQVNvaGhv', { margin: 3 })
-  // showShareQrCode.value = true
+}
+
+const getInvitationList = async (init) => {
+  if (init) {
+    params.value.current = 1
+    inviteList.value = []
+    loadOver.value = false
+    isEmpty.value = false
+  }
+  try {
+    loading.value = true
+    const res = await api.post('/invitation/my/page', params.value)
+    loading.value = false
+    if (res.code === 200) {
+      const list = res.data.data || []
+      inviteList.value = [...inviteList.value, ...list]
+      params.value.current++
+      // 加载完毕
+      loadOver.value = inviteList.value.length >= res.data.total
+      // 空列表
+      isEmpty.value = loadOver.value && inviteList.value.length === 0
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+    loading.value = false
+  }
+}
+
+const clickShare = async () => {
+  // if (false) {
+  //   showRealNameAuth.value = true
+  //   return
+  // }
+  try {
+    const { activityId } = params.value
+    const res = await api.post('/invitation/code/generate', { activityId })
+    if (res.code === 200) {
+      shareQrCode.value = await getQRCodeDataURL(res.data.shareUrl, { margin: 3 })
+      showShareQrCode.value = true
+    } else {
+      $toast.info(res.message)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
 }
 
 const clickRealNameAuth = () => {
