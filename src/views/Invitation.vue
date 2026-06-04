@@ -23,16 +23,16 @@
         </div>
         <div class="button" @click="clickShare">分享海报</div>
       </div>
-      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
-        <template #content>
-          <div class="invite-list">
-            <div class="title">我的邀请</div>
-            <div class="invite-table">
-              <div class="header-row">
-                <div class="desc">好友</div>
-                <div class="desc">充值金额</div>
-                <div class="desc">邀请时间</div>
-              </div>
+      <div class="invite-list">
+        <div class="title">我的邀请</div>
+        <div class="invite-table">
+          <div class="header-row">
+            <div class="desc">好友</div>
+            <div class="desc">充值金额</div>
+            <div class="desc">邀请时间</div>
+          </div>
+          <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
+            <template #content>
               <div class="row" v-for="(item, index) in inviteList" :key="index">
                 <div class="user">
                   <div class="avatar">
@@ -46,10 +46,10 @@
                 <div class="price">￥{{ formatNumberWithCommas(84511) }}</div>
                 <div class="date">{{ item.inviteTime }}</div>
               </div>
-            </div>
-          </div>
-        </template>
-      </InfiniteScroll>
+            </template>
+          </InfiniteScroll>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -104,7 +104,7 @@ const router = useRouter()
 const params = ref({
   current: 1,
   pageSize: 20,
-  activityId: '',  // 活动ID
+  activityId: 1,  // 活动ID
   recordStatus: '',  // 整体状态：1-进行中，2-成功，3-失败
 })
 const inviteInfo = ref({})
