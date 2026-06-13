@@ -306,6 +306,9 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if (startTimer.value) {
+    clearInterval(startTimer.value)
+  }
   if (isLockRoom.value) {
     unlockRoom()
   }
@@ -466,6 +469,9 @@ const launchBall = async () => {
       return
     }
     countdown.value = 0
+    if (startTimer.value) {
+      clearInterval(startTimer.value)
+    }
     sendStatus.value = '发射中'
     const res = await api.post('/pinball/room/launchBall', {
       roomId: roomId.value,
@@ -649,7 +655,7 @@ const setCountdown = () => {
   }
   startTimer.value = setInterval(() => {
     countdown.value--
-    if (countdown.value) {
+    if (countdown.value > 0) {
       return
     }
     countdown.value = 0
