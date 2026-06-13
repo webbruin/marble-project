@@ -6,10 +6,10 @@
         <Upload accept="image/*" @change="avatarChange">
           <template #content>
             <div class="cover" v-if="formdata.avatar">
-              <img :src="formdata.avatar" alt="">
+              <img :src="formdata.avatar" alt="" />
             </div>
             <div class="default" v-else>
-              <img src="@/assets/images/avatar.png" alt="">
+              <img src="@/assets/images/avatar.png" alt="" />
             </div>
           </template>
         </Upload>
@@ -18,7 +18,7 @@
         <p class="text">昵称</p>
         <Input v-model="formdata.nickName" type="text" placeholder="请输入">
           <template #right>
-            <img src="@/assets/images/edit.png" alt="" class="icon">
+            <img src="@/assets/images/edit.png" alt="" class="icon" />
           </template>
         </Input>
       </div>
@@ -28,23 +28,17 @@
       </div>
       <div class="item">
         <p class="text">生日</p>
-        <Input v-model="formdata.birthday" :readonly="true" type="text" placeholder="请输入" @click="clickBirthday">
+        <Input
+          v-model="formdata.birthday"
+          :readonly="true"
+          type="text"
+          placeholder="请输入"
+          @click="clickBirthday"
+        >
           <template #right>
-            <img src="@/assets/images/calendar.png" alt="" class="icon">
+            <img src="@/assets/images/calendar.png" alt="" class="icon" />
           </template>
         </Input>
-      </div>
-      <div class="item">
-        <p class="text">居住地</p>
-        <Input v-model="formdata.address" :readonly="true" type="text" placeholder="请输入" @click="clickRouter('city')">
-          <template #right>
-            <img src="@/assets/images/location.png" alt="" class="icon">
-          </template>
-        </Input>
-      </div>
-      <div class="item">
-        <p class="text">邀请码</p>
-        <Input v-model="formdata.invitationCode" type="text" placeholder="请输入"></Input>
       </div>
     </div>
     <div class="submit">
@@ -54,28 +48,31 @@
   </main>
 
   <van-popup v-model:show="showDatePicker" round position="bottom">
-    <van-date-picker title="选择日期" :min-date="minDate" :max-date="maxDate" :value="formdata.birthday"
-      @cancel="birthdayVisible" @confirm="birthdayChange" />
+    <van-date-picker
+      title="选择日期"
+      :min-date="minDate"
+      :max-date="maxDate"
+      :value="formdata.birthday"
+      @cancel="birthdayVisible"
+      @confirm="birthdayChange"
+    />
   </van-popup>
 </template>
 
 <script setup>
-import { computed, onBeforeMount, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { onBeforeMount, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import Upload from '@/components/FormData/Upload.vue'
 import Input from '@/components/FormData/Input.vue'
 import Gender from '@/components/FormData/Gender.vue'
 import Button from '@/components/FormData/Button.vue'
 
 const router = useRouter()
-const userInfo = ref({})
 const formdata = ref({
   avatar: '',
   nickName: '',
   gender: '',
   birthday: '',
-  address: '',
-  invitationCode: '',
 })
 const genderDisabled = ref(false)
 const showDatePicker = ref(false)
@@ -86,34 +83,27 @@ onBeforeMount(() => {
   // 展示当前用户个人信息
   const userInfo = localStorage.getItem('userInfo')
   if (userInfo) {
-    const { avatar, nickName, gender, birthday, address, invitationCode } = JSON.parse(userInfo)
+    const { avatar, nickName, gender, birthday } = JSON.parse(userInfo)
     formdata.value.avatar = avatar
     formdata.value.nickName = nickName
     formdata.value.gender = gender
     formdata.value.birthday = birthday
-    formdata.value.address = address
-    formdata.value.invitationCode = invitationCode
     if (gender === 1 || gender === 2) {
       genderDisabled.value = true
     }
   }
-  // 获取已选择城市
-  const city = localStorage.getItem('select-city')
-  if (city) {
-    const { name } = JSON.parse(city)
-    formdata.value.address = name
-    localStorage.removeItem('select-city')
+})
+
+const avatarChange = async (event) => {
+  const formData = event[0]
+  try {
+    const res = await api.post('/admin/pinball/file/upload', formData)
+    if (res.code === 200) {
+      formdata.value.avatar = res.data.filePathUrl
+    }
+  } catch (e) {
+    $toast.info('上传失败')
   }
-})
-
-onMounted(() => {
-  const data = localStorage.getItem('userInfo')
-  userInfo.value = JSON.parse(data)
-})
-
-const avatarChange = (event) => {
-  console.log(333, event);
-  formdata.value.avatar = event[0]
 }
 
 const clickGender = (type) => {
@@ -133,24 +123,26 @@ const birthdayChange = (event) => {
   formdata.value.birthday = event.selectedValues.join('-')
 }
 
-
-const clickRouter = (url) => {
-  router.push({ name: url })
-}
-
 const confirm = async () => {
-  console.log(999, formdata.value);
-  // $toast.loading('保存中')
-  // const res = await api.post('', formdata.value)
-  // if (res.code === 200) {
-  //   $toast.info('保存成功')
-  //   const timer = setTimeout(() => {
-  //     clearTimeout(timer)
-  //     router.back()
-  //   }, 1500)
-  // } else {
-  //   $toast.info(res.message)
-  // }
+  const { avatar, nickName, gender, birthday } = formdata.value
+  const birthdayDateTime = birthday ? birthday + ' 00:00:00' : ''
+  try {
+    const res = await api.post('/pinball/user/info/updateProfile', {
+      avatar,
+      nickName,
+      gender,
+      birthday: birthdayDateTime,
+    })
+    if (res.code === 200) {
+      $toast.success('保存成功')
+      const timer = setTimeout(() => {
+        clearTimeout(timer)
+        router.back()
+      }, 1500)
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
 }
 </script>
 
@@ -168,44 +160,47 @@ const confirm = async () => {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 .vw(18)[];
+    padding: 0 .vw(18) [];
 
     .avatar {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding-top: .vw(28)[];
-      padding-bottom: .vw(40)[];
+      padding-top: .vw(28) [];
+      padding-bottom: .vw(40) [];
 
       .cover,
       .default {
-        width: .vw(88)[];
-        height: .vw(88)[];
+        width: .vw(88) [];
+        height: .vw(88) [];
 
         img {
-          max-width: 100%;
-          max-height: 100%;
+          width: 100%;
         }
       }
 
       .cover {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border-radius: 50%;
-        border: .vw(2)[] solid var(--text--);
+        overflow: hidden;
       }
 
       .default {
         position: relative;
+        border: .vw(2) [] solid var(--text--);
 
         &::after {
           content: '';
-          width: .vw(24)[];
-          height: .vw(24)[];
+          width: .vw(24) [];
+          height: .vw(24) [];
           display: flex;
           align-items: center;
           justify-content: center;
           border-radius: 50%;
           background-color: var(--white--);
-          background-size: .vw(18)[] .vw(18)[];
+          background-size: .vw(18) [] .vw(18) [];
           background-position: center;
           background-repeat: no-repeat;
           background-image: url(@/assets/images/camera.png);
@@ -218,40 +213,40 @@ const confirm = async () => {
 
     .item {
       &:not(:last-of-type) {
-        margin-bottom: .vw(16)[];
+        margin-bottom: .vw(16) [];
       }
 
       .text {
         color: var(--text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 400;
         font-style: normal;
-        padding-left: .vw(7)[];
-        margin-bottom: .vw(8)[];
+        padding-left: .vw(7) [];
+        margin-bottom: .vw(8) [];
       }
 
       .icon {
-        width: .vw(18)[];
-        height: .vw(18)[];
-        margin-left: .vw(8)[];
+        width: .vw(18) [];
+        height: .vw(18) [];
+        margin-left: .vw(8) [];
       }
     }
   }
 
   .submit {
-    padding: 0 .vw(18)[] .vw(20)[];
+    padding: 0 .vw(18) [] .vw(20) [];
 
     .desc {
-      color: #B7B9C1;
-      font-family: "PingFang SC";
-      font-size: .vw(14)[];
-      line-height: .vw(14)[];
+      color: #b7b9c1;
+      font-family: 'PingFang SC';
+      font-size: .vw(14) [];
+      line-height: .vw(14) [];
       font-weight: 400;
       font-style: normal;
       text-align: center;
-      margin-top: .vw(12)[];
+      margin-top: .vw(12) [];
     }
   }
 }

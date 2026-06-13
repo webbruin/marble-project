@@ -1,10 +1,12 @@
 <template>
   <div class="ball-success" v-if="show">
     <div class="body">
-      <img src="@/assets/images/ball.png" alt="" v-if="type === 1">
-      <img src="@/assets/images/point.png" alt="" v-if="type === 2">
+      <img src="@/assets/images/ball.png" alt="" v-if="type === 1" />
+      <img src="@/assets/images/point.png" alt="" v-if="type === 2" />
     </div>
-    <div class="close" @click="closeDialog">恭喜{{ type === 1 ? '弹珠' : '积分卡' }}X{{ ball }}</div>
+    <div class="close" @click="closeDialog">
+      恭喜{{ type === 1 ? '弹珠' : '积分卡' }}X{{ ball }}
+    </div>
   </div>
 </template>
 
@@ -14,9 +16,10 @@ import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({
   show: Boolean,
-  type: {  // 1-弹珠 2-积分卡
+  type: {
+    // 1-弹珠 2-积分卡
     type: Number,
-    default: 1
+    default: 1,
   },
   ball: Number,
 })
@@ -24,18 +27,17 @@ const emit = defineEmits(['toggleShow'])
 const time = ref(2000)
 const timer = ref(null)
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 watch(
-  () => props.show, (newName, oldName) => {
+  () => props.show,
+  (newName, oldName) => {
     if (newName) {
       timer.value = setTimeout(() => {
         closeDialog()
       }, time.value)
     }
-  }
+  },
 )
 
 const closeDialog = () => {
@@ -63,14 +65,14 @@ const closeDialog = () => {
   top: 0;
 
   .body {
-    width: .vw(368)[];
-    height: .vw(368)[];
+    width: .vw(368) [];
+    height: .vw(368) [];
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: center;
     position: relative;
-    margin-top: .vw(-180)[];
+    margin-top: .vw(-180) [];
 
     &::before {
       content: '';
@@ -91,29 +93,29 @@ const closeDialog = () => {
     }
 
     img {
-      width: .vw(120)[];
-      height: .vw(120)[];
+      width: .vw(120) [];
+      height: .vw(120) [];
       z-index: 1;
     }
   }
 
   .close {
-    height: .vw(40)[];
+    height: .vw(40) [];
     display: flex;
     justify-content: center;
     align-items: center;
     color: var(--white--);
-    font-family: "PingFang SC";
-    font-size: .vw(16)[];
-    line-height: .vw(16)[];
+    font-family: 'PingFang SC';
+    font-size: .vw(16) [];
+    line-height: .vw(16) [];
     font-weight: 500;
     font-style: normal;
-    border-radius: .vw(45)[];
-    border: .vw(1)[] solid #FF3A64;
-    background: linear-gradient(90deg, #FD689A 0%, #FFAB2D 100%);
-    padding: .vw(8)[] .vw(18)[];
+    border-radius: .vw(45) [];
+    border: .vw(1) [] solid #ff3a64;
+    background: linear-gradient(90deg, #fd689a 0%, #ffab2d 100%);
+    padding: .vw(8) [] .vw(18) [];
     z-index: 1;
-    margin-top: .vw(-80)[];
+    margin-top: .vw(-80) [];
   }
 }
 </style>

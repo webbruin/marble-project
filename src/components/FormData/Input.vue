@@ -6,13 +6,19 @@
     <template v-if="type === 'tel'">
       <span class="tel">+86</span>
     </template>
-    <input class="input" :type="getType" :placeholder="placeholder" :readonly="readonly" :disabled="disabled"
-      v-model="inputValue" />
+    <input
+      class="input"
+      :type="getType"
+      :placeholder="placeholder"
+      :readonly="readonly"
+      :disabled="disabled"
+      v-model="inputValue"
+    />
     <template v-if="type === 'password'">
-      <i class="browse" :class="{ 'off': browseOff }" @click="browseOff = !browseOff"></i>
+      <i class="browse" :class="{ off: browseOff }" @click="browseOff = !browseOff"></i>
     </template>
     <template v-if="type === 'code'">
-      <span class="code" :class="{ 'disabled': !props.mobile || codeSending }" @click="clickSendCode">
+      <span class="code" :class="{ disabled: !props.mobile || codeSending }" @click="clickSendCode">
         {{ codeSending ? `${codeCountdown}S后重新获取` : codeText }}
       </span>
     </template>
@@ -29,24 +35,24 @@ import { useRoute, useRouter } from 'vue-router'
 const props = defineProps({
   type: {
     type: String,
-    default: 'text'
+    default: 'text',
   },
   placeholder: {
     type: String,
-    default: '请输入'
+    default: '请输入',
   },
   mobile: {
     type: String,
-    default: ''
+    default: '',
   },
   readonly: {
     type: Boolean,
-    default: false
+    default: false,
   },
   disabled: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 const inputValue = defineModel({ default: '' })
 const codeText = ref('获取验证码')
@@ -62,19 +68,15 @@ const getType = computed(() => {
   return type
 })
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const clickSendCode = async () => {
   let body = {
-    mobile: props.mobile
-  };
+    mobile: props.mobile,
+  }
   const res = await api.post('/pinball/user/auth/sendSmsCode', body)
   if (res.code === 200) {
     setCountdown()
-  } else {
-    $toast.info(res.message)
   }
 }
 
@@ -101,28 +103,30 @@ const setCountdown = () => {
 .input-item {
   display: flex;
   align-items: center;
-  border-radius: .vw(14)[];
-  background-color: #EFEFEF;
-  padding: .vw(10)[] .vw(16)[];
+  border-radius: .vw(14) [];
+  background-color: #efefef;
+  padding: .vw(10) [] .vw(16) [];
 
   .tel {
     color: var(--light-text--);
-    font-feature-settings: 'liga' off, 'clig' off;
-    font-family: "PingFang SC";
-    font-size: .vw(16)[];
-    line-height: .vw(27)[];
+    font-feature-settings:
+      'liga' off,
+      'clig' off;
+    font-family: 'PingFang SC';
+    font-size: .vw(16) [];
+    line-height: .vw(27) [];
     font-weight: 500;
     font-style: normal;
-    padding: 0 .vw(8)[];
-    margin-right: .vw(10)[];
+    padding: 0 .vw(8) [];
+    margin-right: .vw(10) [];
   }
 
   .input {
     flex: 1;
     color: var(--light-text--);
-    font-family: "PingFang SC";
-    font-size: .vw(16)[];
-    line-height: .vw(27)[];
+    font-family: 'PingFang SC';
+    font-size: .vw(16) [];
+    line-height: .vw(27) [];
     font-weight: 500;
     font-style: normal;
     background-color: transparent;
@@ -136,16 +140,18 @@ const setCountdown = () => {
   }
 
   .code {
-    color: #FFB169;
+    color: #ffb169;
     text-align: center;
-    font-feature-settings: 'liga' off, 'clig' off;
-    font-family: "PingFang SC";
-    font-size: .vw(16)[];
-    line-height: .vw(27)[];
+    font-feature-settings:
+      'liga' off,
+      'clig' off;
+    font-family: 'PingFang SC';
+    font-size: .vw(16) [];
+    line-height: .vw(27) [];
     font-weight: 400;
     font-style: normal;
     white-space: nowrap;
-    margin-left: .vw(10)[];
+    margin-left: .vw(10) [];
 
     &.disabled {
       color: var(--text--);
@@ -154,13 +160,13 @@ const setCountdown = () => {
   }
 
   .browse {
-    width: .vw(16)[];
-    height: .vw(16)[];
+    width: .vw(16) [];
+    height: .vw(16) [];
     background-size: 100%;
     background-position: top;
     background-repeat: no-repeat;
     background-image: url(@/assets/images/login/browse.png);
-    margin-left: .vw(10)[];
+    margin-left: .vw(10) [];
 
     &.off {
       background-image: url(@/assets/images/login/browse-off.png);

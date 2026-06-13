@@ -42,7 +42,7 @@ const goHome = () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: linear-gradient(180deg, #F0EDDE 0%, #F5F6FA 50%);
+  background: linear-gradient(180deg, #f0edde 0%, #f5f6fa 50%);
 
   .content {
     flex: 1;
@@ -52,18 +52,18 @@ const goHome = () => {
     justify-content: center;
 
     .icon {
-      width: .vw(80)[];
-      height: .vw(80)[];
+      width: .vw(80) [];
+      height: .vw(80) [];
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
       background-color: var(--red--);
-      margin-bottom: .vw(24)[];
+      margin-bottom: .vw(24) [];
 
       .icon-text {
         color: var(--white--);
-        font-size: .vw(48)[];
+        font-size: .vw(48) [];
         font-weight: 700;
         line-height: 1;
       }
@@ -71,56 +71,56 @@ const goHome = () => {
 
     .title {
       color: var(--red--);
-      font-family: "PingFang SC";
-      font-size: .vw(20)[];
-      line-height: .vw(28)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(20) [];
+      line-height: .vw(28) [];
       font-weight: 600;
       font-style: normal;
-      margin-bottom: .vw(8)[];
+      margin-bottom: .vw(8) [];
     }
 
     .desc {
       color: var(--text--);
-      font-family: "PingFang SC";
-      font-size: .vw(14)[];
-      line-height: .vw(20)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(14) [];
+      line-height: .vw(20) [];
       font-weight: 400;
       font-style: normal;
 
       &.sub {
-        font-size: .vw(12)[];
-        margin-top: .vw(4)[];
+        font-size: .vw(12) [];
+        margin-top: .vw(4) [];
       }
     }
   }
 
   .footer {
     display: flex;
-    padding: 0 .vw(16)[] .vw(40)[];
+    padding: 0 .vw(16) [] .vw(40) [];
 
     .btn {
       flex: 1;
-      height: .vw(48)[];
+      height: .vw(48) [];
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(16)[];
-      line-height: .vw(16)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(16) [];
+      line-height: .vw(16) [];
       font-weight: 500;
       font-style: normal;
-      border-radius: .vw(45)[];
+      border-radius: .vw(45) [];
       background-color: var(--white--);
-      border: .vw(1)[] solid #ddd;
+      border: .vw(1) [] solid #ddd;
 
       &:not(:last-of-type) {
-        margin-right: .vw(16)[];
+        margin-right: .vw(16) [];
       }
 
       &.primary {
         color: var(--white--);
-        background: linear-gradient(135deg, #FFD332 0%, #FFB169 100%);
+        background: linear-gradient(135deg, #ffd332 0%, #ffb169 100%);
         border: none;
       }
     }

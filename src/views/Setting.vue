@@ -4,8 +4,11 @@
     <div class="body">
       <div class="module" v-for="(item, index) in rows" :key="index">
         <template v-for="(childItem, childIndex) in item" :key="childIndex">
-          <div class="item" v-if="childItem.show"
-            @click="clickRouter(childItem.router, childItem.params, childItem.query)">
+          <div
+            class="item"
+            v-if="childItem.show"
+            @click="clickRouter(childItem.router, childItem.params, childItem.query)"
+          >
             <span class="text">{{ childItem.name }}</span>
             <i class="icon"></i>
           </div>
@@ -37,12 +40,10 @@ const rows = ref([
     { name: '设置登录密码', show: true, router: 'set-password' },
     { name: '修改登录密码', show: true, router: 'change-password' },
     { name: '账号注销', show: true, router: 'account-cancel' },
-  ]
+  ],
 ])
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const clickRouter = (name, params = {}, query = {}) => {
   if (!name) {
@@ -56,7 +57,7 @@ const loginConfirm = () => {
     content: '是否退出登陆',
     onConfirm: () => {
       logout()
-    }
+    },
   })
 }
 
@@ -70,8 +71,6 @@ const logout = async () => {
       localStorage.removeItem('token')
       localStorage.removeItem('userInfo')
       router.replace({ name: 'login' })
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -93,36 +92,36 @@ const logout = async () => {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    background-color: #F8F8F8;
-    padding: .vw(8)[] .vw(18)[];
+    background-color: #f8f8f8;
+    padding: .vw(8) [] .vw(18) [];
 
     .module {
-      border-radius: .vw(9)[];
+      border-radius: .vw(9) [];
       background-color: var(--white--);
-      padding: .vw(9)[] 0;
+      padding: .vw(9) [] 0;
 
       &:not(:last-of-type) {
-        margin-bottom: .vw(8)[];
+        margin-bottom: .vw(8) [];
       }
 
       .item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: .vw(16)[];
+        padding: .vw(16) [];
 
         .text {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 400;
           font-style: normal;
         }
 
         .icon {
-          width: .vw(14)[];
-          height: .vw(14)[];
+          width: .vw(14) [];
+          height: .vw(14) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
@@ -133,10 +132,10 @@ const logout = async () => {
   }
 
   .footer {
-    padding: .vw(12)[] .vw(18)[];
+    padding: .vw(12) [] .vw(18) [];
 
     .button {
-      background-color: #EDEDF0;
+      background-color: #ededf0;
     }
   }
 }

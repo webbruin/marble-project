@@ -9,7 +9,12 @@
         <Button buttonText="断开蓝牙设备" :disabled="false" @click="disconnectBluetooth"></Button>
       </div>
       <div class="item" v-if="characteristic">
-        <Input v-model="write" type="text" placeholder="请输入文本" @input="writeCharacteristicValue"></Input>
+        <Input
+          v-model="write"
+          type="text"
+          placeholder="请输入文本"
+          @input="writeCharacteristicValue"
+        ></Input>
       </div>
       <div class="log">
         <p v-for="(item, index) in logs" :key="index">
@@ -30,27 +35,29 @@ const BATTERY_CHARACTERISTIC_UUID = '0000FFE1-0000-1000-8000-00805F9B34FB'.toLoc
 
 // 指令
 
-
-const write = ref('')  // 蓝牙实例
-const bluetoothDevice = ref(null)  // 蓝牙实例
+const write = ref('') // 蓝牙实例
+const bluetoothDevice = ref(null) // 蓝牙实例
 const gattServer = ref(null)
-const autoSubscribeDone = ref(false)  // 标记是否已自动订阅过
+const autoSubscribeDone = ref(false) // 标记是否已自动订阅过
 const characteristic = ref(null)
-const activeNotifyMap = new Map()  // key: characteristic.uuid, value: { characteristic, handler, isNotifying }
+const activeNotifyMap = new Map() // key: characteristic.uuid, value: { characteristic, handler, isNotifying }
 const logs = ref([])
 
-onMounted(() => {
+onMounted(() => {})
 
-})
-
-onUnmounted(() => {
-
-})
+onUnmounted(() => {})
 
 const parseOptionalServices = () => {
   let raw = BATTERY_SERVICE_UUID.trim()
   if (raw === '') return []
-  return [...new Set(raw.split(',').map(s => s.trim()).filter(s => s !== ""))]
+  return [
+    ...new Set(
+      raw
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s !== ''),
+    ),
+  ]
 }
 
 // 连接主流程
@@ -71,10 +78,7 @@ const connectAndListen = async () => {
       // acceptAllDevices: true,
       // optionalServices: optionalServices,
       acceptAllDevices: false,
-      filters: [
-        { namePrefix: 'JDY-' },
-        { namePrefix: 'BingoBang' },
-      ]
+      filters: [{ namePrefix: 'JDY-' }, { namePrefix: 'BingoBang' }],
     })
     bluetoothDevice.value = device
     addLog(`已选择: ${device.name || '无名称'} (${device.id})`)
@@ -82,11 +86,11 @@ const connectAndListen = async () => {
     addLog(`GATT 连接成功`)
     device.ongattserverdisconnected = () => {
       addLog(`设备意外断开`)
-      stopAllNotifications().catch(e => { })
-      gattServer.value = null;
-      clearLog();
-      bluetoothDevice.value = null;
-      autoSubscribeDone.value = false;
+      stopAllNotifications().catch((e) => {})
+      gattServer.value = null
+      clearLog()
+      bluetoothDevice.value = null
+      autoSubscribeDone.value = false
     }
     // 加载服务和自动订阅通知
     await renderServicesAndCharacteristics()
@@ -144,7 +148,7 @@ const stopAllNotifications = async () => {
       }
     }
   }
-  activeNotifyMap.clear();
+  activeNotifyMap.clear()
 }
 
 // 渲染服务和特征，并自动订阅所有可通知特征
@@ -178,7 +182,7 @@ const renderServicesAndCharacteristics = async () => {
       // 如果可读，自动读取一次初始值
       if (characteristic.value.properties.read) {
         setTimeout(() => {
-          if (gattServer.value?.connected) readCharacteristicValue().catch(e => { })
+          if (gattServer.value?.connected) readCharacteristicValue().catch((e) => {})
         }, 300)
       }
     } catch (err) {
@@ -189,7 +193,10 @@ const renderServicesAndCharacteristics = async () => {
 
 // 订阅特征通知（并同时将收到的数据推送到监听窗口）
 const subscribeToCharacteristic = async (characteristic) => {
-  if (activeNotifyMap.has(characteristic.uuid) && activeNotifyMap.get(characteristic.uuid).isNotifying) {
+  if (
+    activeNotifyMap.has(characteristic.uuid) &&
+    activeNotifyMap.get(characteristic.uuid).isNotifying
+  ) {
     return true // 已订阅
   }
   if (!(characteristic.properties.notify || characteristic.properties.indicate)) {
@@ -207,7 +214,7 @@ const subscribeToCharacteristic = async (characteristic) => {
     activeNotifyMap.set(characteristic.uuid, {
       characteristic: characteristic,
       handler: handler,
-      isNotifying: true
+      isNotifying: true,
     })
   } catch (err) {
     addLog(`订阅失败 ${characteristic.uuid}: ${err.message}`)
@@ -234,7 +241,10 @@ const readCharacteristicValue = async () => {
 const formatValue = (data) => {
   const { buffer } = data
   const bytes = new Uint8Array(buffer)
-  const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ').toUpperCase()
+  const hex = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join(' ')
+    .toUpperCase()
   let utf8Str = ''
   try {
     utf8Str = new TextDecoder('utf-8').decode(buffer)
@@ -269,7 +279,8 @@ const writeCharacteristicValue = async () => {
     addLog('设备未连接，无法写入')
     return
   }
-  const canWrite = characteristic.value.properties.write || characteristic.value.properties.writeWithoutResponse
+  const canWrite =
+    characteristic.value.properties.write || characteristic.value.properties.writeWithoutResponse
   if (!canWrite) {
     addLog(`特征 ${characteristic.value.uuid} 不支持写入`)
     return
@@ -303,13 +314,13 @@ const writeCharacteristicValue = async () => {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: .vw(18)[];
+    padding: .vw(18) [];
     display: flex;
     overflow-x: hidden;
     overflow-y: auto;
 
     .item {
-      margin-bottom: .vw(20)[];
+      margin-bottom: .vw(20) [];
     }
 
     .log {
@@ -319,14 +330,14 @@ const writeCharacteristicValue = async () => {
 
       p {
         color: var(--text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 400;
         font-style: normal;
 
         &:not(:last-of-type) {
-          margin-bottom: .vw(10)[];
+          margin-bottom: .vw(10) [];
         }
       }
     }

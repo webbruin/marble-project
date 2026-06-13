@@ -23,8 +23,8 @@ export async function generateQRCode(text, options = {}) {
     errorCorrectionLevel: options.errorCorrectionLevel || 'M',
     color: {
       dark: options.colorDark || '#000000',
-      light: options.colorLight || '#ffffff'
-    }
+      light: options.colorLight || '#ffffff',
+    },
   }
 
   await QRCode.toCanvas(canvas, text, opts)

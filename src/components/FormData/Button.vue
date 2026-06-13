@@ -1,5 +1,6 @@
 <template>
-  <div class="button" :class="{ 'disabled': disabled }" :style="style" @click="clickSubmit">{{ buttonText }}
+  <div class="button" :class="{ disabled: disabled }" :style="style" @click="clickSubmit">
+    {{ buttonText }}
   </div>
 </template>
 
@@ -10,21 +11,19 @@ import { useRoute, useRouter } from 'vue-router'
 const props = defineProps({
   buttonText: {
     type: String,
-    default: '确定'
+    default: '确定',
   },
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
   style: {
-    type: Object
-  }
+    type: Object,
+  },
 })
 const emit = defineEmits(['click'])
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const clickSubmit = () => {
   emit('click', false)
@@ -38,21 +37,23 @@ const clickSubmit = () => {
 
 .button {
   color: var(--light-text--);
-  font-feature-settings: 'liga' off, 'clig' off;
-  font-family: "PingFang SC";
-  font-size: .vw(16)[];
-  line-height: .vw(27)[];
+  font-feature-settings:
+    'liga' off,
+    'clig' off;
+  font-family: 'PingFang SC';
+  font-size: .vw(16) [];
+  line-height: .vw(27) [];
   font-weight: 500;
   font-style: normal;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: .vw(14)[];
-  background-color: #FFB169;
-  padding: .vw(10)[] .vw(16)[];
+  border-radius: .vw(14) [];
+  background-color: #ffb169;
+  padding: .vw(10) [] .vw(16) [];
 
   &.disabled {
-    background-color: #FFCA91;
+    background-color: #ffca91;
     pointer-events: none;
   }
 }

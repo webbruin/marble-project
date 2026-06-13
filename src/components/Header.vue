@@ -17,18 +17,16 @@ const router = useRouter()
 const props = defineProps({
   showBack: {
     type: Boolean,
-    default: true
+    default: true,
   },
   disabledBack: {
     type: Boolean,
-    default: false
+    default: false,
   },
   title: String,
 })
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const back = () => {
   if (props.disabledBack) {
@@ -44,7 +42,7 @@ const back = () => {
 }
 
 .header {
-  height: .vw(54)[];
+  height: .vw(54) [];
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,22 +50,22 @@ const back = () => {
   background-color: var(--white--);
 
   .back {
-    width: .vw(40)[];
-    height: .vw(40)[];
-    background-size: .vw(24)[] .vw(24)[];
+    width: .vw(40) [];
+    height: .vw(40) [];
+    background-size: .vw(24) [] .vw(24) [];
     background-position: center;
     background-repeat: no-repeat;
     background-image: url(@/assets/images/arrow-left.png);
     position: absolute;
-    left: .vw(6)[];
+    left: .vw(6) [];
   }
 
   .title {
     max-width: 70%;
     color: var(--light-text--);
-    font-family: "PingFang SC";
-    font-size: .vw(18)[];
-    line-height: .vw(18)[];
+    font-family: 'PingFang SC';
+    font-size: .vw(18) [];
+    line-height: .vw(18) [];
     font-weight: 500;
     font-style: normal;
     overflow: hidden;
@@ -77,7 +75,7 @@ const back = () => {
 
   .slot {
     position: absolute;
-    right: .vw(10)[];
+    right: .vw(10) [];
   }
 }
 </style>

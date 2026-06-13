@@ -1,10 +1,10 @@
 <template>
   <div class="confirm-mask" v-if="show" @click="clickClose"></div>
-  <div class="confirm-dialog" :class="{ 'show': show }">
+  <div class="confirm-dialog" :class="{ show: show }">
     <div class="body">
       <p class="title">确认</p>
       <div class="room">
-        <img src="@/assets/images/home/room-bg.png" alt="" class="cover">
+        <img src="@/assets/images/home/room-bg.png" alt="" class="cover" />
         <div class="info">
           <p class="text">{{ level }}</p>
           <p class="desc">投入弹珠：{{ ball }}枚</p>
@@ -12,7 +12,7 @@
         <i class="select selected"></i>
       </div>
       <div class="ball-count">
-        <img src="@/assets/images/ball.png" alt="" class="ball">
+        <img src="@/assets/images/ball.png" alt="" class="ball" />
         <span class="text">弹珠支付（剩余：{{ marbleAmount }}）</span>
         <i class="select selected"></i>
       </div>
@@ -33,18 +33,16 @@ const props = defineProps({
   level: String,
   ball: {
     type: Number,
-    default: 0
+    default: 0,
   },
   marbleAmount: {
     type: Number,
-    default: 0
+    default: 0,
   },
 })
 const emit = defineEmits(['close', 'confirm'])
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const clickClose = () => {
   emit('close')
@@ -79,7 +77,7 @@ const clickConfirm = () => {
   left: 0;
   bottom: 0;
   transform: translateY(115%);
-  transition: transform .2s;
+  transition: transform 0.2s;
 
   &.show {
     transform: translateY(0);
@@ -87,7 +85,7 @@ const clickConfirm = () => {
 
   .body {
     width: 100%;
-    height: .vw(252)[];
+    height: .vw(252) [];
     display: flex;
     flex-direction: column;
     background-size: 100% 100%;
@@ -96,43 +94,43 @@ const clickConfirm = () => {
     background-image: url(@/assets/images/room/confirm-dialog-bg.png);
     position: relative;
     // padding-top: .vw(50)[];
-    padding: .vw(23)[] .vw(16)[] .vw(8)[] .vw(16)[];
+    padding: .vw(23) [] .vw(16) [] .vw(8) [] .vw(16) [];
 
     &::before {
       content: '';
-      width: .vw(134)[];
-      height: .vw(134)[];
+      width: .vw(134) [];
+      height: .vw(134) [];
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
       background-image: url(@/assets/images/room/confirm-dialog-icon.png);
       position: absolute;
-      top: .vw(-57)[];
-      right: .vw(4)[];
+      top: .vw(-57) [];
+      right: .vw(4) [];
     }
 
     .title {
-      font-size: .vw(30)[];
-      line-height: .vw(30)[];
+      font-size: .vw(30) [];
+      line-height: .vw(30) [];
       font-weight: 900;
       font-style: normal;
-      letter-spacing: .vw(5)[];
-      margin-bottom: .vw(20)[];
+      letter-spacing: .vw(5) [];
+      margin-bottom: .vw(20) [];
     }
 
     .room {
       flex: 1;
       display: flex;
       align-items: center;
-      border-radius: .vw(12)[];
+      border-radius: .vw(12) [];
       background-color: var(--white--);
-      padding: .vw(12)[];
-      margin-bottom: .vw(8)[];
+      padding: .vw(12) [];
+      margin-bottom: .vw(8) [];
 
       .cover {
-        max-width: .vw(120)[];
-        max-height: .vw(90)[];
-        margin-right: .vw(12)[];
+        max-width: .vw(120) [];
+        max-height: .vw(90) [];
+        margin-right: .vw(12) [];
       }
 
       .info {
@@ -140,31 +138,31 @@ const clickConfirm = () => {
 
         .text {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(18)[];
-          line-height: .vw(18)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(18) [];
+          line-height: .vw(18) [];
           font-weight: 500;
           font-style: normal;
-          margin-bottom: .vw(12)[];
+          margin-bottom: .vw(12) [];
         }
 
         .desc {
-          color: #FFB169;
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          color: #ffb169;
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 500;
           font-style: normal;
         }
       }
 
       .select {
-        width: .vw(24)[];
-        height: .vw(24)[];
+        width: .vw(24) [];
+        height: .vw(24) [];
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
         background-image: url(@/assets/images/shop/select.png);
-        margin-left: .vw(10)[];
+        margin-left: .vw(10) [];
 
         &.selected {
           background-image: url(@/assets/images/shop/selected.png);
@@ -175,14 +173,14 @@ const clickConfirm = () => {
     .ball-count {
       display: flex;
       align-items: center;
-      border-radius: .vw(12)[];
+      border-radius: .vw(12) [];
       background-color: var(--white--);
-      padding: .vw(12)[];
+      padding: .vw(12) [];
 
       .ball {
-        width: .vw(24)[];
-        height: .vw(24)[];
-        margin-right: .vw(8)[];
+        width: .vw(24) [];
+        height: .vw(24) [];
+        margin-right: .vw(8) [];
       }
 
       .text {
@@ -190,13 +188,13 @@ const clickConfirm = () => {
       }
 
       .select {
-        width: .vw(24)[];
-        height: .vw(24)[];
+        width: .vw(24) [];
+        height: .vw(24) [];
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
         background-image: url(@/assets/images/shop/select.png);
-        margin-left: .vw(10)[];
+        margin-left: .vw(10) [];
 
         &.selected {
           background-image: url(@/assets/images/shop/selected.png);
@@ -206,18 +204,18 @@ const clickConfirm = () => {
   }
 
   .footer {
-    height: .vw(58)[];
+    height: .vw(58) [];
     display: flex;
     align-items: center;
     justify-content: space-between;
     background-color: var(--white--);
-    padding: .vw(8)[] .vw(16)[];
+    padding: .vw(8) [] .vw(16) [];
 
     .text {
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(14)[];
-      line-height: .vw(14)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(14) [];
+      line-height: .vw(14) [];
       font-weight: 400;
       font-style: normal;
     }
@@ -227,14 +225,14 @@ const clickConfirm = () => {
       align-items: center;
       justify-content: center;
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(16)[];
-      line-height: .vw(16)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(16) [];
+      line-height: .vw(16) [];
       font-weight: 500;
       font-style: normal;
-      border-radius: .vw(45)[];
-      background-color: #FFB169;
-      padding: .vw(12)[] .vw(24)[];
+      border-radius: .vw(45) [];
+      background-color: #ffb169;
+      padding: .vw(12) [] .vw(24) [];
     }
   }
 }

@@ -2,10 +2,15 @@
   <main class="my">
     <div class="user">
       <div class="avatar">
-        <img src="@/assets/images/avatar.png" alt="">
+        <template v-if="userInfo.avatar">
+          <img :src="userInfo.avatar" alt="" />
+        </template>
+        <template v-else>
+          <img src="@/assets/images/avatar.png" alt="" />
+        </template>
       </div>
       <div class="info">
-        <p class="name">{{ userInfo.userName }}</p>
+        <p class="name">{{ userInfo.nickName || userInfo.userName }}</p>
         <p class="id">ID:{{ userInfo.userId }}</p>
       </div>
       <div class="entry" @click="clickRouter('edit-user-info')"></div>
@@ -13,13 +18,17 @@
     <div class="vip">
       <div class="info">
         <div class="level">
-          <img src="@/assets/images/my/crown.png" alt="" class="icon">
+          <img src="@/assets/images/my/crown.png" alt="" class="icon" />
           <span class="text">当前会员等级 V{{ userInfo.levelValue }}</span>
         </div>
         <div class="progress">
-          <p :style="{ 'width': `${userInfo.pointCardAmount / userInfo.memberPointTotalAmount}%` }"></p>
+          <p
+            :style="{ width: `${userInfo.pointCardAmount / userInfo.memberPointTotalAmount}%` }"
+          ></p>
         </div>
-        <div class="count">{{ userInfo.pointCardAmount }}/{{ userInfo.memberPointTotalAmount }}</div>
+        <div class="count">
+          {{ userInfo.pointCardAmount }}/{{ userInfo.memberPointTotalAmount }}
+        </div>
         <i class="vip-icon" :class="`level${userInfo.levelValue}`"></i>
       </div>
     </div>
@@ -101,8 +110,6 @@ const getUserInfo = async () => {
   if (res.code === 200) {
     userInfo.value = res.data
     localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
-  } else {
-    $toast.info(res.message)
   }
 }
 
@@ -124,29 +131,29 @@ const clickRouter = (name, params = {}, query = {}) => {
   background-position: center;
   background-repeat: no-repeat;
   background-image: url(@/assets/images/my/my-bg.png);
-  background-color: #F6F6F6;
-  padding-top: .vw(30)[];
+  background-color: #f6f6f6;
+  padding-top: .vw(30) [];
 
   .user {
     display: flex;
     align-items: center;
-    padding: 0 .vw(24)[];
-    margin-bottom: .vw(28)[];
+    padding: 0 .vw(24) [];
+    margin-bottom: .vw(28) [];
 
     .avatar {
-      width: .vw(48)[];
-      height: .vw(48)[];
+      width: .vw(48) [];
+      height: .vw(48) [];
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: .vw(48)[];
-      border: .vw(2)[] solid var(--white--);
-      box-shadow: 0 .vw(4)[] .vw(4)[] 0 rgba(0, 0, 0, 0.15);
-      margin-right: .vw(12)[];
+      border-radius: .vw(48) [];
+      border: .vw(2) [] solid var(--white--);
+      box-shadow: 0 .vw(4) [] .vw(4) [] 0 rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      margin-right: .vw(12) [];
 
       img {
         width: 100%;
-        height: 100%;
       }
     }
 
@@ -155,38 +162,38 @@ const clickRouter = (name, params = {}, query = {}) => {
 
       .name {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(18)[];
-        line-height: .vw(18)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(18) [];
+        line-height: .vw(18) [];
         font-weight: 600;
         font-style: normal;
-        margin-bottom: .vw(8)[];
+        margin-bottom: .vw(8) [];
       }
 
       .id {
         color: var(--text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 400;
         font-style: normal;
       }
     }
 
     .entry {
-      width: .vw(24)[];
-      height: .vw(24)[];
+      width: .vw(24) [];
+      height: .vw(24) [];
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: .vw(45)[];
+      border-radius: .vw(45) [];
       background-color: var(--white--);
-      box-shadow: 0 .vw(4)[] .vw(8)[] 0 rgba(126, 23, 237, 0.15);
+      box-shadow: 0 .vw(4) [] .vw(8) [] 0 rgba(126, 23, 237, 0.15);
 
       &::before {
         content: '';
-        width: .vw(16)[];
-        height: .vw(16)[];
+        width: .vw(16) [];
+        height: .vw(16) [];
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
@@ -196,64 +203,64 @@ const clickRouter = (name, params = {}, query = {}) => {
   }
 
   .vip {
-    border-radius: .vw(9)[];
-    background: linear-gradient(90deg, #2D2F2F 0%, #535353 100%);
-    margin: 0 .vw(16)[];
-    margin-bottom: .vw(8)[];
+    border-radius: .vw(9) [];
+    background: linear-gradient(90deg, #2d2f2f 0%, #535353 100%);
+    margin: 0 .vw(16) [];
+    margin-bottom: .vw(8) [];
 
     .info {
       position: relative;
-      padding: .vw(9)[] .vw(16)[];
+      padding: .vw(9) [] .vw(16) [];
 
       .level {
         display: flex;
         align-items: center;
-        margin-bottom: .vw(9)[];
+        margin-bottom: .vw(9) [];
 
         .icon {
-          width: .vw(24)[];
-          height: .vw(24)[];
-          margin-right: .vw(9)[];
+          width: .vw(24) [];
+          height: .vw(24) [];
+          margin-right: .vw(9) [];
         }
 
         .text {
           color: var(--gold--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 400;
           font-style: normal;
         }
       }
 
       .progress {
-        height: .vw(4)[];
-        border-radius: .vw(9)[];
-        background-color: #72747D;
-        margin-bottom: .vw(9)[];
+        height: .vw(4) [];
+        border-radius: .vw(9) [];
+        background-color: #72747d;
+        margin-bottom: .vw(9) [];
 
         p {
           height: 100%;
-          border-radius: .vw(9)[];
+          border-radius: .vw(9) [];
           background-color: var(--gold--);
         }
       }
 
       .count {
         color: var(--gold--);
-        font-family: "PingFang SC";
-        font-size: .vw(12)[];
-        line-height: .vw(12)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(12) [];
+        line-height: .vw(12) [];
         font-weight: 400;
         font-style: normal;
       }
 
       .vip-icon {
-        width: .vw(58)[];
-        height: .vw(47)[];
+        width: .vw(58) [];
+        height: .vw(47) [];
         position: absolute;
-        top: .vw(-21)[];
-        right: .vw(-8)[];
+        top: .vw(-21) [];
+        right: .vw(-8) [];
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
@@ -282,32 +289,32 @@ const clickRouter = (name, params = {}, query = {}) => {
   }
 
   .order {
-    border-radius: .vw(12)[];
+    border-radius: .vw(12) [];
     background-color: var(--white--);
-    margin: 0 .vw(16)[];
-    margin-bottom: .vw(8)[];
-    padding: .vw(16)[] .vw(9)[];
+    margin: 0 .vw(16) [];
+    margin-bottom: .vw(8) [];
+    padding: .vw(16) [] .vw(9) [];
 
     .info {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: .vw(16)[];
+      margin-bottom: .vw(16) [];
 
       .title {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(16)[];
-        line-height: .vw(16)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(16) [];
+        line-height: .vw(16) [];
         font-weight: 500;
         font-style: normal;
       }
 
       .entry {
         color: var(--text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 400;
         font-style: normal;
         display: flex;
@@ -315,13 +322,13 @@ const clickRouter = (name, params = {}, query = {}) => {
 
         &::after {
           content: '';
-          width: .vw(16)[];
-          height: .vw(16)[];
+          width: .vw(16) [];
+          height: .vw(16) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
           background-image: url(@/assets/images/arrow-right.png);
-          margin-left: .vw(4)[];
+          margin-left: .vw(4) [];
         }
       }
     }
@@ -337,12 +344,12 @@ const clickRouter = (name, params = {}, query = {}) => {
         flex-direction: column;
 
         .icon {
-          width: .vw(24)[];
-          height: .vw(24)[];
+          width: .vw(24) [];
+          height: .vw(24) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
-          margin-bottom: .vw(11)[];
+          margin-bottom: .vw(11) [];
 
           &.status1 {
             background-image: url(@/assets/images/my/order1.png);
@@ -363,9 +370,9 @@ const clickRouter = (name, params = {}, query = {}) => {
 
         .text {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 200;
           font-style: normal;
         }
@@ -374,32 +381,32 @@ const clickRouter = (name, params = {}, query = {}) => {
   }
 
   .service {
-    border-radius: .vw(12)[];
+    border-radius: .vw(12) [];
     background-color: var(--white--);
-    margin: 0 .vw(16)[];
-    margin-bottom: .vw(8)[];
-    padding: .vw(16)[] .vw(9)[];
+    margin: 0 .vw(16) [];
+    margin-bottom: .vw(8) [];
+    padding: .vw(16) [] .vw(9) [];
 
     .info {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: .vw(16)[];
+      margin-bottom: .vw(16) [];
 
       .title {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(16)[];
-        line-height: .vw(16)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(16) [];
+        line-height: .vw(16) [];
         font-weight: 500;
         font-style: normal;
       }
 
       .entry {
         color: var(--text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 400;
         font-style: normal;
         display: flex;
@@ -407,13 +414,13 @@ const clickRouter = (name, params = {}, query = {}) => {
 
         &::after {
           content: '';
-          width: .vw(16)[];
-          height: .vw(16)[];
+          width: .vw(16) [];
+          height: .vw(16) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
           background-image: url(@/assets/images/arrow-right.png);
-          margin-left: .vw(4)[];
+          margin-left: .vw(4) [];
         }
       }
     }
@@ -424,22 +431,22 @@ const clickRouter = (name, params = {}, query = {}) => {
       justify-content: space-between;
 
       &:not(:last-of-type) {
-        margin-bottom: .vw(16)[];
+        margin-bottom: .vw(16) [];
       }
 
       .item {
-        width: .vw(56)[];
+        width: .vw(56) [];
         display: flex;
         align-items: center;
         flex-direction: column;
 
         .icon {
-          width: .vw(24)[];
-          height: .vw(24)[];
+          width: .vw(24) [];
+          height: .vw(24) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
-          margin-bottom: .vw(11)[];
+          margin-bottom: .vw(11) [];
 
           &.service1 {
             background-image: url(@/assets/images/my/service1.png);
@@ -464,9 +471,9 @@ const clickRouter = (name, params = {}, query = {}) => {
 
         .text {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 200;
           font-style: normal;
         }

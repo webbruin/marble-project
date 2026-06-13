@@ -1,14 +1,24 @@
 <template>
   <main class="login">
     <div class="header">
-      <img src="@/assets/images/login/hello-icon.png" alt="" class="icon">
+      <img src="@/assets/images/login/hello-icon.png" alt="" class="icon" />
       <p class="title">欢迎来到弹珠潮玩</p>
     </div>
     <div class="body">
-      <div class="module" :class="{ 'left': loginType === 'msgCode', 'right': loginType === 'password' }">
+      <div
+        class="module"
+        :class="{ left: loginType === 'msgCode', right: loginType === 'password' }"
+      >
         <div class="tabs">
-          <div class="item" :class="{ 'selected': loginType === item.type }" v-for="(item, index) in tabList"
-            :key="index" @click="clickTab(item)">{{ item.name }}</div>
+          <div
+            class="item"
+            :class="{ selected: loginType === item.type }"
+            v-for="(item, index) in tabList"
+            :key="index"
+            @click="clickTab(item)"
+          >
+            {{ item.name }}
+          </div>
         </div>
         <div class="formdata">
           <div class="item">
@@ -17,7 +27,12 @@
           <!-- 验证码登陆 -->
           <template v-if="loginType === 'msgCode'">
             <div class="item">
-              <Input v-model="formdata.msgCode" :mobile="formdata.mobile" type="code" placeholder="请输入验证码"></Input>
+              <Input
+                v-model="formdata.msgCode"
+                :mobile="formdata.mobile"
+                type="code"
+                placeholder="请输入验证码"
+              ></Input>
             </div>
           </template>
           <!-- 密码登陆 -->
@@ -30,11 +45,16 @@
         </div>
         <!-- 表单提交 -->
         <div class="submit">
-          <Button :disabled="!(formdata.mobile && (loginType === 'msgCode' ? formdata.msgCode : formdata.password))"
-            buttonText="立即登录" @click="clickLogin"></Button>
+          <Button
+            :disabled="
+              !(formdata.mobile && (loginType === 'msgCode' ? formdata.msgCode : formdata.password))
+            "
+            buttonText="立即登录"
+            @click="clickLogin"
+          ></Button>
         </div>
         <div class="aggrement" @click="isAgree = !isAgree">
-          <i class="select" :class="{ 'selected': isAgree }"></i>
+          <i class="select" :class="{ selected: isAgree }"></i>
           <div class="text">
             未注册手机号将自动注册，勾选代表您已阅读并同意
             <span class="bold" @click.stop="clickAggrement('yhxy')">《用户协议》</span>
@@ -52,7 +72,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Input from '@/components/FormData/Input.vue'
 import Button from '@/components/FormData/Button.vue'
-import { encrypt } from '@/utils/aes';
+import { encrypt } from '@/utils/aes'
 
 const route = useRoute()
 const router = useRouter()
@@ -70,16 +90,14 @@ const formdata = ref({
 })
 const isAgree = ref(false)
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const clickTab = (item) => {
   loginType.value = item.type
 }
 
 const clickForgetPassword = () => {
-  router.push('/forget-password');
+  router.push('/forget-password')
 }
 
 const clickLogin = async () => {
@@ -89,11 +107,11 @@ const clickLogin = async () => {
       onConfirm: () => {
         isAgree.value = true
         clickLogin()
-      }
+      },
     })
     return
   }
-  const { mobile, msgCode, password } = formdata.value;
+  const { mobile, msgCode, password } = formdata.value
   let url = ''
   let body = {}
   if (loginType.value === 'msgCode') {
@@ -114,8 +132,6 @@ const clickLogin = async () => {
       router.push({ name: 'home' })
     }
     getUserInfo()
-  } else {
-    $toast.info(res.message)
   }
 }
 
@@ -127,8 +143,6 @@ const getUserInfo = async () => {
   const res = await api.post('/pinball/user/info/getUserInfo')
   if (res.code === 200) {
     localStorage.setItem('userInfo', JSON.stringify(res.data))
-  } else {
-    $toast.info(res.message)
   }
 }
 </script>
@@ -152,20 +166,20 @@ const getUserInfo = async () => {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-top: .vw(58)[];
-    padding-bottom: .vw(50)[];
-    padding-left: .vw(45)[];
+    padding-top: .vw(58) [];
+    padding-bottom: .vw(50) [];
+    padding-left: .vw(45) [];
 
     .icon {
-      width: .vw(103)[];
-      margin-bottom: .vw(15)[];
+      width: .vw(103) [];
+      margin-bottom: .vw(15) [];
     }
 
     .title {
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(16)[];
-      line-height: .vw(16)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(16) [];
+      line-height: .vw(16) [];
       font-weight: 500;
       font-style: normal;
     }
@@ -173,9 +187,9 @@ const getUserInfo = async () => {
 
   .body {
     flex: 1;
-    border-radius: .vw(8)[];
-    background: linear-gradient(180deg, #F6F6F6 0%, rgba(255, 255, 255, 0.25) 100%);
-    margin: 0 .vw(6)[];
+    border-radius: .vw(8) [];
+    background: linear-gradient(180deg, #f6f6f6 0%, rgba(255, 255, 255, 0.25) 100%);
+    margin: 0 .vw(6) [];
 
     .module {
       height: 100%;
@@ -186,18 +200,18 @@ const getUserInfo = async () => {
       background-repeat: no-repeat;
 
       .tabs {
-        height: .vw(55)[];
+        height: .vw(55) [];
         display: flex;
         align-items: center;
-        margin-bottom: .vw(54)[];
+        margin-bottom: .vw(54) [];
 
         .item {
           flex: 1;
           height: 100%;
           color: var(--text--);
-          font-family: "PingFang SC";
-          font-size: .vw(16)[];
-          line-height: .vw(16)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(16) [];
           font-weight: 400;
           font-style: normal;
           display: flex;
@@ -205,18 +219,18 @@ const getUserInfo = async () => {
           justify-content: center;
 
           &.selected {
-            color: #FFB169;
+            color: #ffb169;
             font-weight: 500;
             position: relative;
 
             &::after {
               content: '';
-              width: .vw(20)[];
-              height: .vw(4)[];
-              border-radius: .vw(45)[];
-              background-color: #FFB169;
+              width: .vw(20) [];
+              height: .vw(4) [];
+              border-radius: .vw(45) [];
+              background-color: #ffb169;
               position: absolute;
-              bottom: .vw(7)[];
+              bottom: .vw(7) [];
             }
           }
         }
@@ -224,61 +238,64 @@ const getUserInfo = async () => {
 
       .formdata {
         flex: 1;
-        padding: 0 .vw(15)[];
+        padding: 0 .vw(15) [];
 
         .item {
           &:not(:last-of-type) {
-            margin-bottom: .vw(32)[];
+            margin-bottom: .vw(32) [];
           }
         }
 
         .change-password {
           color: var(--text--);
-          font-feature-settings: 'liga' off, 'clig' off;
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-feature-settings:
+            'liga' off,
+            'clig' off;
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 400;
           font-style: normal;
           position: relative;
-          top: .vw(-16)[];
+          top: .vw(-16) [];
         }
 
         .forget-password {
-          color: #FFB169;
+          color: #ffb169;
           text-align: right;
-          font-feature-settings: 'liga' off, 'clig' off;
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-feature-settings:
+            'liga' off,
+            'clig' off;
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 400;
           font-style: normal;
           position: relative;
-          top: .vw(-16)[];
+          top: .vw(-16) [];
         }
-
       }
 
       .submit {
-        padding: 0 .vw(15)[];
+        padding: 0 .vw(15) [];
         // margin-bottom: .vw(67)[];
-        margin-bottom: .vw(32)[];
+        margin-bottom: .vw(32) [];
       }
 
       .aggrement {
         display: flex;
-        padding: 0 .vw(15)[];
-        padding-bottom: .vw(20)[];
+        padding: 0 .vw(15) [];
+        padding-bottom: .vw(20) [];
 
         .select {
-          min-width: .vw(18)[];
-          height: .vw(18)[];
+          min-width: .vw(18) [];
+          height: .vw(18) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
           background-image: url(@/assets/images/shop/select.png);
-          margin-right: .vw(6)[];
-          margin-top: .vw(2)[];
+          margin-right: .vw(6) [];
+          margin-top: .vw(2) [];
 
           &.selected {
             background-image: url(@/assets/images/shop/selected.png);
@@ -286,14 +303,14 @@ const getUserInfo = async () => {
         }
 
         .text {
-          color: #50525C;
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(24)[];
+          color: #50525c;
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(24) [];
           font-weight: 200;
 
           .bold {
-            color: #FFB169;
+            color: #ffb169;
           }
         }
       }

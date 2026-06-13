@@ -25,27 +25,27 @@ import { onMounted, ref, watch } from 'vue'
 const props = defineProps({
   title: {
     type: String,
-    default: '小提示'
+    default: '小提示',
   },
   content: {
     type: String,
-    default: ''
+    default: '',
   },
   cancelText: {
     type: String,
-    default: '取消'
+    default: '取消',
   },
   confirmText: {
     type: String,
-    default: '确定'
+    default: '确定',
   },
   showCancel: {
     type: Boolean,
-    default: true
+    default: true,
   },
   showConfirm: {
     type: Boolean,
-    default: true
+    default: true,
   },
   onCancel: { type: Function },
   onConfirm: { type: Function },
@@ -53,9 +53,7 @@ const props = defineProps({
 
 const visible = ref(true)
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 // 暴露关闭方法
 const close = () => {
@@ -98,22 +96,22 @@ const clickConfirm = () => {
   top: 0;
 
   .body {
-    width: .vw(345)[];
-    border-radius: .vw(9)[];
+    width: .vw(345) [];
+    border-radius: .vw(9) [];
     background-color: var(--white--);
     position: relative;
-    padding: .vw(24)[];
+    padding: .vw(24) [];
 
     .close {
-      width: .vw(16)[];
-      height: .vw(16)[];
+      width: .vw(16) [];
+      height: .vw(16) [];
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
       background-image: url(@/assets/images/close.png);
       position: absolute;
-      right: .vw(16)[];
-      top: .vw(16)[];
+      right: .vw(16) [];
+      top: .vw(16) [];
     }
 
     .title {
@@ -121,36 +119,36 @@ const clickConfirm = () => {
       align-items: center;
 
       .icon {
-        width: .vw(18)[];
-        height: .vw(18)[];
+        width: .vw(18) [];
+        height: .vw(18) [];
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
         background-image: url(@/assets/images/warning-icon.png);
-        margin-right: .vw(6)[];
+        margin-right: .vw(6) [];
       }
 
       .text {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(18)[];
-        line-height: .vw(18)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(18) [];
+        line-height: .vw(18) [];
         font-weight: 500;
         font-style: normal;
       }
     }
 
     .content {
-      min-height: .vw(100)[];
+      min-height: .vw(100) [];
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(16)[];
-      line-height: .vw(22)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(16) [];
+      line-height: .vw(22) [];
       font-weight: 400;
       font-style: normal;
       display: flex;
       flex-direction: column;
-      padding: .vw(24)[] 0;
+      padding: .vw(24) [] 0;
     }
 
     .buttons {
@@ -160,25 +158,25 @@ const clickConfirm = () => {
 
       div {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(16)[];
-        line-height: .vw(16)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(16) [];
+        line-height: .vw(16) [];
         font-weight: 500;
         font-style: normal;
-        border-radius: .vw(9)[];
-        padding: .vw(12)[] .vw(24)[];
+        border-radius: .vw(9) [];
+        padding: .vw(12) [] .vw(24) [];
 
         &:not(:last-of-type) {
-          margin-right: .vw(12)[];
+          margin-right: .vw(12) [];
         }
       }
 
       .cancel {
-        border: .vw(1)[] solid #E3E3E4;
+        border: .vw(1) [] solid #e3e3e4;
       }
 
       .ok {
-        background-color: #FF7716;
+        background-color: #ff7716;
       }
     }
   }

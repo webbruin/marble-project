@@ -18,7 +18,11 @@
         </Input>
       </div>
       <div class="confirm">
-        <Button buttonText="提交" :disabled="!(formdata.realName && formdata.idCardNo)" @click="clickConfirm"></Button>
+        <Button
+          buttonText="提交"
+          :disabled="!(formdata.realName && formdata.idCardNo)"
+          @click="clickConfirm"
+        ></Button>
       </div>
     </div>
   </main>
@@ -37,9 +41,7 @@ const formdata = ref({
   idCardNo: '',
 })
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const clickConfirm = async () => {
   $toast.loading()
@@ -50,8 +52,6 @@ const clickConfirm = async () => {
       clearTimeout(timer)
       router.back()
     }, 1500)
-  } else {
-    $toast.info(res.message)
   }
 }
 </script>
@@ -63,34 +63,34 @@ const clickConfirm = async () => {
 
 main {
   height: 100%;
-  background-color: #F5F6FA;
+  background-color: #f5f6fa;
 
   .formdata {
-    padding: 0 .vw(24)[];
+    padding: 0 .vw(24) [];
 
     .title {
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(24)[];
-      line-height: .vw(24)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(24) [];
+      line-height: .vw(24) [];
       font-weight: 500;
       font-style: normal;
-      margin-top: .vw(54)[];
-      margin-bottom: .vw(43)[];
+      margin-top: .vw(54) [];
+      margin-bottom: .vw(43) [];
     }
 
     .item {
       &:not(:last-of-type) {
-        margin-bottom: .vw(32)[];
+        margin-bottom: .vw(32) [];
       }
 
       .text {
-        width: .vw(80)[];
+        width: .vw(80) [];
         display: inline-block;
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(16)[];
-        line-height: .vw(27)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(16) [];
+        line-height: .vw(27) [];
         font-weight: 500;
         font-style: normal;
       }

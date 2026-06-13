@@ -29,7 +29,7 @@ export function createModal(options) {
       }
       _instance = null
       container = null
-    }
+    },
   })
 
   const instance = app.mount(container)

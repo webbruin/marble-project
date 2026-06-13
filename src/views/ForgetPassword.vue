@@ -7,7 +7,12 @@
         <Input v-model="formdata.mobile" type="tel" placeholder="请输入手机号"></Input>
       </div>
       <div class="item">
-        <Input v-model="formdata.msgCode" :mobile="formdata.mobile" type="code" placeholder="请输入验证码"></Input>
+        <Input
+          v-model="formdata.msgCode"
+          :mobile="formdata.mobile"
+          type="code"
+          placeholder="请输入验证码"
+        ></Input>
       </div>
       <div class="confirm">
         <Button :disabled="!(formdata.mobile && formdata.msgCode)" @click="clickConfirm"></Button>
@@ -30,9 +35,7 @@ const formdata = ref({
   msgCode: '',
 })
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const clickConfirm = async () => {
   $toast.loading()
@@ -42,8 +45,6 @@ const clickConfirm = async () => {
     const { access_token, hasPassword } = res.data
     localStorage.setItem('token', access_token)
     router.push({ name: 'set-password' })
-  } else {
-    $toast.info(res.message)
   }
 }
 </script>
@@ -55,36 +56,36 @@ const clickConfirm = async () => {
 
 main {
   height: 100%;
-  background-color: #F5F6FA;
+  background-color: #f5f6fa;
 
   .formdata {
-    padding: 0 .vw(24)[];
+    padding: 0 .vw(24) [];
 
     .title {
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(24)[];
-      line-height: .vw(24)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(24) [];
+      line-height: .vw(24) [];
       font-weight: 500;
       font-style: normal;
-      margin-top: .vw(54)[];
-      margin-bottom: .vw(43)[];
+      margin-top: .vw(54) [];
+      margin-bottom: .vw(43) [];
     }
 
     .item {
       .desc {
         color: var(--text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 400;
         font-style: normal;
-        margin-top: .vw(16)[];
-        margin-left: .vw(13)[];
+        margin-top: .vw(16) [];
+        margin-left: .vw(13) [];
       }
 
       &:not(:last-of-type) {
-        margin-bottom: .vw(32)[];
+        margin-bottom: .vw(32) [];
       }
     }
 

@@ -9,22 +9,34 @@
     </div>
     <div class="body">
       <div class="tab">
-        <div class="item" v-for="(item, index) in categorys" :key="index" @click="clickCategory(item)">
+        <div
+          class="item"
+          v-for="(item, index) in categorys"
+          :key="index"
+          @click="clickCategory(item)"
+        >
           <div class="icon">
-            <img :src="item.icon" alt="" v-if="item.icon">
+            <img :src="item.icon" alt="" v-if="item.icon" />
           </div>
           <p class="text">{{ item.categoryName }}</p>
         </div>
       </div>
       <div class="banner">
-        <img src="@/assets/images/home/banner.png" alt="">
+        <img src="@/assets/images/home/banner.png" alt="" />
       </div>
       <div class="filter">
-        <div class="item" :class="{ light: params.sortType === item.type }" v-for="(item, index) in sortTypeList"
-          :key="index">
+        <div
+          class="item"
+          :class="{ light: params.sortType === item.type }"
+          v-for="(item, index) in sortTypeList"
+          :key="index"
+        >
           <span @click="clickFilter(item)">{{ item.name }}</span>
           <template v-if="item.sort">
-            <div class="sort" :class="{ 'low': params.order === 'low', 'hight': params.order === 'hight' }"></div>
+            <div
+              class="sort"
+              :class="{ low: params.order === 'low', hight: params.order === 'hight' }"
+            ></div>
           </template>
         </div>
       </div>
@@ -35,7 +47,7 @@
               <div v-if="item.vipEntry" class="entry" @click="toVip"></div>
               <div v-else class="item" @click="clickProduct(item)">
                 <div class="cover">
-                  <img :src="item.mainImage" alt="">
+                  <img :src="item.mainImage" alt="" />
                 </div>
                 <div class="text">{{ item.productName }}</div>
                 <div class="option">
@@ -96,11 +108,11 @@ const sortTypeList = ref([
 const params = ref({
   current: 1,
   pageSize: 20,
-  categoryId: '',  // 分类ID
-  productName: '',  // 商品名称（模糊查询）
-  status: 1,  // 状态：0-下架，1-上架
-  sortType: 'recommend',  // 推荐-recommend 热度-hot 价格-price
-  order: '',  // 低到高-low 高到低-hight
+  categoryId: '', // 分类ID
+  productName: '', // 商品名称（模糊查询）
+  status: 1, // 状态：0-下架，1-上架
+  sortType: 'recommend', // 推荐-recommend 热度-hot 价格-price
+  order: '', // 低到高-low 高到低-hight
 })
 // 商品列表
 const productList = ref([])
@@ -127,8 +139,6 @@ const getPointCardAmount = async () => {
     const res = await api.post('/pinball/user/account/getPointCardAmount')
     if (res.code === 200) {
       cardAmount.value = +res.data
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -144,8 +154,6 @@ const getCategoryList = async () => {
     const res = await api.post('/pinball/shop/category/list', {})
     if (res.code === 200) {
       categorys.value = res.data || []
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -176,8 +184,6 @@ const getProductList = async (init) => {
         hasVipEntry.value = true
         productList.value.splice(1, 0, { vipEntry: true })
       }
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -211,16 +217,18 @@ const toVip = () => {
 }
 
 const clickProduct = ({ productId }) => {
-  router.push({ name: 'product-detail', params: { productId } });
+  router.push({ name: 'product-detail', params: { productId } })
 }
 
 const addCart = async ({ productId, minSkuId }) => {
   try {
-    const res = await api.post('/pinball/shop/cart/add', { productId, skuId: minSkuId, quantity: 1 })
+    const res = await api.post('/pinball/shop/cart/add', {
+      productId,
+      skuId: minSkuId,
+      quantity: 1,
+    })
     if (res.code === 200) {
       $toast.info('加入购物车成功')
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -235,7 +243,7 @@ const addCart = async ({ productId, minSkuId }) => {
 
 .shop {
   .header {
-    height: .vw(160)[];
+    height: .vw(160) [];
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -243,33 +251,33 @@ const addCart = async ({ productId, minSkuId }) => {
 
     .title {
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(32)[];
-      line-height: .vw(32)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(32) [];
+      line-height: .vw(32) [];
       font-weight: 900;
-      padding: .vw(12)[] .vw(18)[] .vw(9)[] .vw(18)[];
-      margin-bottom: .vw(8)[];
+      padding: .vw(12) [] .vw(18) [] .vw(9) [] .vw(18) [];
+      margin-bottom: .vw(8) [];
     }
 
     .point {
-      padding: 0 .vw(18)[];
-      margin-bottom: .vw(17)[];
+      padding: 0 .vw(18) [];
+      margin-bottom: .vw(17) [];
 
       .text {
         color: var(--text--);
-        font-family: "PingFang SC";
-        font-size: .vw(16)[];
-        line-height: .vw(16)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(16) [];
+        line-height: .vw(16) [];
         font-weight: 200;
         font-style: normal;
-        margin-bottom: .vw(10)[];
+        margin-bottom: .vw(10) [];
       }
 
       .count {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(26)[];
-        line-height: .vw(26)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(26) [];
+        line-height: .vw(26) [];
         font-weight: 900;
         font-style: normal;
       }
@@ -277,49 +285,49 @@ const addCart = async ({ productId, minSkuId }) => {
   }
 
   .body {
-    border-radius: .vw(24)[] .vw(24)[] 0 0;
+    border-radius: .vw(24) [] .vw(24) [] 0 0;
     background-color: var(--white--);
-    padding-top: .vw(23)[];
-    margin-top: .vw(-20)[];
+    padding-top: .vw(23) [];
+    margin-top: .vw(-20) [];
 
     .tab {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      padding: 0 .vw(28)[];
+      padding: 0 .vw(28) [];
 
       .item {
         display: flex;
         align-items: center;
         flex-direction: column;
-        margin-bottom: .vw(16)[];
-        margin-right: .vw(31)[];
+        margin-bottom: .vw(16) [];
+        margin-right: .vw(31) [];
 
         &:nth-child(4n + 0) {
           margin-right: 0;
         }
 
         .icon {
-          width: .vw(48)[];
-          height: .vw(48)[];
+          width: .vw(48) [];
+          height: .vw(48) [];
           display: flex;
           align-items: center;
           justify-content: center;
-          border-radius: .vw(12)[];
-          background: linear-gradient(153deg, #CCF4FF 5.44%, #98E0ED 80.37%);
-          margin-bottom: .vw(8)[];
+          border-radius: .vw(12) [];
+          background: linear-gradient(153deg, #ccf4ff 5.44%, #98e0ed 80.37%);
+          margin-bottom: .vw(8) [];
 
           img {
-            width: .vw(40)[];
-            height: .vw(40)[];
+            width: .vw(40) [];
+            height: .vw(40) [];
           }
         }
 
         .text {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 400;
           font-style: normal;
         }
@@ -327,20 +335,20 @@ const addCart = async ({ productId, minSkuId }) => {
     }
 
     .banner {
-      padding: 0 .vw(16)[];
-      margin-bottom: .vw(16)[];
+      padding: 0 .vw(16) [];
+      margin-bottom: .vw(16) [];
 
       img {
         width: 100%;
-        border-radius: .vw(16)[];
+        border-radius: .vw(16) [];
         overflow: hidden;
       }
     }
 
     .filter {
       display: flex;
-      padding: 0 .vw(16)[];
-      margin-bottom: .vw(16)[];
+      padding: 0 .vw(16) [];
+      margin-bottom: .vw(16) [];
       overflow-x: auto;
       overflow-y: hidden;
 
@@ -349,15 +357,15 @@ const addCart = async ({ productId, minSkuId }) => {
         align-items: center;
 
         &:not(:last-of-type) {
-          margin-right: .vw(24)[];
+          margin-right: .vw(24) [];
         }
 
         span {
-          width: .vw(32)[];
+          width: .vw(32) [];
           color: var(--text--);
-          font-family: "PingFang SC";
-          font-size: .vw(16)[];
-          line-height: .vw(28)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(28) [];
           font-weight: 500;
           font-style: normal;
         }
@@ -367,41 +375,41 @@ const addCart = async ({ productId, minSkuId }) => {
           align-items: center;
           flex-direction: column;
           justify-content: center;
-          margin-left: .vw(6)[];
+          margin-left: .vw(6) [];
 
           &::before {
             content: '';
-            width: .vw(6)[];
-            height: .vw(6)[];
-            border-top: .vw(1)[] solid var(--text--);
-            border-left: .vw(1)[] solid var(--text--);
-            border-bottom: .vw(1)[] solid transparent;
-            border-right: .vw(1)[] solid transparent;
+            width: .vw(6) [];
+            height: .vw(6) [];
+            border-top: .vw(1) [] solid var(--text--);
+            border-left: .vw(1) [] solid var(--text--);
+            border-bottom: .vw(1) [] solid transparent;
+            border-right: .vw(1) [] solid transparent;
             transform: rotate(45deg);
           }
 
           &::after {
             content: '';
-            width: .vw(6)[];
-            height: .vw(6)[];
-            border-top: .vw(1)[] solid transparent;
-            border-left: .vw(1)[] solid transparent;
-            border-bottom: .vw(1)[] solid var(--text--);
-            border-right: .vw(1)[] solid var(--text--);
+            width: .vw(6) [];
+            height: .vw(6) [];
+            border-top: .vw(1) [] solid transparent;
+            border-left: .vw(1) [] solid transparent;
+            border-bottom: .vw(1) [] solid var(--text--);
+            border-right: .vw(1) [] solid var(--text--);
             transform: rotate(45deg);
           }
 
           &.low {
             &::before {
-              border-top: .vw(1)[] solid var(--light-text--);
-              border-left: .vw(1)[] solid var(--light-text--);
+              border-top: .vw(1) [] solid var(--light-text--);
+              border-left: .vw(1) [] solid var(--light-text--);
             }
           }
 
           &.hight {
             &::after {
-              border-bottom: .vw(1)[] solid var(--light-text--);
-              border-right: .vw(1)[] solid var(--light-text--);
+              border-bottom: .vw(1) [] solid var(--light-text--);
+              border-right: .vw(1) [] solid var(--light-text--);
             }
           }
         }
@@ -409,12 +417,12 @@ const addCart = async ({ productId, minSkuId }) => {
 
       .light {
         span {
-          width: .vw(48)[];
+          width: .vw(48) [];
           color: var(--light-text--);
-          font-size: .vw(24)[];
-          line-height: .vw(24)[];
+          font-size: .vw(24) [];
+          line-height: .vw(24) [];
           background-size: 90%;
-          background-position: center .vw(7)[];
+          background-position: center .vw(7) [];
           background-repeat: no-repeat;
           background-image: url(@/assets/images/home/filter-select-bg.png);
         }
@@ -425,32 +433,32 @@ const addCart = async ({ productId, minSkuId }) => {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      padding: 0 .vw(16)[];
+      padding: 0 .vw(16) [];
 
       .entry {
-        width: .vw(166)[];
-        height: .vw(200)[];
+        width: .vw(166) [];
+        height: .vw(200) [];
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
         background-image: url(@/assets/images/shop/vip-entry.png);
-        margin-bottom: .vw(16)[];
+        margin-bottom: .vw(16) [];
       }
 
       .item {
-        width: .vw(166)[];
-        height: .vw(200)[];
+        width: .vw(166) [];
+        height: .vw(200) [];
         display: flex;
         flex-direction: column;
-        border-radius: .vw(12)[];
-        background-color: #F5F6FA;
-        margin-bottom: .vw(16)[];
+        border-radius: .vw(12) [];
+        background-color: #f5f6fa;
+        margin-bottom: .vw(16) [];
         overflow: hidden;
 
         .cover {
           display: flex;
           justify-content: center;
-          padding: .vw(15)[] .vw(28)[] .vw(20)[] .vw(28)[];
+          padding: .vw(15) [] .vw(28) [] .vw(20) [] .vw(28) [];
 
           img {
             max-width: 100%;
@@ -460,32 +468,32 @@ const addCart = async ({ productId, minSkuId }) => {
 
         .text {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(16)[];
-          line-height: .vw(16)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(16) [];
           font-weight: 500;
           font-style: normal;
-          padding: 0 .vw(12)[];
-          margin-bottom: .vw(6)[];
+          padding: 0 .vw(12) [];
+          margin-bottom: .vw(6) [];
         }
 
         .option {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 .vw(12)[];
+          padding: 0 .vw(12) [];
 
           .point {
             color: var(--orange--);
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 500;
             font-style: normal;
           }
 
           .add-cart {
-            width: .vw(18)[];
-            height: .vw(18)[];
+            width: .vw(18) [];
+            height: .vw(18) [];
             background-size: 100%;
             background-position: center;
             background-repeat: no-repeat;

@@ -2,13 +2,23 @@
   <main class="record">
     <Header title="弹珠记录"></Header>
     <div class="tab">
-      <div class="item" :class="{ 'selected': params.changeType === item.type }" v-for="(item, index) in tabList"
-        :key="index" @click="clickTab(item.type)">
+      <div
+        class="item"
+        :class="{ selected: params.changeType === item.type }"
+        v-for="(item, index) in tabList"
+        :key="index"
+        @click="clickTab(item.type)"
+      >
         {{ item.name }}
       </div>
     </div>
     <div class="body">
-      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="getRecordList">
+      <InfiniteScroll
+        :loading="loading"
+        :loadOver="loadOver"
+        :empty="isEmpty"
+        @load="getRecordList"
+      >
         <template #content>
           <div class="record-list">
             <div class="item" v-for="(item, index) in recordList" :key="index">
@@ -16,7 +26,7 @@
                 <p class="text">{{ item.remark }}</p>
                 <p class="date">{{ item.createTime }}</p>
               </div>
-              <div class="count" :class="{ 'red': index % 2 === 1 }">
+              <div class="count" :class="{ red: index % 2 === 1 }">
                 {{ item.changeType === 1 ? '+' : '-' }}{{ item.changeAmount }}弹珠
               </div>
             </div>
@@ -38,7 +48,7 @@ const tabList = ref([
   { name: '支出', type: 2 },
 ])
 const params = ref({
-  changeType: '',  // null-全部，1-收入，2-支出
+  changeType: '', // null-全部，1-收入，2-支出
   current: 1,
   pageSize: 20,
 })
@@ -70,8 +80,6 @@ const getRecordList = async (init) => {
       loadOver.value = recordList.value.length >= res.data.total
       // 空列表
       isEmpty.value = loadOver.value && recordList.value.length === 0
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -102,27 +110,27 @@ const clickTab = (type) => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 .vw(15)[];
+    padding: 0 .vw(15) [];
 
     .item {
       color: var(--text--);
-      font-family: "PingFang SC";
-      font-size: .vw(16)[];
-      line-height: .vw(16)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(16) [];
+      line-height: .vw(16) [];
       font-weight: 400;
       font-style: normal;
       position: relative;
-      padding: .vw(10)[];
+      padding: .vw(10) [];
 
       &.selected {
-        color: #FFB169;
+        color: #ffb169;
         font-weight: 500;
 
         &::after {
           content: '';
           width: 100%;
-          height: .vw(2)[];
-          background-color: #FFB169;
+          height: .vw(2) [];
+          background-color: #ffb169;
           position: absolute;
           bottom: 0;
           left: 0;
@@ -133,61 +141,60 @@ const clickTab = (type) => {
 
   .body {
     flex: 1;
-    background-color: #F5F6FA;
+    background-color: #f5f6fa;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 .vw(8)[] .vw(10)[];
+    padding: 0 .vw(8) [] .vw(10) [];
 
     .record-list {
       .item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border-radius: .vw(9)[];
+        border-radius: .vw(9) [];
         background-color: #fff;
-        padding: .vw(16)[];
-        margin-bottom: .vw(8)[];
+        padding: .vw(16) [];
+        margin-bottom: .vw(8) [];
 
         &:first-of-type {
-          margin-top: .vw(8)[];
+          margin-top: .vw(8) [];
         }
 
         .info {
           .text {
             color: var(--light-text--);
-            font-family: "PingFang SC";
-            font-size: .vw(16)[];
-            line-height: .vw(16)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(16) [];
+            line-height: .vw(16) [];
             font-weight: 500;
             font-style: normal;
-            margin-bottom: .vw(8)[];
+            margin-bottom: .vw(8) [];
           }
 
           .date {
             color: var(--text--);
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 400;
             font-style: normal;
           }
         }
 
         .count {
-          color: #52C41A;
-          font-family: "PingFang SC";
-          font-size: .vw(16)[];
-          line-height: .vw(16)[];
+          color: #52c41a;
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(16) [];
           font-weight: 500;
           font-style: normal;
 
           &.red {
-            color: #F20C32;
+            color: #f20c32;
           }
         }
       }
     }
-
   }
 }
 </style>

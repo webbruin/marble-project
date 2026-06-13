@@ -17,19 +17,19 @@ const validatePhone = (phone) => {
 // 手机号中间四位机密
 const maskPhoneNumber = (phone) => {
   // 参数校验：必须为字符串或可转为字符串的类型
-  if (phone == null) return phone;
-  const str = String(phone);
-  
+  if (phone == null) return phone
+  const str = String(phone)
+
   // 仅当长度为11时执行脱敏，否则返回原字符串（可根据需求调整）
   if (str.length === 11) {
-    return str.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+    return str.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
   }
   // 通用处理：如果长度足够，将第4-7位替换为****
   if (str.length >= 7) {
-    return str.substring(0, 3) + '****' + str.substring(7);
+    return str.substring(0, 3) + '****' + str.substring(7)
   }
   // 长度不足7位，无法脱敏，返回原值
-  return str;
+  return str
 }
 
 /**
@@ -55,8 +55,8 @@ function formatNumberWithCommas(input, separator = ',') {
     return str
   }
 
-  const sign = match[1]        // 负号或空
-  let integerPart = match[2]   // 整数部分
+  const sign = match[1] // 负号或空
+  let integerPart = match[2] // 整数部分
   const decimalPart = match[3] // 小数部分（可能 undefined）
 
   // 整数部分添加千位分隔符
@@ -83,7 +83,7 @@ function formatToTwoDecimals(input) {
 
   // 转换为数字
   const num = Number(input)
-  
+
   // 无效数字判断
   if (isNaN(num)) {
     return String(input)
@@ -99,5 +99,5 @@ export {
   validatePhone,
   maskPhoneNumber,
   formatNumberWithCommas,
-  formatToTwoDecimals
+  formatToTwoDecimals,
 }

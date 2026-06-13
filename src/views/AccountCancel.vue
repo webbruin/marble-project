@@ -34,9 +34,7 @@ onMounted(() => {
   userInfo.value = JSON.parse(data)
 })
 
-const cancel = (url) => {
-
-}
+const cancel = (url) => {}
 
 const logout = async () => {
   $toast.loading('退出中')
@@ -45,8 +43,6 @@ const logout = async () => {
     $toast.info('退出登陆成功')
     localStorage.removeItem('token')
     router.replace({ name: 'login' })
-  } else {
-    $toast.info(res.message)
   }
 }
 </script>
@@ -65,29 +61,29 @@ const logout = async () => {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    background-color: #F8F8F8;
-    padding: .vw(8)[] .vw(18)[];
+    background-color: #f8f8f8;
+    padding: .vw(8) [] .vw(18) [];
 
     .module {
-      border-radius: .vw(9)[];
+      border-radius: .vw(9) [];
       background-color: var(--white--);
-      padding: .vw(9)[] 0;
+      padding: .vw(9) [] 0;
 
       &:not(:last-of-type) {
-        margin-bottom: .vw(8)[];
+        margin-bottom: .vw(8) [];
       }
 
       .item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: .vw(16)[];
+        padding: .vw(16) [];
 
         .text {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 400;
           font-style: normal;
         }
@@ -95,18 +91,18 @@ const logout = async () => {
         .desc {
           flex: 1;
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(12)[];
-          line-height: .vw(12)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(12) [];
+          line-height: .vw(12) [];
           font-weight: 400;
           font-style: normal;
           text-align: right;
-          margin: 0 .vw(9)[];
+          margin: 0 .vw(9) [];
         }
 
         .icon {
-          width: .vw(14)[];
-          height: .vw(14)[];
+          width: .vw(14) [];
+          height: .vw(14) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
@@ -117,10 +113,10 @@ const logout = async () => {
   }
 
   .footer {
-    padding: .vw(12)[] .vw(18)[];
+    padding: .vw(12) [] .vw(18) [];
 
     .button {
-      background-color: #EDEDF0;
+      background-color: #ededf0;
     }
   }
 }

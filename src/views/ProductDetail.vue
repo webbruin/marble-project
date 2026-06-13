@@ -4,7 +4,7 @@
     <div class="body">
       <div class="swiper" v-if="productData.images?.length">
         <van-swipe :autoplay="3000" indicator-color="#FFB169" lazy-render>
-          <van-swipe-item v-for="item, index in productData.images" :key="index">
+          <van-swipe-item v-for="(item, index) in productData.images" :key="index">
             <div class="avatar">
               <img :src="item" />
             </div>
@@ -20,10 +20,14 @@
           <div class="name">{{ productData.productName }}</div>
           <div class="desc">{{ productData.description }}</div>
           <div class="sku-list" v-if="productData.skuList?.length">
-            <template v-for="item, index in productData.skuList" :key="index">
-              <div class="sku" :class="{ 'selected': item.skuId === selectSkuId }" @click="selectSkuId = item.skuId">
+            <template v-for="(item, index) in productData.skuList" :key="index">
+              <div
+                class="sku"
+                :class="{ selected: item.skuId === selectSkuId }"
+                @click="selectSkuId = item.skuId"
+              >
                 <div class="sku-img" v-if="item.image">
-                  <img :src="item.image" alt="">
+                  <img :src="item.image" alt="" />
                 </div>
                 <span class="sku-name">{{ item.skuName }}</span>
               </div>
@@ -38,7 +42,7 @@
     </div>
     <div class="footer">
       <div class="cart" @click="toCart">
-        <img src="@/assets/images/product-detail/cart.png" alt="">
+        <img src="@/assets/images/product-detail/cart.png" alt="" />
       </div>
       <div class="settlement" @click="toSettlement">立即兑换</div>
     </div>
@@ -54,7 +58,7 @@ const route = useRoute()
 const router = useRouter()
 
 const params = reactive({
-  productId: ''
+  productId: '',
 })
 const productData = ref({})
 const selectSkuId = ref('')
@@ -76,11 +80,9 @@ const getProductDetail = async () => {
     if (res.code === 200) {
       productData.value = {
         ...(res.data || {}),
-        images: res.data.images ? JSON.parse(res.data.images) : []
+        images: res.data.images ? JSON.parse(res.data.images) : [],
       }
       selectSkuId.value = res.data.skuList[0].skuId || {}
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -88,7 +90,9 @@ const getProductDetail = async () => {
 }
 
 const selectSku = computed(() => {
-  return productData.value.skuList ? productData.value.skuList.find(item => item.skuId === selectSkuId.value) : {}
+  return productData.value.skuList
+    ? productData.value.skuList.find((item) => item.skuId === selectSkuId.value)
+    : {}
 })
 
 const toCart = () => {
@@ -96,12 +100,14 @@ const toCart = () => {
 }
 
 const toSettlement = () => {
-  const selectCart = [{
-    ...selectSku.value,
-    productImage: productData.value.mainImage,
-    productName: productData.value.productName,
-    quantity: 1
-  }]
+  const selectCart = [
+    {
+      ...selectSku.value,
+      productImage: productData.value.mainImage,
+      productName: productData.value.productName,
+      quantity: 1,
+    },
+  ]
   localStorage.setItem('selectCart', JSON.stringify(selectCart))
   localStorage.removeItem('selectAddress')
   router.push({ name: 'settlement', params: { source: 'product-detail' } })
@@ -117,7 +123,7 @@ const toSettlement = () => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #F4F4F4;
+  background-color: #f4f4f4;
   position: relative;
 
   .header {
@@ -134,11 +140,11 @@ const toSettlement = () => {
     overflow: auto;
 
     .swiper {
-      margin-bottom: .vw(8)[];
+      margin-bottom: .vw(8) [];
 
       .avatar {
         width: 100%;
-        height: .vw(393)[];
+        height: .vw(393) [];
         display: flex;
         align-items: center;
         justify-content: center;
@@ -151,59 +157,59 @@ const toSettlement = () => {
     }
 
     .main {
-      padding: 0 .vw(16)[];
+      padding: 0 .vw(16) [];
 
       .module {
-        border-radius: .vw(9)[];
+        border-radius: .vw(9) [];
         background-color: #fff;
-        padding: .vw(12)[] .vw(10)[];
-        margin-bottom: .vw(8)[];
+        padding: .vw(12) [] .vw(10) [];
+        margin-bottom: .vw(8) [];
       }
 
       .module1 {
         .point {
           display: flex;
           align-items: center;
-          margin-bottom: .vw(16)[];
+          margin-bottom: .vw(16) [];
 
           .text {
-            color: #F20C32;
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            color: #f20c32;
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 500;
             font-style: normal;
-            margin-right: .vw(4)[];
+            margin-right: .vw(4) [];
           }
 
           .count {
-            color: #F20C32;
-            font-family: "PingFang SC";
-            font-size: .vw(18)[];
-            line-height: .vw(18)[];
+            color: #f20c32;
+            font-family: 'PingFang SC';
+            font-size: .vw(18) [];
+            line-height: .vw(18) [];
             font-weight: 500;
             font-style: normal;
           }
         }
 
         .name {
-          color: #151F04;
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          color: #151f04;
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 400;
           font-style: normal;
-          margin-bottom: .vw(14)[];
+          margin-bottom: .vw(14) [];
         }
 
         .desc {
           color: var(--text--);
-          font-family: "PingFang SC";
-          font-size: .vw(12)[];
-          line-height: .vw(12)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(12) [];
+          line-height: .vw(12) [];
           font-weight: 400;
           font-style: normal;
-          margin-bottom: .vw(16)[];
+          margin-bottom: .vw(16) [];
         }
 
         .sku-list {
@@ -215,27 +221,27 @@ const toSettlement = () => {
           .sku {
             display: flex;
             align-items: center;
-            border-radius: .vw(3)[];
+            border-radius: .vw(3) [];
             border: 1px solid transparent;
-            background-color: #F2F2F2;
-            padding: .vw(6)[] .vw(8)[];
+            background-color: #f2f2f2;
+            padding: 0 .vw(8) [];
 
             &:not(:last-of-type) {
-              margin-right: .vw(8)[];
+              margin-right: .vw(8) [];
             }
 
             &.selected {
-              border: 1px solid #FF7716;
-              background-color: rgba(#FFB169, 0.45);
+              border: 1px solid #ff7716;
+              background-color: rgba(#ffb169, 0.45);
             }
 
             .sku-img {
-              width: .vw(20)[];
-              height: .vw(20)[];
+              width: .vw(22) [];
+              height: .vw(22) [];
               display: flex;
               align-items: center;
               justify-content: center;
-              margin-right: .vw(4)[];
+              margin-right: .vw(4) [];
 
               img {
                 max-width: 100%;
@@ -244,13 +250,14 @@ const toSettlement = () => {
             }
 
             .sku-name {
-              color: #151F04;
-              font-family: "PingFang SC";
-              font-size: .vw(12)[];
-              line-height: .vw(12)[];
+              color: #151f04;
+              font-family: 'PingFang SC';
+              font-size: .vw(12) [];
+              line-height: .vw(20) [];
               font-weight: 400;
               font-style: normal;
               white-space: nowrap;
+              padding: .vw(6) [] 0;
             }
           }
         }
@@ -262,38 +269,37 @@ const toSettlement = () => {
 
         .desc {
           color: var(--text--);
-          font-family: "PingFang SC";
-          font-size: .vw(12)[];
-          line-height: .vw(12)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(12) [];
+          line-height: .vw(12) [];
           font-weight: 400;
           font-style: normal;
-          margin-right: .vw(16)[];
+          margin-right: .vw(16) [];
         }
 
         .text {
-          color: #151F04;
-          font-family: "PingFang SC";
-          font-size: .vw(12)[];
-          line-height: .vw(12)[];
+          color: #151f04;
+          font-family: 'PingFang SC';
+          font-size: .vw(12) [];
+          line-height: .vw(12) [];
           font-weight: 400;
           font-style: normal;
         }
       }
-
     }
   }
 
   .footer {
-    height: .vw(64)[];
+    height: .vw(64) [];
     display: flex;
     align-items: center;
     background-color: #fff;
-    padding: .vw(8)[] .vw(16)[];
+    padding: .vw(8) [] .vw(16) [];
 
     .cart {
-      width: .vw(28)[];
-      height: .vw(28)[];
-      margin-right: .vw(24)[];
+      width: .vw(28) [];
+      height: .vw(28) [];
+      margin-right: .vw(24) [];
 
       img {
         width: 100%;
@@ -304,14 +310,14 @@ const toSettlement = () => {
     .settlement {
       flex: 1;
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(16)[];
-      line-height: .vw(48)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(16) [];
+      line-height: .vw(48) [];
       font-weight: 500;
       text-align: center;
       font-style: normal;
-      border-radius: .vw(45)[];
-      background-color: #FFB169;
+      border-radius: .vw(45) [];
+      background-color: #ffb169;
     }
   }
 }

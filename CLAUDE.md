@@ -48,7 +48,8 @@ src/
 
 - 所有接口统一使用 POST 请求，完整路径为 `VITE_API_BASE_URL + 接口路径`，接口路径以 `/pinball/` 开头
 - 请求示例：`api.post('/pinball/路径/接口名', 参数)`
-- 响应格式：`{ code: 200, data: ..., message: '...' }` —— 始终先判断 `res.code === 200`
+- 响应格式：`{ code: 200, data: ..., message: '...' }` —— `code === 200` 表示成功
+- 全局拦截器已统一处理非 200 错误（toast 出 message），调用方无需再手动 toast
 - 401 处理：清除 token，1 秒后跳转到 `/login`
 - 错误处理模式：
 
@@ -57,8 +58,6 @@ try {
   const res = await api.post('/pinball/路径', params)
   if (res.code === 200) {
     // 处理成功
-  } else {
-    $toast.info(res.message)
   }
 } catch (e) {
   $toast.info('系统错误')

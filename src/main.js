@@ -20,6 +20,6 @@ app.mount('#app')
 
 app.component('Header', Header)
 
-window.$toast = Toast;
-window.$modal = Modal;
-window.api = api;
+window.$toast = Toast
+window.$modal = Modal
+window.api = api

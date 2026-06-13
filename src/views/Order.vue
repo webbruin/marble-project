@@ -2,8 +2,13 @@
   <main class="order">
     <Header title="订单"></Header>
     <div class="tab">
-      <div class="item" :class="{ 'selected': params.orderStatus === item.orderStatus }"
-        v-for="(item, index) in tabList" :key="index" @click="clickTab(item.orderStatus)">
+      <div
+        class="item"
+        :class="{ selected: params.orderStatus === item.orderStatus }"
+        v-for="(item, index) in tabList"
+        :key="index"
+        @click="clickTab(item.orderStatus)"
+      >
         {{ item.name }}
       </div>
     </div>
@@ -11,7 +16,12 @@
       <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
         <template #content>
           <div class="order-list">
-            <div class="item" v-for="(item, index) in orderList" :key="index" @click="toOrderDetail(item)">
+            <div
+              class="item"
+              v-for="(item, index) in orderList"
+              :key="index"
+              @click="toOrderDetail(item)"
+            >
               <div class="address">
                 <!-- <span class="text">北京市朝阳区凤凰汇6栋1584市</span> -->
                 <span class="text">{{ item.firstProductName }}</span>
@@ -20,7 +30,7 @@
               <div class="product">
                 <div class="cover-list">
                   <div class="cover">
-                    <img :src="item.firstProductImage" alt="">
+                    <img :src="item.firstProductImage" alt="" />
                   </div>
                 </div>
                 <div class="info">
@@ -30,14 +40,14 @@
               </div>
               <div class="button-list">
                 <template v-if="item.orderStatus === 0">
-                  <div class="button" :class="{ 'disabled': false }">待支付</div>
+                  <div class="button" :class="{ disabled: false }">待支付</div>
                 </template>
                 <template v-if="item.orderStatus === 1"></template>
                 <template v-if="item.orderStatus === 2"></template>
                 <template v-if="item.orderStatus === 3"></template>
                 <template v-if="item.orderStatus === 4"></template>
                 <template v-if="item.orderStatus === 5 || item.orderStatus === 6">
-                  <div class="button" :class="{ 'disabled': true }">已完成</div>
+                  <div class="button" :class="{ disabled: true }">已完成</div>
                 </template>
               </div>
             </div>
@@ -60,11 +70,11 @@ const router = useRouter()
 const params = reactive({
   current: 1,
   pageSize: 20,
-  orderStatus: null,  // 0-待支付，1-已支付，2-已发货，3-已收货，4-退款中，5-已退款，6-已关闭
-  createTimeStart: '',  // 创建时间起（含）
-  createTimeEnd: '',  // 创建时间止（含）
-  orderId: '',  // 订单号（模糊查询）
-  recipientPhone: '',  // 收货人电话（模糊查询）
+  orderStatus: null, // 0-待支付，1-已支付，2-已发货，3-已收货，4-退款中，5-已退款，6-已关闭
+  createTimeStart: '', // 创建时间起（含）
+  createTimeEnd: '', // 创建时间止（含）
+  orderId: '', // 订单号（模糊查询）
+  recipientPhone: '', // 收货人电话（模糊查询）
 })
 const tabList = ref([
   { name: '全部', orderStatus: null },
@@ -119,11 +129,9 @@ const getOrderList = async (init) => {
       loadOver.value = orderList.value.length >= res.data.total
       // 空列表
       isEmpty.value = loadOver.value && orderList.value.length === 0
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
-    console.log(222, e);
+    console.log(222, e)
     $toast.info('系统错误')
     loading.value = false
   }
@@ -144,7 +152,7 @@ const loadMore = () => {
 }
 
 const toOrderDetail = (item) => {
-  console.log(111, item);
+  console.log(111, item)
 }
 </script>
 
@@ -164,16 +172,16 @@ const toOrderDetail = (item) => {
     justify-content: space-between;
     overflow-y: hidden;
     overflow-x: auto;
-    padding: .vw(12)[] .vw(16)[] 0;
+    padding: .vw(12) [] .vw(16) [] 0;
 
     .item {
-      width: .vw(72)[];
-      min-width: .vw(72)[];
-      height: .vw(32)[];
+      width: .vw(72) [];
+      min-width: .vw(72) [];
+      height: .vw(32) [];
       color: var(--text--);
-      font-family: "PingFang SC";
-      font-size: .vw(14)[];
-      line-height: .vw(14)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(14) [];
+      line-height: .vw(14) [];
       font-weight: 500;
       font-style: normal;
       text-align: center;
@@ -181,15 +189,15 @@ const toOrderDetail = (item) => {
       position: relative;
 
       &.selected {
-        color: #FFB169;
+        color: #ffb169;
         font-weight: 500;
 
         &::after {
           content: '';
-          width: .vw(24)[];
-          height: .vw(3)[];
-          border-radius: .vw(6)[];
-          background-color: #FFB169;
+          width: .vw(24) [];
+          height: .vw(3) [];
+          border-radius: .vw(6) [];
+          background-color: #ffb169;
           position: absolute;
           bottom: 0;
           left: 50%;
@@ -201,42 +209,42 @@ const toOrderDetail = (item) => {
 
   .body {
     flex: 1;
-    background-color: #F5F6FA;
+    background-color: #f5f6fa;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 .vw(8)[] .vw(10)[];
+    padding: 0 .vw(8) [] .vw(10) [];
 
     .order-list {
       .item {
-        border-radius: .vw(9)[];
+        border-radius: .vw(9) [];
         background-color: #fff;
-        padding: .vw(15)[] 0;
-        margin-bottom: .vw(8)[];
+        padding: .vw(15) [] 0;
+        margin-bottom: .vw(8) [];
 
         &:first-of-type {
-          margin-top: .vw(8)[];
+          margin-top: .vw(8) [];
         }
 
         .address {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 .vw(8)[];
-          margin-bottom: .vw(8)[];
+          padding: 0 .vw(8) [];
+          margin-bottom: .vw(8) [];
 
           .text {
             flex: 1;
             color: var(--light-text--);
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 500;
             font-style: normal;
           }
 
           .arrow {
-            width: .vw(14)[];
-            height: .vw(14)[];
+            width: .vw(14) [];
+            height: .vw(14) [];
             background-size: 100%;
             background-position: center;
             background-repeat: no-repeat;
@@ -247,8 +255,8 @@ const toOrderDetail = (item) => {
         .product {
           display: flex;
           align-items: center;
-          padding-right: .vw(15)[];
-          margin-bottom: .vw(8)[];
+          padding-right: .vw(15) [];
+          margin-bottom: .vw(8) [];
 
           .cover-list {
             flex: 1;
@@ -256,12 +264,12 @@ const toOrderDetail = (item) => {
             align-items: center;
             overflow-x: auto;
             overflow-y: hidden;
-            margin-right: .vw(20)[];
+            margin-right: .vw(20) [];
 
             .cover {
-              min-width: .vw(56)[];
-              width: .vw(56)[];
-              height: .vw(56)[];
+              min-width: .vw(56) [];
+              width: .vw(56) [];
+              height: .vw(56) [];
 
               img {
                 max-width: 100%;
@@ -273,19 +281,19 @@ const toOrderDetail = (item) => {
           .info {
             .point {
               color: var(--light-text--);
-              font-family: "PingFang SC";
-              font-size: .vw(14)[];
-              line-height: .vw(14)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(14) [];
+              line-height: .vw(14) [];
               font-weight: 600;
               font-style: normal;
-              margin-bottom: .vw(6)[];
+              margin-bottom: .vw(6) [];
             }
 
             .count {
               color: var(--text--);
-              font-family: "PingFang SC";
-              font-size: .vw(12)[];
-              line-height: .vw(12)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(12) [];
+              line-height: .vw(12) [];
               font-weight: 400;
               font-style: normal;
             }
@@ -296,31 +304,30 @@ const toOrderDetail = (item) => {
           display: flex;
           align-items: center;
           justify-content: flex-end;
-          padding: 0 .vw(15)[];
+          padding: 0 .vw(15) [];
 
           .button {
             color: var(--light-text--);
-            font-family: "PingFang SC";
-            font-size: .vw(12)[];
-            line-height: .vw(12)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(12) [];
+            line-height: .vw(12) [];
             font-weight: 400;
             font-style: normal;
-            border-radius: .vw(6)[];
-            background-color: #FFB169;
-            padding: .vw(9)[] .vw(15)[];
+            border-radius: .vw(6) [];
+            background-color: #ffb169;
+            padding: .vw(9) [] .vw(15) [];
 
             &:not(:last-of-type) {
-              margin-right: .vw(8)[];
+              margin-right: .vw(8) [];
             }
 
             &.disabled {
               pointer-events: none;
               color: var(--text--);
-              background-color: #E3E3E4;
+              background-color: #e3e3e4;
             }
           }
         }
-
       }
     }
   }

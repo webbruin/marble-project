@@ -1,7 +1,7 @@
 <template>
   <Transition name="fade">
     <div v-if="visible" class="toast" :class="`${type}`">
-      <img v-if="loading" src="@/assets/images/loading.png" alt="" class="loading">
+      <img v-if="loading" src="@/assets/images/loading.png" alt="" class="loading" />
       <span class="text">{{ message }}</span>
     </div>
   </Transition>
@@ -15,14 +15,14 @@ const props = defineProps({
   // success, error, warning
   type: {
     type: String,
-    default: 'info'
+    default: 'info',
   },
   // 自动关闭时间，0 表示不自动关闭
   duration: {
     type: Number,
-    default: 2000
+    default: 2000,
   },
-  loading: Boolean
+  loading: Boolean,
 })
 
 const visible = ref(true)
@@ -49,7 +49,7 @@ onMounted(() => {
 }
 
 .toast {
-  min-width: .vw(100)[];
+  min-width: .vw(100) [];
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -59,15 +59,15 @@ onMounted(() => {
   left: 50%;
   z-index: 20000;
   transform: translate(-50%, -50%);
-  padding: .vw(10)[] .vw(20)[];
-  border-radius: .vw(8)[];
+  padding: .vw(10) [] .vw(20) [];
+  border-radius: .vw(8) [];
   background-color: rgba(#000, 0.8);
 
   .loading {
-    width: .vw(30)[];
-    height: .vw(30)[];
-    margin-top: .vw(15)[];
-    margin-bottom: .vw(15)[];
+    width: .vw(30) [];
+    height: .vw(30) [];
+    margin-top: .vw(15) [];
+    margin-bottom: .vw(15) [];
     animation: rotate 1.5s linear infinite;
 
     @keyframes rotate {
@@ -79,7 +79,7 @@ onMounted(() => {
 
   .text {
     color: var(--white--);
-    font-size: .vw(14)[];
+    font-size: .vw(14) [];
     // text-align: justify;
     text-align: center;
   }

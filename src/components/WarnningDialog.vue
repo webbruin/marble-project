@@ -20,9 +20,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['toggleShow'])
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const confirmDialog = () => {
   closeDialog()
@@ -52,8 +50,8 @@ const closeDialog = () => {
   top: 0;
 
   .body {
-    width: .vw(330)[];
-    height: .vw(242)[];
+    width: .vw(330) [];
+    height: .vw(242) [];
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -63,50 +61,50 @@ const closeDialog = () => {
     background-repeat: no-repeat;
     background-image: url(@/assets/images/room/warninng-dialog-bg.png);
     position: relative;
-    padding-top: .vw(50)[];
+    padding-top: .vw(50) [];
 
     &::before {
       content: '';
-      width: .vw(174)[];
-      height: .vw(174)[];
+      width: .vw(174) [];
+      height: .vw(174) [];
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
       background-image: url(@/assets/images/room/warninng-dialog-icon.png);
       position: absolute;
-      top: .vw(-102)[];
-      right: .vw(-26)[];
+      top: .vw(-102) [];
+      right: .vw(-26) [];
     }
 
     .text {
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(32)[];
-      line-height: .vw(32)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(32) [];
+      line-height: .vw(32) [];
       font-weight: 600;
       font-style: normal;
-      margin-bottom: .vw(24)[];
+      margin-bottom: .vw(24) [];
     }
 
     .desc {
-      color: #50525C;
-      font-family: "PingFang SC";
-      font-size: .vw(24)[];
-      line-height: .vw(24)[];
+      color: #50525c;
+      font-family: 'PingFang SC';
+      font-size: .vw(24) [];
+      line-height: .vw(24) [];
       font-weight: 500;
       font-style: normal;
-      margin-bottom: .vw(24)[];
+      margin-bottom: .vw(24) [];
     }
 
     .confirm {
-      width: .vw(130)[];
-      height: .vw(40)[];
+      width: .vw(130) [];
+      height: .vw(40) [];
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--white--);
-      font-size: .vw(16)[];
-      line-height: .vw(16)[];
+      font-size: .vw(16) [];
+      line-height: .vw(16) [];
       font-weight: 500;
       font-style: normal;
       background-size: 100%;
@@ -117,13 +115,13 @@ const closeDialog = () => {
   }
 
   .close {
-    width: .vw(24)[];
-    height: .vw(24)[];
+    width: .vw(24) [];
+    height: .vw(24) [];
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
     background-image: url(@/assets/images/close.png);
-    margin-top: .vw(40)[];
+    margin-top: .vw(40) [];
   }
 }
 </style>

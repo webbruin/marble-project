@@ -1,23 +1,20 @@
 /* eslint-disable*/
 
 export default function genTestUserSig({ sdkAppId, userId, sdkSecretKey }) {
+  const SDKAPPID = sdkAppId
 
-  const SDKAPPID = sdkAppId;
+  const EXPIRETIME = 604800
 
-  const EXPIRETIME = 604800;
-
-  const SDKSECRETKEY = sdkSecretKey;
+  const SDKSECRETKEY = sdkSecretKey
 
   // a soft reminder to guide developer to configure sdkAppId/SDKSecretKey
   if (SDKAPPID === '' || SDKSECRETKEY === '') {
-    alert(
-      'Please configure your SDKAPPID/SDKSECRETKEY in js/debug/GenerateTestUserSig.js'
-    );
+    alert('Please configure your SDKAPPID/SDKSECRETKEY in js/debug/GenerateTestUserSig.js')
   }
-  const generator = new LibGenerateTestUserSig(SDKAPPID, SDKSECRETKEY, EXPIRETIME);
-  const userSig = generator.genTestUserSig(userId);
+  const generator = new LibGenerateTestUserSig(SDKAPPID, SDKSECRETKEY, EXPIRETIME)
+  const userSig = generator.genTestUserSig(userId)
   return {
     sdkAppId: SDKAPPID,
-    userSig: userSig
-  };
+    userSig: userSig,
+  }
 }

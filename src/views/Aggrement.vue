@@ -60,7 +60,7 @@ const agreeDataMap = {
       `3. 若甲方已使用部分充值款项，退款金额为充值总金额减去已使用金额后的余额；若充值款项已全部使用，乙方不予退款。`,
       `4. 甲方自充值之日起7日内，未使用充值款项且无违约行为的，可依据相关规定申请无理由退款，乙方应予以配合，已使用部分不予退还。`,
       `五、违约责任`,
-    ]
+    ],
   },
   yhxy: {
     title: '用户协议',
@@ -79,7 +79,7 @@ const agreeDataMap = {
       '1111111111',
       '1111111111',
       '1111111111',
-    ]
+    ],
   },
   ysxy: {
     title: '隐私协议',
@@ -98,7 +98,7 @@ const agreeDataMap = {
       '1111111111',
       '1111111111',
       '1111111111',
-    ]
+    ],
   },
   gmsm: {
     title: '购买说明',
@@ -117,8 +117,8 @@ const agreeDataMap = {
       '1111111111',
       '1111111111',
       '1111111111',
-    ]
-  }
+    ],
+  },
 }
 
 const agree = computed(() => {
@@ -142,18 +142,18 @@ const agree = computed(() => {
     overflow-y: auto;
     overflow-x: hidden;
     background-color: var(--white--);
-    padding: .vw(8)[] .vw(18)[];
+    padding: .vw(8) [] .vw(18) [];
 
     p {
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(14)[];
-      line-height: .vw(22)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(14) [];
+      line-height: .vw(22) [];
       font-weight: 400;
       font-style: normal;
 
       &:not(:last-of-type) {
-        margin-bottom: .vw(10)[];
+        margin-bottom: .vw(10) [];
       }
     }
   }

@@ -9,7 +9,8 @@
             <template v-if="address.addressId">
               <div class="text">{{ address.recipientName }} {{ address.recipientPhone }}</div>
               <div class="text">
-                {{ address.province }} {{ address.city }} {{ address.district }} {{ address.detailAddress }}
+                {{ address.province }} {{ address.city }} {{ address.district }}
+                {{ address.detailAddress }}
               </div>
             </template>
             <template v-else>
@@ -21,7 +22,7 @@
       <div class="product-list">
         <div class="item" v-for="(item, index) in settlementList" :key="index">
           <div class="cover">
-            <img :src="item.productImage" alt="">
+            <img :src="item.productImage" alt="" />
           </div>
           <div class="info">
             <p class="name">{{ item.productName }}</p>
@@ -34,17 +35,17 @@
       <div class="pay-list">
         <div class="title">支付方式</div>
         <div class="item" v-for="(item, index) in payList" :key="index" @click="clickPayType(item)">
-          <img :src="item.icon" alt="" class="icon">
+          <img :src="item.icon" alt="" class="icon" />
           <span class="text">
             {{ item.name }}
             {{ item.type === 'point' ? `（剩余：${cardAmount}）` : '' }}
           </span>
-          <span class="select" :class="{ 'selected': payType === item.type }"></span>
+          <span class="select" :class="{ selected: payType === item.type }"></span>
         </div>
       </div>
     </div>
     <div class="aggreement">
-      <div class="select" :class="{ 'selected': isAgree }" @click="isAgree = !isAgree"></div>
+      <div class="select" :class="{ selected: isAgree }" @click="isAgree = !isAgree"></div>
       <div class="text">
         为注册手机号将自动注册，勾选代表您已阅读并同意
         <span class="orange" @click.stop="clickAggrement('yhxy')">《用户协议》</span>
@@ -73,21 +74,21 @@ const router = useRouter()
 const params = ref({
   addressId: '',
   cartIds: [],
-  remark: ''
+  remark: '',
 })
 const paramsByDirect = ref({
   addressId: '',
   productId: '',
   skuId: '',
   quantity: '',
-  remark: ''
+  remark: '',
 })
 const settlementList = ref([])
 const payList = ref([
   {
     icon: new URL(`@/assets/images/point.png`, import.meta.url).href,
     name: '积分支付',
-    type: 'point'
+    type: 'point',
   },
 ])
 const address = ref({})
@@ -103,7 +104,7 @@ onMounted(() => {
 const init = async () => {
   settlementList.value = JSON.parse(localStorage.getItem('selectCart')) || []
   if (route.params.source === 'cart') {
-    params.value.cartIds = settlementList.value.map(item => item.cartId)
+    params.value.cartIds = settlementList.value.map((item) => item.cartId)
   }
   if (route.params.source === 'product-detail') {
     paramsByDirect.value.productId = settlementList.value[0].productId
@@ -127,15 +128,13 @@ const getDefaultAddress = async () => {
   try {
     const res = await api.post('/pinball/shop/address/list', {})
     if (res.code === 200) {
-      address.value = res.data.find(item => item.isDefault === 1) || {}
+      address.value = res.data.find((item) => item.isDefault === 1) || {}
       if (route.params.source === 'cart') {
         params.value.addressId = address.value.addressId || ''
       }
       if (route.params.source === 'product-detail') {
         paramsByDirect.value.addressId = address.value.addressId || ''
       }
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -148,8 +147,6 @@ const getPointCardAmount = async () => {
     const res = await api.post('/pinball/user/account/getPointCardAmount')
     if (res.code === 200) {
       cardAmount.value = +res.data
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -159,14 +156,14 @@ const getPointCardAmount = async () => {
 const selectedPrice = computed(() => {
   if (settlementList.value.length) {
     return settlementList.value
-      .map(item => item.quantity * item.price)
+      .map((item) => item.quantity * item.price)
       .reduce((a, b) => (a || 0) + (b || 0))
   }
   return 0
 })
 
 const clickSelectAddress = () => {
-  router.push({ name: 'address', params: { type: 'select' } });
+  router.push({ name: 'address', params: { type: 'select' } })
 }
 
 const clickPayType = (item) => {
@@ -177,7 +174,7 @@ const clickPayType = (item) => {
 }
 
 const clickAggrement = (type) => {
-  router.push({ name: 'aggrement', params: { type } });
+  router.push({ name: 'aggrement', params: { type } })
 }
 
 const clickPay = () => {
@@ -195,7 +192,7 @@ const clickPay = () => {
       onConfirm: () => {
         isAgree.value = true
         clickPay()
-      }
+      },
     })
     return
   }
@@ -214,8 +211,6 @@ const createByCart = async () => {
     $toast.close()
     if (res.code === 200) {
       orderPay(res.data)
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -229,8 +224,6 @@ const createByDirect = async () => {
     $toast.close()
     if (res.code === 200) {
       orderPay(res.data)
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -246,10 +239,8 @@ const orderPay = async (orderId) => {
       $toast.info('支付成功')
       const timer = setTimeout(() => {
         clearTimeout(timer)
-        router.push({ name: 'order' });
+        router.push({ name: 'order' })
       }, 1500)
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -266,42 +257,42 @@ const orderPay = async (orderId) => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #F5F6FA;
+  background-color: #f5f6fa;
 
   .body {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: .vw(12)[] .vw(16)[];
+    padding: .vw(12) [] .vw(16) [];
 
     .address {
       .title {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 500;
         font-style: normal;
-        margin-bottom: .vw(8)[];
+        margin-bottom: .vw(8) [];
       }
 
       .item {
         display: flex;
         align-items: center;
-        border-radius: .vw(12)[];
+        border-radius: .vw(12) [];
         background-color: var(--white--);
-        padding: .vw(12)[];
-        margin-bottom: .vw(12)[];
+        padding: .vw(12) [];
+        margin-bottom: .vw(12) [];
 
         &::after {
           content: '';
-          width: .vw(14)[];
-          height: .vw(14)[];
+          width: .vw(14) [];
+          height: .vw(14) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
           background-image: url(@/assets/images/arrow-right.png);
-          margin-left: .vw(10)[];
+          margin-left: .vw(10) [];
         }
 
         .info {
@@ -309,22 +300,22 @@ const orderPay = async (orderId) => {
 
           .desc {
             color: var(--text--);
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 400;
           }
 
           .text {
             color: var(--light-text--);
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 400;
             font-style: normal;
 
             &:not(:last-of-type) {
-              margin-bottom: .vw(10)[];
+              margin-bottom: .vw(10) [];
             }
           }
         }
@@ -335,22 +326,22 @@ const orderPay = async (orderId) => {
       .item {
         display: flex;
         align-items: center;
-        border-radius: .vw(6)[];
+        border-radius: .vw(6) [];
         background-color: var(--white--);
-        padding: .vw(16)[];
-        margin-bottom: .vw(12)[];
+        padding: .vw(16) [];
+        margin-bottom: .vw(12) [];
 
         &:not(:last-of-type) {
-          margin-bottom: .vw(8)[];
+          margin-bottom: .vw(8) [];
         }
 
         .cover {
-          width: .vw(56)[];
-          height: .vw(56)[];
+          width: .vw(56) [];
+          height: .vw(56) [];
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-right: .vw(8)[];
+          margin-right: .vw(8) [];
 
           img {
             max-width: 100%;
@@ -363,29 +354,29 @@ const orderPay = async (orderId) => {
 
           .name {
             color: var(--light-text--);
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 500;
             font-style: normal;
-            margin-bottom: .vw(6)[];
+            margin-bottom: .vw(6) [];
           }
 
           .desc {
             color: var(--text--);
-            font-family: "PingFang SC";
-            font-size: .vw(12)[];
-            line-height: .vw(12)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(12) [];
+            line-height: .vw(12) [];
             font-weight: 400;
             font-style: normal;
-            margin-bottom: .vw(6)[];
+            margin-bottom: .vw(6) [];
           }
 
           .point {
             color: var(--orange--);
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 500;
             font-style: normal;
           }
@@ -393,9 +384,9 @@ const orderPay = async (orderId) => {
 
         .count {
           color: var(--text--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 500;
           font-style: normal;
         }
@@ -405,49 +396,49 @@ const orderPay = async (orderId) => {
     .pay-list {
       .title {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 500;
         font-style: normal;
-        margin-bottom: .vw(8)[];
+        margin-bottom: .vw(8) [];
       }
 
       .item {
         display: flex;
         align-items: center;
-        border-radius: .vw(12)[];
+        border-radius: .vw(12) [];
         background-color: var(--white--);
-        padding: .vw(12)[];
+        padding: .vw(12) [];
 
         &:not(:last-of-type) {
-          margin-bottom: .vw(8)[];
+          margin-bottom: .vw(8) [];
         }
 
         .icon {
-          width: .vw(24)[];
-          height: .vw(24)[];
-          margin-right: .vw(8)[];
+          width: .vw(24) [];
+          height: .vw(24) [];
+          margin-right: .vw(8) [];
         }
 
         .text {
           flex: 1;
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 500;
           font-style: normal;
         }
 
         .select {
-          width: .vw(24)[];
-          height: .vw(24)[];
+          width: .vw(24) [];
+          height: .vw(24) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
           background-image: url(@/assets/images/shop/select.png);
-          margin-left: .vw(8)[];
+          margin-left: .vw(8) [];
 
           &.selected {
             background-image: url(@/assets/images/shop/selected.png);
@@ -459,16 +450,16 @@ const orderPay = async (orderId) => {
 
   .aggreement {
     display: flex;
-    padding: .vw(8)[] .vw(15)[];
+    padding: .vw(8) [] .vw(15) [];
 
     .select {
-      min-width: .vw(20)[];
-      height: .vw(20)[];
+      min-width: .vw(20) [];
+      height: .vw(20) [];
       background-size: 85%;
       background-position: center;
       background-repeat: no-repeat;
       background-image: url(@/assets/images/shop/select.png);
-      margin-right: .vw(6)[];
+      margin-right: .vw(6) [];
 
       &.selected {
         background-image: url(@/assets/images/shop/selected.png);
@@ -477,26 +468,26 @@ const orderPay = async (orderId) => {
 
     .text {
       color: var(--text--);
-      font-family: "PingFang SC";
-      font-size: .vw(14)[];
-      line-height: .vw(20)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(14) [];
+      line-height: .vw(20) [];
       font-weight: 400;
       font-style: normal;
 
       .orange {
-        color: #FFB169;
+        color: #ffb169;
       }
     }
   }
 
   .footer {
     width: 100%;
-    height: .vw(64)[];
+    height: .vw(64) [];
     display: flex;
     align-items: center;
     justify-content: space-between;
     background-color: var(--white--);
-    padding: 0 .vw(16)[];
+    padding: 0 .vw(16) [];
 
     .info {
       display: flex;
@@ -504,37 +495,37 @@ const orderPay = async (orderId) => {
 
       .text {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(12)[];
-        line-height: .vw(16)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(12) [];
+        line-height: .vw(16) [];
         font-weight: 400;
         font-style: normal;
       }
 
       .count {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(18)[];
-        line-height: .vw(18)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(18) [];
+        line-height: .vw(18) [];
         font-weight: 400;
         font-style: normal;
       }
     }
 
     .pay {
-      width: .vw(112)[];
-      height: .vw(48)[];
+      width: .vw(112) [];
+      height: .vw(48) [];
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(16)[];
-      line-height: .vw(16)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(16) [];
+      line-height: .vw(16) [];
       font-weight: 500;
       font-style: normal;
-      border-radius: .vw(45)[];
-      background-color: #FFB169;
+      border-radius: .vw(45) [];
+      background-color: #ffb169;
     }
   }
 }

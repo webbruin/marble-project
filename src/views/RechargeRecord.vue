@@ -27,20 +27,11 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
 
-const recordList = ref([
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-])
+const recordList = ref([{}, {}, {}, {}, {}, {}])
 const loading = ref(false)
 const loadOver = ref(false)
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const clickTab = (item) => {
   tab.value = item.type
@@ -69,41 +60,41 @@ const loadMore = () => {
 
   .body {
     flex: 1;
-    background-color: #F5F6FA;
+    background-color: #f5f6fa;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 .vw(8)[] .vw(10)[];
+    padding: 0 .vw(8) [] .vw(10) [];
 
     .record-list {
       .item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border-radius: .vw(9)[];
+        border-radius: .vw(9) [];
         background-color: #fff;
-        padding: .vw(16)[];
-        margin-bottom: .vw(8)[];
+        padding: .vw(16) [];
+        margin-bottom: .vw(8) [];
 
         &:first-of-type {
-          margin-top: .vw(8)[];
+          margin-top: .vw(8) [];
         }
 
         .info {
           .text {
             color: var(--light-text--);
-            font-family: "PingFang SC";
-            font-size: .vw(16)[];
-            line-height: .vw(16)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(16) [];
+            line-height: .vw(16) [];
             font-weight: 500;
             font-style: normal;
-            margin-bottom: .vw(8)[];
+            margin-bottom: .vw(8) [];
           }
 
           .date {
             color: var(--text--);
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 400;
             font-style: normal;
           }
@@ -111,20 +102,20 @@ const loadMore = () => {
 
         .right {
           .price {
-            color: #F20C32;
-            font-family: "PingFang SC";
-            font-size: .vw(16)[];
-            line-height: .vw(16)[];
+            color: #f20c32;
+            font-family: 'PingFang SC';
+            font-size: .vw(16) [];
+            line-height: .vw(16) [];
             font-weight: 500;
             font-style: normal;
-            margin-bottom: .vw(8)[];
+            margin-bottom: .vw(8) [];
           }
 
           .status {
             color: var(--text--);
-            font-family: "PingFang SC";
-            font-size: .vw(12)[];
-            line-height: .vw(12)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(12) [];
+            line-height: .vw(12) [];
             font-weight: 400;
             font-style: normal;
           }

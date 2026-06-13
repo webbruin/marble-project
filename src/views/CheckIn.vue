@@ -6,21 +6,24 @@
         <div class="left">
           <p class="text">弹珠数量</p>
           <p class="count">{{ formatNumberWithCommas(marbleAmount) }}</p>
-          <div class="button" :class="{ 'disabled': checkInData.signedToday }" @click="clickCheckIn">
+          <div class="button" :class="{ disabled: checkInData.signedToday }" @click="clickCheckIn">
             {{ checkInData.signedToday ? '已签到' : '立即签到' }}
           </div>
         </div>
         <div class="right">
-          <img src="@/assets/images/check-in-icon.png" alt="" class="icon">
+          <img src="@/assets/images/check-in-icon.png" alt="" class="icon" />
         </div>
       </div>
       <div class="module2">
         <div class="list">
-          <div :class="{ 'big': item.bigSize, 'item': !item.bigSize }" v-for="(item, index) in checkInList"
-            :key="index">
+          <div
+            :class="{ big: item.bigSize, item: !item.bigSize }"
+            v-for="(item, index) in checkInList"
+            :key="index"
+          >
             <span class="text">第{{ item.dayIndex }}天</span>
-            <div class="icon" :class="{ 'check': item.signedFlag === 1 }">
-              <img src="@/assets/images/ball.png" alt="">
+            <div class="icon" :class="{ check: item.signedFlag === 1 }">
+              <img src="@/assets/images/ball.png" alt="" />
             </div>
             <span class="ball">X{{ item.rewardMarble }}</span>
           </div>
@@ -33,17 +36,23 @@
             <div class="info">
               <p class="text">{{ item.name }}</p>
               <div class="ball">
-                <img src="@/assets/images/ball.png" alt="" class="icon">
+                <img src="@/assets/images/ball.png" alt="" class="icon" />
                 <span class="count">X{{ item.ball }}</span>
               </div>
             </div>
-            <div class="button" :class="{ 'done': item.done }">{{ item.done ? '已完成' : '去完成' }}</div>
+            <div class="button" :class="{ done: item.done }">
+              {{ item.done ? '已完成' : '去完成' }}
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <BallSuccess :show="showBallSuccess" :ball="checkInBallInfo.rewardMarble" @toggleShow="showBallSuccess = $event">
+  <BallSuccess
+    :show="showBallSuccess"
+    :ball="checkInBallInfo.rewardMarble"
+    @toggleShow="showBallSuccess = $event"
+  >
   </BallSuccess>
 </template>
 
@@ -81,8 +90,6 @@ const getStatus = async () => {
   const res = await api.post('/pinball/signIn/getStatus')
   if (res.code === 200) {
     checkInData.value = res.data || {}
-  } else {
-    $toast.info(res.message)
   }
 }
 
@@ -91,8 +98,6 @@ const getCalendar = async () => {
   if (res.code === 200) {
     checkInList.value = res.data.slice(0, 7) || []
     checkInList.value[6].bigSize = true
-  } else {
-    $toast.info(res.message)
   }
 }
 
@@ -109,8 +114,6 @@ const clickCheckIn = async () => {
     checkInData.value.signedToday = true
     getUserMarbleAmount()
     getCalendar()
-  } else {
-    $toast.info(res.message)
   }
 }
 
@@ -120,8 +123,6 @@ const getUserMarbleAmount = async () => {
     const res = await api.post('/pinball/user/account/getMarbleAmount')
     if (res.code === 200) {
       marbleAmount.value = +res.data
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -138,15 +139,15 @@ const getUserMarbleAmount = async () => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #F6F6F6;
+  background-color: #f6f6f6;
   position: relative;
 
   &::before {
     content: '';
     width: 100%;
-    height: .vw(334)[];
-    background-color: #FFF3E6;
-    filter: blur(.vw(50)[]);
+    height: .vw(334) [];
+    background-color: #fff3e6;
+    filter: blur(.vw(50) []);
     position: absolute;
     left: 0;
     top: 0;
@@ -165,116 +166,116 @@ const getUserMarbleAmount = async () => {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-left: .vw(28)[];
-      padding-right: .vw(12)[];
+      padding-left: .vw(28) [];
+      padding-right: .vw(12) [];
 
       .left {
         display: flex;
         flex-direction: column;
         position: relative;
-        top: .vw(-10)[];
+        top: .vw(-10) [];
 
         .text {
           color: var(--text--);
-          font-family: "PingFang SC";
-          font-size: .vw(16)[];
-          line-height: .vw(16)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(16) [];
           font-weight: 200;
           font-style: normal;
-          margin-bottom: .vw(8)[];
+          margin-bottom: .vw(8) [];
         }
 
         .count {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(36)[];
-          line-height: .vw(36)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(36) [];
+          line-height: .vw(36) [];
           font-weight: 500;
           font-style: normal;
-          margin-bottom: .vw(16)[];
+          margin-bottom: .vw(16) [];
         }
 
         .button {
-          height: .vw(40)[];
+          height: .vw(40) [];
           color: var(--white--);
-          font-family: "PingFang SC";
-          font-size: .vw(16)[];
-          line-height: .vw(24)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(24) [];
           font-weight: 500;
           font-style: normal;
-          border-radius: .vw(45)[];
-          border: .vw(1)[] solid #FF3A64;
-          background: linear-gradient(90deg, #FD689A 0%, #FFAB2D 100%);
-          padding: .vw(8)[] .vw(18)[];
+          border-radius: .vw(45) [];
+          border: .vw(1) [] solid #ff3a64;
+          background: linear-gradient(90deg, #fd689a 0%, #ffab2d 100%);
+          padding: .vw(8) [] .vw(18) [];
 
           &.disabled {
             pointer-events: none;
-            background: #E3E3E4;
-            border: .vw(1)[] solid transparent;
+            background: #e3e3e4;
+            border: .vw(1) [] solid transparent;
           }
         }
       }
 
       .right {
         .icon {
-          width: .vw(134)[];
+          width: .vw(134) [];
         }
       }
     }
 
     .module2 {
       position: relative;
-      padding: 0 .vw(16)[];
-      margin-bottom: .vw(8)[];
-      margin-top: .vw(-20)[];
+      padding: 0 .vw(16) [];
+      margin-bottom: .vw(8) [];
+      margin-top: .vw(-20) [];
 
       .list {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        border-radius: .vw(12)[];
+        border-radius: .vw(12) [];
         background-color: var(--white--);
-        padding: .vw(12)[] .vw(15)[] 0;
+        padding: .vw(12) [] .vw(15) [] 0;
 
         .item {
-          width: .vw(69)[];
-          height: .vw(72)[];
+          width: .vw(69) [];
+          height: .vw(72) [];
           display: flex;
           align-items: center;
           flex-direction: column;
           justify-content: center;
-          border-radius: .vw(16)[];
-          border: .vw(1)[] solid #A83602;
-          background-color: #FFD2AA;
-          margin-bottom: .vw(12)[];
+          border-radius: .vw(16) [];
+          border: .vw(1) [] solid #a83602;
+          background-color: #ffd2aa;
+          margin-bottom: .vw(12) [];
           position: relative;
           overflow: hidden;
 
-          &:not(:nth-child(4n+0)) {
-            margin-right: .vw(12)[];
+          &:not(:nth-child(4n + 0)) {
+            margin-right: .vw(12) [];
           }
 
           &::before {
             content: '';
-            width: .vw(90)[];
-            height: .vw(34)[];
+            width: .vw(90) [];
+            height: .vw(34) [];
             background-size: 100%;
             background-position: center;
             background-repeat: no-repeat;
             background-image: url(@/assets/images/ellipse-icon.png);
             position: absolute;
-            top: .vw(-11)[];
+            top: .vw(-11) [];
           }
 
           .text {
-            color: #70380E;
-            font-family: "PingFang SC";
-            font-size: .vw(12)[];
-            line-height: .vw(12)[];
+            color: #70380e;
+            font-family: 'PingFang SC';
+            font-size: .vw(12) [];
+            line-height: .vw(12) [];
             font-style: normal;
             font-weight: 500;
             z-index: 1;
-            margin-bottom: .vw(5)[];
+            margin-bottom: .vw(5) [];
           }
 
           .icon {
@@ -284,14 +285,14 @@ const getUserMarbleAmount = async () => {
             position: relative;
 
             img {
-              width: .vw(30)[];
-              height: .vw(30)[];
+              width: .vw(30) [];
+              height: .vw(30) [];
             }
 
             &.check::before {
               content: '';
-              width: .vw(24)[];
-              height: .vw(24)[];
+              width: .vw(24) [];
+              height: .vw(24) [];
               background-size: 100%;
               background-position: center;
               background-repeat: no-repeat;
@@ -301,49 +302,49 @@ const getUserMarbleAmount = async () => {
           }
 
           .ball {
-            color: #D95809;
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            color: #d95809;
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 500;
             font-style: normal;
           }
         }
 
         .big {
-          width: .vw(150)[];
-          height: .vw(72)[];
+          width: .vw(150) [];
+          height: .vw(72) [];
           display: flex;
           align-items: center;
           justify-content: center;
-          border-radius: .vw(16)[];
-          border: .vw(1)[] solid #A83602;
-          background-color: #FFD2AA;
+          border-radius: .vw(16) [];
+          border: .vw(1) [] solid #a83602;
+          background-color: #ffd2aa;
           position: relative;
-          margin-bottom: .vw(12)[];
-          padding-top: .vw(20)[];
+          margin-bottom: .vw(12) [];
+          padding-top: .vw(20) [];
 
           &::before {
             content: '';
-            width: .vw(60)[];
-            height: .vw(24)[];
-            border-radius: .vw(16)[] 0;
-            background: #FFBE45;
+            width: .vw(60) [];
+            height: .vw(24) [];
+            border-radius: .vw(16) [] 0;
+            background: #ffbe45;
             position: absolute;
             left: 0;
             top: 0;
           }
 
           .text {
-            color: #70380E;
-            font-family: "PingFang SC";
-            font-size: .vw(12)[];
-            line-height: .vw(12)[];
+            color: #70380e;
+            font-family: 'PingFang SC';
+            font-size: .vw(12) [];
+            line-height: .vw(12) [];
             font-style: normal;
             font-weight: 500;
             position: absolute;
-            left: .vw(12)[];
-            top: .vw(6)[];
+            left: .vw(12) [];
+            top: .vw(6) [];
             z-index: 1;
           }
 
@@ -352,17 +353,17 @@ const getUserMarbleAmount = async () => {
             align-items: center;
             justify-content: center;
             position: relative;
-            margin-right: .vw(12)[];
+            margin-right: .vw(12) [];
 
             img {
-              width: .vw(36)[];
-              height: .vw(36)[];
+              width: .vw(36) [];
+              height: .vw(36) [];
             }
 
             &.check::before {
               content: '';
-              width: .vw(30)[];
-              height: .vw(30)[];
+              width: .vw(30) [];
+              height: .vw(30) [];
               background-size: 100%;
               background-position: center;
               background-repeat: no-repeat;
@@ -372,10 +373,10 @@ const getUserMarbleAmount = async () => {
           }
 
           .ball {
-            color: #D95809;
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            color: #d95809;
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 500;
             font-style: normal;
           }
@@ -384,44 +385,44 @@ const getUserMarbleAmount = async () => {
     }
 
     .module3 {
-      padding: 0 .vw(16)[];
+      padding: 0 .vw(16) [];
 
       .list {
-        border-radius: .vw(12)[];
+        border-radius: .vw(12) [];
         background-color: var(--white--);
-        padding: .vw(10)[] .vw(12)[];
+        padding: .vw(10) [] .vw(12) [];
 
         .sub-title {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(16)[];
-          line-height: .vw(16)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(16) [];
           font-weight: 500;
           font-style: normal;
-          margin-bottom: .vw(16)[];
+          margin-bottom: .vw(16) [];
         }
 
         .item {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-radius: .vw(8)[];
-          background-color: #FFF4E6;
-          padding: .vw(8)[] .vw(16)[];
+          border-radius: .vw(8) [];
+          background-color: #fff4e6;
+          padding: .vw(8) [] .vw(16) [];
 
           &:not(:last-of-type) {
-            margin-bottom: .vw(8)[];
+            margin-bottom: .vw(8) [];
           }
 
           .info {
             .text {
               color: var(--light-text--);
-              font-family: "PingFang SC";
-              font-size: .vw(14)[];
-              line-height: .vw(14)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(14) [];
+              line-height: .vw(14) [];
               font-weight: 500;
               font-style: normal;
-              margin-bottom: .vw(12)[];
+              margin-bottom: .vw(12) [];
             }
 
             .ball {
@@ -429,16 +430,16 @@ const getUserMarbleAmount = async () => {
               align-items: center;
 
               .icon {
-                width: .vw(24)[];
-                height: .vw(24)[];
-                margin-right: .vw(8)[];
+                width: .vw(24) [];
+                height: .vw(24) [];
+                margin-right: .vw(8) [];
               }
 
               .count {
-                color: #70380E;
-                font-family: "PingFang SC";
-                font-size: .vw(14)[];
-                line-height: .vw(14)[];
+                color: #70380e;
+                font-family: 'PingFang SC';
+                font-size: .vw(14) [];
+                line-height: .vw(14) [];
                 font-weight: 500;
                 font-style: normal;
               }
@@ -447,18 +448,18 @@ const getUserMarbleAmount = async () => {
 
           .button {
             color: var(--white--);
-            font-family: "PingFang SC";
-            font-size: .vw(14)[];
-            line-height: .vw(14)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
             font-weight: 500;
             font-style: normal;
-            border-radius: .vw(8)[];
-            background-color: #FF7716;
-            padding: .vw(8)[] .vw(12)[];
+            border-radius: .vw(8) [];
+            background-color: #ff7716;
+            padding: .vw(8) [] .vw(12) [];
 
             &.done {
               pointer-events: none;
-              background-color: #FFCA91;
+              background-color: #ffca91;
             }
           }
         }

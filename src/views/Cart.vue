@@ -19,11 +19,15 @@
             <template v-for="(item, index) in cartList" :key="index">
               <div class="item" v-if="item.quantity > 0">
                 <div class="check">
-                  <i class="select" :class="{ 'selected': item.selected === 1 }" @click="clickSelectCart(item)"></i>
+                  <i
+                    class="select"
+                    :class="{ selected: item.selected === 1 }"
+                    @click="clickSelectCart(item)"
+                  ></i>
                 </div>
                 <div class="module">
                   <div class="cover">
-                    <img :src="item.productImage" alt="">
+                    <img :src="item.productImage" alt="" />
                   </div>
                   <div class="info">
                     <p class="name">{{ item.productName }}</p>
@@ -32,11 +36,23 @@
                   </div>
                 </div>
                 <div class="option">
-                  <i class="sub" :class="{ 'disabled': item.quantity < 1 }" @click="subQuantity(item)"></i>
+                  <i
+                    class="sub"
+                    :class="{ disabled: item.quantity < 1 }"
+                    @click="subQuantity(item)"
+                  ></i>
                   <div class="quantity">
-                    <input type="number" v-model="item.quantity" @input="quantityChange($event, item)">
+                    <input
+                      type="number"
+                      v-model="item.quantity"
+                      @input="quantityChange($event, item)"
+                    />
                   </div>
-                  <i class="plus" :class="{ 'disabled': item.quantity >= item.stock }" @click="plusQuantity(item)"></i>
+                  <i
+                    class="plus"
+                    :class="{ disabled: item.quantity >= item.stock }"
+                    @click="plusQuantity(item)"
+                  ></i>
                 </div>
               </div>
             </template>
@@ -46,15 +62,17 @@
     </div>
     <div class="footer">
       <div class="select-all" @click="clickAll">
-        <i class="icon" :class="{ 'selected': cartListIsAll }"></i>
+        <i class="icon" :class="{ selected: cartListIsAll }"></i>
         <span class="text">全选</span>
       </div>
       <div class="price">
         <p class="text">合计积分</p>
         <p class="quantity">{{ formatNumberWithCommas(selectedItemPrice) }}</p>
       </div>
-      <div class="checkout" :class="{ 'disabled': !selectedItemQuantity }" @click="clickSettlement">
-        <span class="text">去结算{{ selectedItemQuantity ? `(${selectedItemQuantity})` : '' }}</span>
+      <div class="checkout" :class="{ disabled: !selectedItemQuantity }" @click="clickSettlement">
+        <span class="text"
+          >去结算{{ selectedItemQuantity ? `(${selectedItemQuantity})` : '' }}</span
+        >
       </div>
     </div>
   </main>
@@ -101,7 +119,7 @@ const getCartList = async (init) => {
     if (res.code === 200) {
       res.data = {
         data: res.data,
-        total: 0
+        total: 0,
       }
       const list = res.data.data || []
       cartList.value = [...cartList.value, ...list]
@@ -110,8 +128,6 @@ const getCartList = async (init) => {
       loadOver.value = cartList.value.length >= res.data.total
       // 空列表
       isEmpty.value = loadOver.value && cartList.value.length === 0
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -120,14 +136,12 @@ const getCartList = async (init) => {
 }
 
 const selectedCartList = computed(() => {
-  return cartList.value.filter(item => item.selected === 1)
+  return cartList.value.filter((item) => item.selected === 1)
 })
 
 const selectedItemQuantity = computed(() => {
   if (selectedCartList.value.length) {
-    return selectedCartList.value
-      .map(item => item.quantity)
-      .reduce((a, b) => (a || 0) + (b || 0))
+    return selectedCartList.value.map((item) => item.quantity).reduce((a, b) => (a || 0) + (b || 0))
   }
   return 0
 })
@@ -135,18 +149,18 @@ const selectedItemQuantity = computed(() => {
 const selectedItemPrice = computed(() => {
   if (selectedCartList.value.length) {
     return selectedCartList.value
-      .map(item => item.quantity * item.price)
+      .map((item) => item.quantity * item.price)
       .reduce((a, b) => (a || 0) + (b || 0))
   }
   return 0
 })
 
 const cartListIsAll = computed(() => {
-  return cartList.value.length && cartList.value.every(item => item.selected === 1)
+  return cartList.value.length && cartList.value.every((item) => item.selected === 1)
 })
 
 const clickSelectCart = (item) => {
-  item.selected = (item.selected ? 0 : 1)
+  item.selected = item.selected ? 0 : 1
   updateCart(item)
 }
 
@@ -180,10 +194,10 @@ const clickAll = () => {
   if (!cartList.value.length) {
     return
   }
-  cartList.value = cartList.value.map(item => {
+  cartList.value = cartList.value.map((item) => {
     return {
       ...item,
-      selected: !cartListIsAll.value ? 1 : 0
+      selected: !cartListIsAll.value ? 1 : 0,
     }
   })
 }
@@ -195,7 +209,7 @@ const clickSettlement = () => {
 }
 
 const toAddress = () => {
-  router.push({ name: 'address' });
+  router.push({ name: 'address' })
 }
 
 const clickClearCart = () => {
@@ -203,7 +217,7 @@ const clickClearCart = () => {
     content: '是否清空背包？',
     onConfirm: () => {
       clearCart()
-    }
+    },
   })
 }
 
@@ -212,8 +226,6 @@ const updateCart = async ({ cartId, quantity, selected }) => {
     const res = await api.post('/pinball/shop/cart/update', { cartId, quantity, selected })
     if (res.code === 200) {
       // ...
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -224,9 +236,7 @@ const deleteCart = async ({ cartId }) => {
   try {
     const res = await api.post('/pinball/shop/cart/delete', { cartId })
     if (res.code === 200) {
-      cartList.value = cartList.value.filter(item => item.cartId != cartId)
-    } else {
-      $toast.info(res.message)
+      cartList.value = cartList.value.filter((item) => item.cartId != cartId)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -239,8 +249,6 @@ const clearCart = async () => {
     if (res.code === 200) {
       cartList.value = []
       isEmpty.value = true
-    } else {
-      $toast.info(res.message)
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -259,16 +267,16 @@ const clearCart = async () => {
 
   .address-edit {
     color: var(--text--);
-    font-family: "PingFang SC";
-    font-size: .vw(14)[];
-    line-height: .vw(14)[];
+    font-family: 'PingFang SC';
+    font-size: .vw(14) [];
+    line-height: .vw(14) [];
     font-weight: 400;
     font-style: normal;
   }
 
   .body {
     flex: 1;
-    padding: .vw(12)[] .vw(16)[];
+    padding: .vw(12) [] .vw(16) [];
     overflow-x: hidden;
     overflow-y: auto;
 
@@ -276,13 +284,13 @@ const clearCart = async () => {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: .vw(8)[];
+      margin-bottom: .vw(8) [];
 
       .all-quantity {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 400;
       }
 
@@ -291,20 +299,20 @@ const clearCart = async () => {
         align-items: center;
 
         .icon {
-          width: .vw(14)[];
-          height: .vw(14)[];
+          width: .vw(14) [];
+          height: .vw(14) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
           background-image: url(@/assets/images/shop/trash.png);
-          margin-right: .vw(8)[];
+          margin-right: .vw(8) [];
         }
 
         .text {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 400;
           font-style: normal;
         }
@@ -314,18 +322,18 @@ const clearCart = async () => {
     .cart-list {
       .item {
         display: flex;
-        padding: .vw(16)[];
+        padding: .vw(16) [];
 
         .check {
           height: 100%;
           display: flex;
           align-self: center;
           align-items: center;
-          margin-right: .vw(8)[];
+          margin-right: .vw(8) [];
 
           .select {
-            width: .vw(24)[];
-            height: .vw(24)[];
+            width: .vw(24) [];
+            height: .vw(24) [];
             background-size: 100%;
             background-position: center;
             background-repeat: no-repeat;
@@ -342,12 +350,12 @@ const clearCart = async () => {
           display: flex;
 
           .cover {
-            width: .vw(56)[];
-            height: .vw(56)[];
+            width: .vw(56) [];
+            height: .vw(56) [];
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: .vw(8)[];
+            margin-right: .vw(8) [];
 
             img {
               max-width: 100%;
@@ -358,29 +366,29 @@ const clearCart = async () => {
           .info {
             .name {
               color: var(--light-text--);
-              font-family: "PingFang SC";
-              font-size: .vw(14)[];
-              line-height: .vw(14)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(14) [];
+              line-height: .vw(14) [];
               font-weight: 500;
               font-style: normal;
-              margin-bottom: .vw(6)[];
+              margin-bottom: .vw(6) [];
             }
 
             .desc {
               color: var(--text--);
-              font-family: "PingFang SC";
-              font-size: .vw(12)[];
-              line-height: .vw(12)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(12) [];
+              line-height: .vw(12) [];
               font-weight: 400;
               font-style: normal;
-              margin-bottom: .vw(6)[];
+              margin-bottom: .vw(6) [];
             }
 
             .price {
               color: var(--orange--);
-              font-family: "PingFang SC";
-              font-size: .vw(14)[];
-              line-height: .vw(14)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(14) [];
+              line-height: .vw(14) [];
               font-weight: 500;
               font-style: normal;
             }
@@ -391,8 +399,8 @@ const clearCart = async () => {
           display: flex;
           align-items: center;
           align-self: flex-end;
-          border: .vw(1.5)[] solid #EDEDF0;
-          border-radius: .vw(3)[];
+          border: .vw(1.5) [] solid #ededf0;
+          border-radius: .vw(3) [];
 
           i,
           span {
@@ -402,14 +410,14 @@ const clearCart = async () => {
           }
 
           i {
-            width: .vw(18)[];
-            height: .vw(18)[];
+            width: .vw(18) [];
+            height: .vw(18) [];
             background-size: 70%;
             background-position: center;
             background-repeat: no-repeat;
 
             &.disabled {
-              opacity: .5;
+              opacity: 0.5;
               pointer-events: none;
             }
           }
@@ -423,21 +431,21 @@ const clearCart = async () => {
           }
 
           .quantity {
-            min-width: .vw(30)[];
-            width: .vw(30)[];
-            height: .vw(18)[];
+            min-width: .vw(30) [];
+            width: .vw(30) [];
+            height: .vw(18) [];
             display: flex;
             align-items: center;
-            border-left: .vw(1.5)[] solid #EDEDF0;
-            border-right: .vw(1.5)[] solid #EDEDF0;
+            border-left: .vw(1.5) [] solid #ededf0;
+            border-right: .vw(1.5) [] solid #ededf0;
 
             input {
               width: 100%;
-              height: .vw(14)[];
+              height: .vw(14) [];
               color: var(--light-text--);
-              font-family: "PingFang SC";
-              font-size: .vw(12)[];
-              line-height: .vw(12)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(12) [];
+              line-height: .vw(12) [];
               font-weight: 500;
               font-style: normal;
               text-align: center;
@@ -454,83 +462,82 @@ const clearCart = async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-top: .vw(1)[] solid #EDEDF0;
-    padding: .vw(8)[] .vw(16)[];
+    border-top: .vw(1) [] solid #ededf0;
+    padding: .vw(8) [] .vw(16) [];
 
     .select-all {
       display: flex;
       align-items: center;
 
       .icon {
-        width: .vw(24)[];
-        height: .vw(24)[];
+        width: .vw(24) [];
+        height: .vw(24) [];
         background-size: 100%;
         background-position: center;
         background-repeat: no-repeat;
         background-image: url(@/assets/images/shop/select.png);
-        margin-right: .vw(8)[];
+        margin-right: .vw(8) [];
 
         &.selected {
           background-image: url(@/assets/images/shop/selected.png);
-
         }
       }
 
       .text {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(14)[];
-        line-height: .vw(14)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
         font-weight: 500;
         font-style: normal;
       }
     }
 
     .price {
-      margin-left: .vw(30)[];
-      margin-right: .vw(10)[];
+      margin-left: .vw(30) [];
+      margin-right: .vw(10) [];
 
       .text {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(12)[];
-        line-height: .vw(12)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(12) [];
+        line-height: .vw(12) [];
         font-weight: 400;
         font-style: normal;
-        margin-bottom: .vw(4)[];
+        margin-bottom: .vw(4) [];
       }
 
       .quantity {
         color: var(--orange--);
-        font-family: "PingFang SC";
-        font-size: .vw(18)[];
-        line-height: .vw(18)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(18) [];
+        line-height: .vw(18) [];
         font-weight: 500;
         font-style: normal;
       }
     }
 
     .checkout {
-      width: .vw(130)[];
-      height: .vw(48)[];
+      width: .vw(130) [];
+      height: .vw(48) [];
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: .vw(45)[];
-      background-color: #FFB169;
+      border-radius: .vw(45) [];
+      background-color: #ffb169;
 
       .text {
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(16)[];
-        line-height: .vw(16)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(16) [];
+        line-height: .vw(16) [];
         font-weight: 500;
         font-style: normal;
       }
 
       &.disabled {
         pointer-events: none;
-        background-color: rgba(#FFB169, 0.75);
+        background-color: rgba(#ffb169, 0.75);
       }
     }
   }

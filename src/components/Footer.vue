@@ -2,7 +2,7 @@
   <footer>
     <div class="icons">
       <div class="item" v-for="(item, index) in icons" :key="index" @click="clickIcon(item)">
-        <img class="icon" :src="currentRoute == item.value ? item.icon2 : item.icon1" alt="">
+        <img class="icon" :src="currentRoute == item.value ? item.icon2 : item.icon1" alt="" />
         <span class="text" :class="{ light: currentRoute == item.value }">{{ item.name }}</span>
       </div>
     </div>
@@ -21,46 +21,44 @@ const icons = ref([
     value: 'home',
     icon1: new URL(`@/assets/images/footer/home.png`, import.meta.url).href,
     icon2: new URL(`@/assets/images/footer/home-selected.png`, import.meta.url).href,
-    url: '/'
+    url: '/',
   },
   {
     name: '商场',
     value: 'shop',
     icon1: new URL(`@/assets/images/footer/shop.png`, import.meta.url).href,
     icon2: new URL(`@/assets/images/footer/shop-selected.png`, import.meta.url).href,
-    url: '/shop'
+    url: '/shop',
   },
   {
     name: '背包',
     value: 'cart',
     icon1: new URL(`@/assets/images/footer/cart.png`, import.meta.url).href,
     icon2: new URL(`@/assets/images/footer/cart-selected.png`, import.meta.url).href,
-    url: '/cart'
+    url: '/cart',
   },
   {
     name: '我的',
     value: 'my',
     icon1: new URL(`@/assets/images/footer/my.png`, import.meta.url).href,
     icon2: new URL(`@/assets/images/footer/my-selected.png`, import.meta.url).href,
-    url: '/my'
+    url: '/my',
   },
 ])
 const currentRoute = ref(route.name)
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 watch(
-  () => route.name, (newName, oldName) => {
-    currentRoute.value = newName;
-  }
+  () => route.name,
+  (newName, oldName) => {
+    currentRoute.value = newName
+  },
 )
 
-const clickIcon = item => {
-  router.push(item.url);
+const clickIcon = (item) => {
+  router.push(item.url)
 }
-
 </script>
 
 <style scoped lang="less">
@@ -69,7 +67,7 @@ const clickIcon = item => {
 }
 
 footer {
-  height: .vw(60)[];
+  height: .vw(60) [];
 
   .icons {
     height: 100%;
@@ -78,27 +76,27 @@ footer {
     justify-content: space-around;
 
     .item {
-      width: .vw(50)[];
-      height: .vw(45)[];
+      width: .vw(50) [];
+      height: .vw(45) [];
       display: flex;
       align-items: center;
       flex-direction: column;
       justify-content: center;
 
       .icon {
-        width: .vw(28)[];
-        height: .vw(28)[];
-        margin-bottom: .vw(3)[];
+        width: .vw(28) [];
+        height: .vw(28) [];
+        margin-bottom: .vw(3) [];
       }
 
       .text {
         color: var(--text--);
         text-align: center;
-        font-family: "PingFang SC";
-        font-size: .vw(12)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(12) [];
         font-style: normal;
         font-weight: 500;
-        line-height: .vw(14)[];
+        line-height: .vw(14) [];
 
         &.light {
           color: var(--light-text--);

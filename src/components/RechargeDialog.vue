@@ -1,13 +1,18 @@
 <template>
   <div class="recharge-mask" v-if="show"></div>
-  <div class="recharge-dialog" :class="{ 'show': show }">
+  <div class="recharge-dialog" :class="{ show: show }">
     <div class="close" @click="clickClose"></div>
     <div class="body">
       <p class="title">弹珠充值</p>
       <div class="recharge">
         <div class="ball-count-list">
-          <div class="item" :class="{ 'selected': selectedRechargePackage === item.packageId }"
-            v-for="(item, index) in rechargeList" :key="index" @click="clickPackage(item)">
+          <div
+            class="item"
+            :class="{ selected: selectedRechargePackage === item.packageId }"
+            v-for="(item, index) in rechargeList"
+            :key="index"
+            @click="clickPackage(item)"
+          >
             <div class="ball">
               <i class="icon"></i>
               <i class="count">X{{ Number(item.marbleAmount) + Number(item.giftMarbleAmount) }}</i>
@@ -18,17 +23,24 @@
         <div class="payway">
           <div class="sub-title">支付方式</div>
           <div class="payway-list">
-            <div class="item" v-for="(item, index) in paywayList" :key="index" @click="clickPayway(item)">
-              <img src="@/assets/images/alipay.png" alt="" class="icon">
+            <div
+              class="item"
+              v-for="(item, index) in paywayList"
+              :key="index"
+              @click="clickPayway(item)"
+            >
+              <img src="@/assets/images/alipay.png" alt="" class="icon" />
               <span class="text">{{ item.name }}</span>
-              <i class="select" :class="{ 'selected': selectedPayway === item.value }"></i>
+              <i class="select" :class="{ selected: selectedPayway === item.value }"></i>
             </div>
           </div>
         </div>
         <div class="confirm" @click="clickConfirm">确认充值</div>
         <div class="aggrement" @click="isAgree = !isAgree">
-          <i class="select" :class="{ 'selected': isAgree }"></i>
-          <div class="text">须满18周岁，请勾选<span class="bold" @click.stop="clickAggrement">《充值协议》</span></div>
+          <i class="select" :class="{ selected: isAgree }"></i>
+          <div class="text">
+            须满18周岁，请勾选<span class="bold" @click.stop="clickAggrement">《充值协议》</span>
+          </div>
         </div>
       </div>
     </div>
@@ -59,14 +71,12 @@ const emit = defineEmits(['toggleShow'])
 
 const rechargeList = ref([])
 const selectedRechargePackage = ref('')
-const paywayList = ref([
-  { value: 'alipay', name: '支付宝' }
-])
+const paywayList = ref([{ value: 'alipay', name: '支付宝' }])
 const selectedPayway = ref('alipay')
 const isAgree = ref(false)
 const showRechargeSuccess = ref(false)
 const timer = ref(null)
-const time = ref(1000)  // 轮询间隔1000ms
+const time = ref(1000) // 轮询间隔1000ms
 
 onMounted(() => {
   getRechargeList()
@@ -80,19 +90,17 @@ const getRechargeList = async () => {
   const res = await api.post('/pinball/recharge/listPackages')
   if (res.code === 200) {
     rechargeList.value = res.data
-  } else {
-    $toast.info(res.message)
   }
 }
 
 const clickConfirm = async () => {
   if (!selectedRechargePackage.value) {
     $toast.info('请选择充值包')
-    return;
+    return
   }
   if (!isAgree.value) {
     $toast.info('请阅读并同意《充值协议》')
-    return;
+    return
   }
   const body = { packageId: selectedRechargePackage.value }
   const res = await api.post('/pinball/recharge/createWapPayOrder', body)
@@ -108,12 +116,10 @@ const clickConfirm = async () => {
       // 处理弹窗被拦截
       $toast.info('请允许弹出窗口，或手动打开支付页面')
     }
-  } else {
-    $toast.info(res.message)
   }
 }
 
-// 
+//
 
 /**
  * 轮询查询支付状态回调，间隔1000ms
@@ -137,14 +143,14 @@ const getPayStateCallback = (body) => {
           $toast.close()
           emit('toggleShow', false)
           showRechargeSuccess.value = true
-          break;
+          break
         case 'WAIT_BUYER_PAY':
           $toast.loading('支付中...')
-          break;
+          break
         case 'TRADE_CLOSED':
           clearInterval(timer.value)
           $toast.info('支付失败')
-          break;
+          break
       }
     } else {
       // $toast.info(res.message)
@@ -203,25 +209,25 @@ const closeRechargeSuccess = () => {
   left: 0;
   bottom: 0;
   transform: translateY(115%);
-  transition: transform .3s;
+  transition: transform 0.3s;
 
   &.show {
     transform: translateY(0);
   }
 
   .close {
-    width: .vw(24)[];
-    height: .vw(24)[];
+    width: .vw(24) [];
+    height: .vw(24) [];
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
     background-image: url(@/assets/images/close.png);
-    margin-bottom: .vw(20)[];
+    margin-bottom: .vw(20) [];
   }
 
   .body {
     width: 100%;
-    min-height: .vw(400)[];
+    min-height: .vw(400) [];
     max-height: 75vh;
     display: flex;
     flex-direction: column;
@@ -230,79 +236,79 @@ const closeRechargeSuccess = () => {
     background-repeat: no-repeat;
     background-image: url(@/assets/images/recharge-bg.png);
     position: relative;
-    padding: .vw(23)[] .vw(16)[] .vw(17)[] .vw(16)[];
+    padding: .vw(23) [] .vw(16) [] .vw(17) [] .vw(16) [];
 
     &::before {
       content: '';
-      width: .vw(134)[];
-      height: .vw(134)[];
+      width: .vw(134) [];
+      height: .vw(134) [];
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
       background-image: url(@/assets/images/recharge-icon.png);
       position: absolute;
-      top: .vw(-57)[];
-      right: .vw(4)[];
+      top: .vw(-57) [];
+      right: .vw(4) [];
     }
 
     .title {
-      font-size: .vw(30)[];
-      line-height: .vw(30)[];
+      font-size: .vw(30) [];
+      line-height: .vw(30) [];
       font-weight: 900;
       font-style: normal;
-      letter-spacing: .vw(5)[];
-      margin-bottom: .vw(20)[];
+      letter-spacing: .vw(5) [];
+      margin-bottom: .vw(20) [];
     }
 
     .recharge {
       flex: 1;
-      border-radius: .vw(12)[];
+      border-radius: .vw(12) [];
       background-color: var(--white--);
       overflow-y: auto;
       overflow-x: hidden;
-      padding: .vw(18)[];
+      padding: .vw(18) [];
 
       .ball-count-list {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        margin-bottom: .vw(16)[];
+        margin-bottom: .vw(16) [];
 
         .item {
-          width: .vw(96)[];
-          height: .vw(88)[];
+          width: .vw(96) [];
+          height: .vw(88) [];
           display: flex;
           align-items: center;
           flex-direction: column;
           justify-content: center;
-          border-radius: .vw(24)[];
-          background-color: #F5F6FA;
-          margin-bottom: .vw(9)[];
+          border-radius: .vw(24) [];
+          background-color: #f5f6fa;
+          margin-bottom: .vw(9) [];
 
-          &:not(:nth-child(3n+0)) {
-            margin-right: .vw(9)[];
+          &:not(:nth-child(3n + 0)) {
+            margin-right: .vw(9) [];
           }
 
           .ball {
             display: flex;
             align-items: center;
-            margin-bottom: .vw(11)[];
+            margin-bottom: .vw(11) [];
 
             .icon {
-              width: .vw(24)[];
-              height: .vw(24)[];
+              width: .vw(24) [];
+              height: .vw(24) [];
               background-size: 100%;
               background-position: center;
               background-repeat: no-repeat;
               background-image: url(@/assets/images/ball.png);
-              margin-right: .vw(4)[];
+              margin-right: .vw(4) [];
             }
 
             .count {
               color: var(--light-text--);
-              font-family: "PingFang SC";
-              font-size: .vw(18)[];
-              line-height: .vw(22)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(18) [];
+              line-height: .vw(22) [];
               font-weight: 900;
               font-style: normal;
             }
@@ -310,9 +316,9 @@ const closeRechargeSuccess = () => {
 
           .price {
             color: var(--light-text--);
-            font-family: "PingFang SC";
-            font-size: .vw(16)[];
-            line-height: .vw(16)[];
+            font-family: 'PingFang SC';
+            font-size: .vw(16) [];
+            line-height: .vw(16) [];
             font-weight: 500;
             font-style: normal;
             display: flex;
@@ -320,66 +326,66 @@ const closeRechargeSuccess = () => {
 
             &::before {
               content: '￥';
-              font-family: "PingFang SC";
-              font-size: .vw(12)[];
-              line-height: .vw(12)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(12) [];
+              line-height: .vw(12) [];
               font-weight: 400;
               font-style: normal;
             }
           }
 
           &.selected {
-            border: .vw(2)[] solid #FF7716;
-            background-color: #FFF4E6;
+            border: .vw(2) [] solid #ff7716;
+            background-color: #fff4e6;
           }
         }
       }
 
       .payway {
-        margin-bottom: .vw(16)[];
+        margin-bottom: .vw(16) [];
 
         .sub-title {
           color: var(--light-text--);
-          font-family: "PingFang SC";
-          font-size: .vw(16)[];
-          line-height: .vw(16)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(16) [];
           font-weight: 200;
           font-style: normal;
-          margin-bottom: .vw(8)[];
+          margin-bottom: .vw(8) [];
         }
 
         .payway-list {
           .item {
             display: flex;
             align-items: center;
-            border-radius: .vw(12)[];
-            background-color: #EFEFEF;
-            padding: .vw(12)[] .vw(19)[];
+            border-radius: .vw(12) [];
+            background-color: #efefef;
+            padding: .vw(12) [] .vw(19) [];
 
             .icon {
-              width: .vw(24)[];
-              height: .vw(24)[];
-              margin-right: .vw(8)[];
+              width: .vw(24) [];
+              height: .vw(24) [];
+              margin-right: .vw(8) [];
             }
 
             .text {
               flex: 1;
               color: var(--light-text--);
-              font-family: "PingFang SC";
-              font-size: .vw(14)[];
-              line-height: .vw(14)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(14) [];
+              line-height: .vw(14) [];
               font-weight: 500;
               font-style: normal;
             }
 
             .select {
-              width: .vw(24)[];
-              height: .vw(24)[];
+              width: .vw(24) [];
+              height: .vw(24) [];
               background-size: 100%;
               background-position: center;
               background-repeat: no-repeat;
               background-image: url(@/assets/images/shop/select.png);
-              margin-left: .vw(10)[];
+              margin-left: .vw(10) [];
 
               &.selected {
                 background-image: url(@/assets/images/shop/selected.png);
@@ -390,19 +396,19 @@ const closeRechargeSuccess = () => {
       }
 
       .confirm {
-        height: .vw(48)[];
+        height: .vw(48) [];
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--light-text--);
-        font-family: "PingFang SC";
-        font-size: .vw(16)[];
-        line-height: .vw(16)[];
+        font-family: 'PingFang SC';
+        font-size: .vw(16) [];
+        line-height: .vw(16) [];
         font-weight: 500;
         font-style: normal;
-        border-radius: .vw(45)[];
-        background-color: #FFB169;
-        margin-bottom: .vw(16)[];
+        border-radius: .vw(45) [];
+        background-color: #ffb169;
+        margin-bottom: .vw(16) [];
       }
 
       .aggrement {
@@ -410,13 +416,13 @@ const closeRechargeSuccess = () => {
         align-items: center;
 
         .select {
-          width: .vw(18)[];
-          height: .vw(18)[];
+          width: .vw(18) [];
+          height: .vw(18) [];
           background-size: 100%;
           background-position: center;
           background-repeat: no-repeat;
           background-image: url(@/assets/images/shop/select.png);
-          margin-right: .vw(6)[];
+          margin-right: .vw(6) [];
 
           &.selected {
             background-image: url(@/assets/images/shop/selected.png);
@@ -424,14 +430,14 @@ const closeRechargeSuccess = () => {
         }
 
         .text {
-          color: #50525C;
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          color: #50525c;
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 200;
 
           .bold {
-            color: #FFB169;
+            color: #ffb169;
           }
         }
       }
@@ -453,8 +459,8 @@ const closeRechargeSuccess = () => {
   top: 0;
 
   .body {
-    width: .vw(328)[];
-    height: .vw(242)[];
+    width: .vw(328) [];
+    height: .vw(242) [];
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -464,66 +470,66 @@ const closeRechargeSuccess = () => {
     background-repeat: no-repeat;
     background-image: url(@/assets/images/recharge-success-bg.png);
     position: relative;
-    padding-top: .vw(50)[];
+    padding-top: .vw(50) [];
 
     &::before {
       content: '';
-      width: .vw(110)[];
-      height: .vw(110)[];
+      width: .vw(110) [];
+      height: .vw(110) [];
       background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
       background-image: url(@/assets/images/recharge-success-icon.png);
       position: absolute;
-      top: .vw(-25)[];
-      right: .vw(8)[];
+      top: .vw(-25) [];
+      right: .vw(8) [];
     }
 
     .text {
       color: var(--light-text--);
-      font-family: "PingFang SC";
-      font-size: .vw(24)[];
-      line-height: .vw(24)[];
+      font-family: 'PingFang SC';
+      font-size: .vw(24) [];
+      line-height: .vw(24) [];
       font-weight: 900;
       font-style: normal;
-      margin-bottom: .vw(10)[];
+      margin-bottom: .vw(10) [];
     }
 
     .desc {
-      color: #50525C;
-      font-family: "PingFang SC";
-      font-size: .vw(16)[];
-      line-height: .vw(16)[];
+      color: #50525c;
+      font-family: 'PingFang SC';
+      font-size: .vw(16) [];
+      line-height: .vw(16) [];
       font-weight: 400;
       font-style: normal;
-      margin-bottom: .vw(36)[];
+      margin-bottom: .vw(36) [];
     }
 
     .confirm {
-      width: .vw(240)[];
-      height: .vw(48)[];
+      width: .vw(240) [];
+      height: .vw(48) [];
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--white--);
-      font-size: .vw(16)[];
-      line-height: .vw(16)[];
+      font-size: .vw(16) [];
+      line-height: .vw(16) [];
       font-weight: 500;
       font-style: normal;
-      border-radius: .vw(45)[];
-      border: 1px solid #FF3A64;
-      background: linear-gradient(90deg, #FD689A 0%, #FFAB2D 100%);
+      border-radius: .vw(45) [];
+      border: 1px solid #ff3a64;
+      background: linear-gradient(90deg, #fd689a 0%, #ffab2d 100%);
     }
   }
 
   .close {
-    width: .vw(24)[];
-    height: .vw(24)[];
+    width: .vw(24) [];
+    height: .vw(24) [];
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
     background-image: url(@/assets/images/close.png);
-    margin-top: .vw(62)[];
+    margin-top: .vw(62) [];
   }
 }
 </style>

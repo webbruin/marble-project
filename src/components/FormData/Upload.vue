@@ -1,8 +1,15 @@
 <template>
   <div class="upload" @click="clickFile">
     <slot name="content" />
-    <input class="file-upload" ref="fileUpload" type="file" :accept="accept" :multiple="limit > 1" :disabled="disabled"
-      @change="uploadChange" />
+    <input
+      class="file-upload"
+      ref="fileUpload"
+      type="file"
+      :accept="accept"
+      :multiple="limit > 1"
+      :disabled="disabled"
+      @change="uploadChange"
+    />
   </div>
 </template>
 
@@ -15,20 +22,18 @@ const props = defineProps({
   },
   limit: {
     type: Number,
-    default: 1
+    default: 1,
   },
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
 })
 const emit = defineEmits(['change'])
 const fileUpload = ref(null)
 const maxSize = ref(20)
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const clickFile = () => {
   if (props.disabled) {
@@ -76,7 +81,7 @@ const uploadChange = async (event) => {
   }
 
   &.disabled {
-    background-color: #FFCA91;
+    background-color: #ffca91;
     pointer-events: none;
   }
 }

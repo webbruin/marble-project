@@ -9,7 +9,7 @@
               <div class="date">下单时间：2026.03.11 15:21:22</div>
               <div class="module">
                 <div class="cover">
-                  <img src="@/assets/images/home/room-bg.png" alt="">
+                  <img src="@/assets/images/home/room-bg.png" alt="" />
                 </div>
                 <div class="info">
                   <p class="room-level">初级房间</p>
@@ -17,11 +17,11 @@
                   <div class="have">
                     <span class="text">获得</span>
                     <span class="text">
-                      <img src="@/assets/images/ball.png" alt="" class="icon">
+                      <img src="@/assets/images/ball.png" alt="" class="icon" />
                       X45.00
                     </span>
                     <span class="text">
-                      <img src="@/assets/images/point.png" alt="" class="icon">
+                      <img src="@/assets/images/point.png" alt="" class="icon" />
                       X145.00
                     </span>
                   </div>
@@ -40,21 +40,11 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
 
-const recordList = ref([
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-])
+const recordList = ref([{}, {}, {}, {}, {}, {}, {}])
 const loading = ref(false)
 const loadOver = ref(false)
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 const loadMore = () => {
   loading.value = true
@@ -79,30 +69,30 @@ const loadMore = () => {
 
   .body {
     flex: 1;
-    background-color: #F5F6FA;
+    background-color: #f5f6fa;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 .vw(18)[] .vw(10)[];
+    padding: 0 .vw(18) [] .vw(10) [];
 
     .record-list {
       .item {
-        border-radius: .vw(12)[];
+        border-radius: .vw(12) [];
         background-color: #fff;
-        padding: .vw(16)[] .vw(12)[];
-        margin-bottom: .vw(12)[];
+        padding: .vw(16) [] .vw(12) [];
+        margin-bottom: .vw(12) [];
 
         &:first-of-type {
-          margin-top: .vw(12)[];
+          margin-top: .vw(12) [];
         }
 
         .date {
           color: var(--text--);
-          font-family: "PingFang SC";
-          font-size: .vw(14)[];
-          line-height: .vw(14)[];
+          font-family: 'PingFang SC';
+          font-size: .vw(14) [];
+          line-height: .vw(14) [];
           font-weight: 400;
           font-style: normal;
-          margin-bottom: .vw(10)[];
+          margin-bottom: .vw(10) [];
         }
 
         .module {
@@ -110,9 +100,9 @@ const loadMore = () => {
           align-items: center;
 
           .cover {
-            width: .vw(120)[];
-            height: .vw(88)[];
-            margin-right: .vw(12)[];
+            width: .vw(120) [];
+            height: .vw(88) [];
+            margin-right: .vw(12) [];
 
             img {
               width: 100%;
@@ -125,22 +115,22 @@ const loadMore = () => {
 
             .room-level {
               color: var(--light-text--);
-              font-family: "PingFang SC";
-              font-size: .vw(18)[];
-              line-height: .vw(18)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(18) [];
+              line-height: .vw(18) [];
               font-weight: 500;
               font-style: normal;
-              margin-bottom: .vw(12)[];
+              margin-bottom: .vw(12) [];
             }
 
             .use-ball {
               color: var(--text--);
-              font-family: "PingFang SC";
-              font-size: .vw(14)[];
-              line-height: .vw(14)[];
+              font-family: 'PingFang SC';
+              font-size: .vw(14) [];
+              line-height: .vw(14) [];
               font-weight: 400;
               font-style: normal;
-              margin-bottom: .vw(12)[];
+              margin-bottom: .vw(12) [];
             }
 
             .have {
@@ -149,9 +139,9 @@ const loadMore = () => {
 
               .text {
                 color: var(--text--);
-                font-family: "PingFang SC";
-                font-size: .vw(14)[];
-                line-height: .vw(14)[];
+                font-family: 'PingFang SC';
+                font-size: .vw(14) [];
+                line-height: .vw(14) [];
                 font-weight: 400;
                 font-style: normal;
                 white-space: nowrap;
@@ -159,13 +149,13 @@ const loadMore = () => {
                 align-items: center;
 
                 &:not(:last-of-type) {
-                  margin-right: .vw(8)[];
+                  margin-right: .vw(8) [];
                 }
 
                 .icon {
-                  width: .vw(18)[];
-                  height: .vw(18)[];
-                  margin-right: .vw(4)[];
+                  width: .vw(18) [];
+                  height: .vw(18) [];
+                  margin-right: .vw(4) [];
                 }
               }
             }
