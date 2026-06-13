@@ -138,7 +138,7 @@ const init = async () => {
 
 const getRoomType = async () => {
   try {
-    const res = await api.post('/homepage/listRoomTypes')
+    const res = await api.post('/pinball/homepage/listRoomTypes')
     if (res.code === 200) {
       roomLevelList.value = res.data || []
     } else {
@@ -162,7 +162,7 @@ const getRoomList = async (init) => {
   }
   try {
     loading.value = true
-    const res = await api.post('/homepage/listRooms', params.value)
+    const res = await api.post('/pinball/homepage/listRooms', params.value)
     loading.value = false
     if (res.code === 200) {
       const list = res.data.data || []
@@ -223,7 +223,7 @@ const clickRoom = (item) => {
 // 查询当前用户弹珠余额
 const getUserMarbleAmount = async () => {
   try {
-    const res = await api.post('/user/account/getMarbleAmount')
+    const res = await api.post('/pinball/user/account/getMarbleAmount')
     if (res.code === 200) {
       marbleAmount.value = +res.data
     } else {

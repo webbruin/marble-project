@@ -52,7 +52,7 @@ const clickConfirm = async () => {
     oldPassword: encrypt(oldPassword.value),
     newPassword: encrypt(newPassword1.value)
   }
-  const res = await api.post('/user/info/changePassword', body)
+  const res = await api.post('/pinball/user/info/changePassword', body)
   if (res.code === 200) {
     router.back()
   } else {

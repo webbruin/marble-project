@@ -96,7 +96,7 @@ const getCartList = async (init) => {
   }
   try {
     loading.value = true
-    const res = await api.post('/shop/cart/list', params.value)
+    const res = await api.post('/pinball/shop/cart/list', params.value)
     loading.value = false
     if (res.code === 200) {
       res.data = {
@@ -209,7 +209,7 @@ const clickClearCart = () => {
 
 const updateCart = async ({ cartId, quantity, selected }) => {
   try {
-    const res = await api.post('/shop/cart/update', { cartId, quantity, selected })
+    const res = await api.post('/pinball/shop/cart/update', { cartId, quantity, selected })
     if (res.code === 200) {
       // ...
     } else {
@@ -222,7 +222,7 @@ const updateCart = async ({ cartId, quantity, selected }) => {
 
 const deleteCart = async ({ cartId }) => {
   try {
-    const res = await api.post('/shop/cart/delete', { cartId })
+    const res = await api.post('/pinball/shop/cart/delete', { cartId })
     if (res.code === 200) {
       cartList.value = cartList.value.filter(item => item.cartId != cartId)
     } else {
@@ -235,7 +235,7 @@ const deleteCart = async ({ cartId }) => {
 
 const clearCart = async () => {
   try {
-    const res = await api.post('/shop/cart/clear', {})
+    const res = await api.post('/pinball/shop/cart/clear', {})
     if (res.code === 200) {
       cartList.value = []
       isEmpty.value = true

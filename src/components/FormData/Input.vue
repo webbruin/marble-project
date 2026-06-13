@@ -70,7 +70,7 @@ const clickSendCode = async () => {
   let body = {
     mobile: props.mobile
   };
-  const res = await api.post('/user/auth/sendSmsCode', body)
+  const res = await api.post('/pinball/user/auth/sendSmsCode', body)
   if (res.code === 200) {
     setCountdown()
   } else {

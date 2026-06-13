@@ -125,7 +125,7 @@ const init = async () => {
 
 const getDefaultAddress = async () => {
   try {
-    const res = await api.post('/shop/address/list', {})
+    const res = await api.post('/pinball/shop/address/list', {})
     if (res.code === 200) {
       address.value = res.data.find(item => item.isDefault === 1) || {}
       if (route.params.source === 'cart') {
@@ -145,7 +145,7 @@ const getDefaultAddress = async () => {
 // 查询当前用户积分余额
 const getPointCardAmount = async () => {
   try {
-    const res = await api.post('/user/account/getPointCardAmount')
+    const res = await api.post('/pinball/user/account/getPointCardAmount')
     if (res.code === 200) {
       cardAmount.value = +res.data
     } else {
@@ -210,7 +210,7 @@ const clickPay = () => {
 const createByCart = async () => {
   $toast.loading('订单创建中')
   try {
-    const res = await api.post('/shop/order/createByCart', params.value)
+    const res = await api.post('/pinball/shop/order/createByCart', params.value)
     $toast.close()
     if (res.code === 200) {
       orderPay(res.data)
@@ -225,7 +225,7 @@ const createByCart = async () => {
 const createByDirect = async () => {
   $toast.loading('订单创建中')
   try {
-    const res = await api.post('/shop/order/createByDirect', paramsByDirect.value)
+    const res = await api.post('/pinball/shop/order/createByDirect', paramsByDirect.value)
     $toast.close()
     if (res.code === 200) {
       orderPay(res.data)
@@ -240,7 +240,7 @@ const createByDirect = async () => {
 const orderPay = async (orderId) => {
   $toast.loading('订单支付中')
   try {
-    const res = await api.post('/shop/order/pay', { orderId })
+    const res = await api.post('/pinball/shop/order/pay', { orderId })
     $toast.close()
     if (res.code === 200) {
       $toast.info('支付成功')

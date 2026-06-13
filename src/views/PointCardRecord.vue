@@ -63,7 +63,7 @@ const getRecordList = async (init) => {
   }
   try {
     loading.value = true
-    const res = await api.post('/user/account/pagePointCardLog', params.value)
+    const res = await api.post('/pinball/user/account/pagePointCardLog', params.value)
     loading.value = false
     if (res.code === 200) {
       const list = res.data.data || []

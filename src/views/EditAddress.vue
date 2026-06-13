@@ -131,7 +131,7 @@ const clickSaveAddress = async () => {
 
   try {
     $toast.loading()
-    const res = await api.post('/shop/address/save', body)
+    const res = await api.post('/pinball/shop/address/save', body)
     $toast.close()
     if (res.code === 200) {
       router.back()

@@ -63,7 +63,7 @@ const loginConfirm = () => {
 const logout = async () => {
   try {
     $toast.loading()
-    const res = await api.post('/user/auth/logout')
+    const res = await api.post('/pinball/user/auth/logout')
     $toast.close()
     if (res.code === 200) {
       // $toast.info('退出登陆成功')

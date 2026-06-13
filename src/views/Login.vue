@@ -97,11 +97,11 @@ const clickLogin = async () => {
   let url = ''
   let body = {}
   if (loginType.value === 'msgCode') {
-    url = '/user/auth/smsLogin'
+    url = '/pinball/user/auth/smsLogin'
     body = { mobile, msgCode }
   }
   if (loginType.value === 'password') {
-    url = '/user/auth/passwordLogin'
+    url = '/pinball/user/auth/passwordLogin'
     body = { mobile, password: encrypt(password) }
   }
   const res = await api.post(url, body)
@@ -124,7 +124,7 @@ const clickAggrement = (type) => {
 }
 
 const getUserInfo = async () => {
-  const res = await api.post('/user/info/getUserInfo')
+  const res = await api.post('/pinball/user/info/getUserInfo')
   if (res.code === 200) {
     localStorage.setItem('userInfo', JSON.stringify(res.data))
   } else {

@@ -275,7 +275,7 @@ const updateCount = () => {
 // 查询当前用户弹珠余额
 const getUserMarbleAmount = async () => {
   try {
-    const res = await api.post('/user/account/getMarbleAmount')
+    const res = await api.post('/pinball/user/account/getMarbleAmount')
     if (res.code === 200) {
       marbleAmount.value = +res.data
     } else {
@@ -289,7 +289,7 @@ const getUserMarbleAmount = async () => {
 // 查询当前用户积分卡余额
 const getPointCardAmount = async () => {
   try {
-    const res = await api.post('/user/account/getPointCardAmount')
+    const res = await api.post('/pinball/user/account/getPointCardAmount')
     if (res.code === 200) {
       cardAmount.value = +res.data
     } else {
@@ -324,7 +324,7 @@ const createRoom = async () => {
 // 获取房间详情
 const getRoomDetail = async () => {
   try {
-    const res = await api.post('/room/getRoomDetail', { roomId: roomId.value })
+    const res = await api.post('/pinball/room/getRoomDetail', { roomId: roomId.value })
     if (res.code === 200) {
       roomInfo.value = res.data
       // 查询弹幕列表
@@ -362,7 +362,7 @@ const getRoomDetail = async () => {
 const startGame = async () => {
   try {
     $toast.loading()
-    const res = await api.post('/room/startGame', { roomId: roomId.value })
+    const res = await api.post('/pinball/room/startGame', { roomId: roomId.value })
     $toast.close()
     if (res.code === 200) {
       if (!isLockRoom.value) {
@@ -387,7 +387,7 @@ const startGame = async () => {
 // 弹珠加投
 const addMarble = async (marbleCount) => {
   try {
-    const res = await api.post('/room/addMarble', {
+    const res = await api.post('/pinball/room/addMarble', {
       roomId: roomId.value,
       marbleCount,
       orderId: gameInfo.value.orderId
@@ -414,7 +414,7 @@ const launchBall = async () => {
     }
     countdown.value = 0
     sendStatus.value = '发射中'
-    const res = await api.post('/room/launchBall', {
+    const res = await api.post('/pinball/room/launchBall', {
       roomId: roomId.value,
       powerLevel,
       orderId: gameInfo.value.orderId
@@ -445,7 +445,7 @@ const launchBall = async () => {
 // 查询弹幕消息列表
 const queryDanmaku = async () => {
   try {
-    const res = await api.post('/room/queryDanmaku', {
+    const res = await api.post('/pinball/room/queryDanmaku', {
       roomId: roomId.value,
       limit: 100,  // 查询条数（最大100）
       sortType: 0  // 0-创建时间倒序（默认），1-创建时间正序
@@ -471,7 +471,7 @@ const sendDanmaku = async () => {
   }
   try {
     $toast.loading('发送中')
-    const res = await api.post('/room/sendDanmaku', {
+    const res = await api.post('/pinball/room/sendDanmaku', {
       roomId: roomId.value,
       content: danmakuContent.value
     })
@@ -493,7 +493,7 @@ const sendDanmaku = async () => {
 // 中奖记录查询（瀑布式分页）
 const winRecordList = async () => {
   try {
-    const res = await api.post('/room/winRecordList', {
+    const res = await api.post('/pinball/room/winRecordList', {
       roomId: roomId.value,
       pageSize: 20,
       lastOrderId: null  // 上一页最后一条记录的游戏订单ID（第一页传空）
@@ -511,7 +511,7 @@ const winRecordList = async () => {
 // 解锁
 const unlockRoom = async () => {
   try {
-    const res = await api.post('/room/unlockRoom', {
+    const res = await api.post('/pinball/room/unlockRoom', {
       roomId: roomId.value,
     })
     if (res.code === 200) {

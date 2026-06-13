@@ -135,7 +135,7 @@ const loadMore = () => {
 const getInvitationSummary = async () => {
   try {
     const { activityId } = params.value
-    const res = await api.post('/invitation/my/summary', { activityId })
+    const res = await api.post('/pinball/invitation/my/summary', { activityId })
     if (res.code === 200) {
       inviteInfo.value = res.data || {}
     } else {
@@ -155,7 +155,7 @@ const getInvitationList = async (init) => {
   }
   try {
     loading.value = true
-    const res = await api.post('/invitation/my/page', params.value)
+    const res = await api.post('/pinball/invitation/my/page', params.value)
     loading.value = false
     if (res.code === 200) {
       const list = res.data.data || []
@@ -181,7 +181,7 @@ const clickShare = async () => {
   // }
   try {
     const { activityId } = params.value
-    const res = await api.post('/invitation/code/generate', { activityId })
+    const res = await api.post('/pinball/invitation/code/generate', { activityId })
     if (res.code === 200) {
       shareQrCode.value = await getQRCodeDataURL(res.data.shareUrl, { margin: 3 })
       showShareQrCode.value = true

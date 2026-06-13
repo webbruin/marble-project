@@ -72,7 +72,7 @@ const init = async () => {
 
 const getProductDetail = async () => {
   try {
-    const res = await api.post('/shop/product/detail', params)
+    const res = await api.post('/pinball/shop/product/detail', params)
     if (res.code === 200) {
       productData.value = {
         ...(res.data || {}),

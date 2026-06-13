@@ -43,7 +43,7 @@ onMounted(() => {
 
 const clickConfirm = async () => {
   $toast.loading()
-  const res = await api.post('/user/info/realNameAuth', formdata.value)
+  const res = await api.post('/pinball/user/info/realNameAuth', formdata.value)
   if (res.code === 200) {
     $toast.info('实名认证成功')
     const timer = setTimeout(() => {

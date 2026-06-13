@@ -100,7 +100,7 @@ const clickTab = (index) => {
 const getRankList = async () => {
   $toast.loading()
   try {
-    const res = await api.post(`/ranking/${url.value}`, { type: tabType.value })
+    const res = await api.post(`/pinball/ranking/${url.value}`, { type: tabType.value })
     $toast.close()
     if (res.code === 200) {
       rankList.value = res.data

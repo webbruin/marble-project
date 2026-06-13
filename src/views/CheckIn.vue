@@ -78,7 +78,7 @@ const init = async () => {
 }
 
 const getStatus = async () => {
-  const res = await api.post('/signIn/getStatus')
+  const res = await api.post('/pinball/signIn/getStatus')
   if (res.code === 200) {
     checkInData.value = res.data || {}
   } else {
@@ -87,7 +87,7 @@ const getStatus = async () => {
 }
 
 const getCalendar = async () => {
-  const res = await api.post('/signIn/getCalendar')
+  const res = await api.post('/pinball/signIn/getCalendar')
   if (res.code === 200) {
     checkInList.value = res.data.slice(0, 7) || []
     checkInList.value[6].bigSize = true
@@ -101,7 +101,7 @@ const clickCheckIn = async () => {
     return
   }
   $toast.loading('签到中')
-  const res = await api.post('/signIn/doSignIn')
+  const res = await api.post('/pinball/signIn/doSignIn')
   $toast.close()
   if (res.code === 200) {
     showBallSuccess.value = true
@@ -117,7 +117,7 @@ const clickCheckIn = async () => {
 // 查询当前用户弹珠余额
 const getUserMarbleAmount = async () => {
   try {
-    const res = await api.post('/user/account/getMarbleAmount')
+    const res = await api.post('/pinball/user/account/getMarbleAmount')
     if (res.code === 200) {
       marbleAmount.value = +res.data
     } else {

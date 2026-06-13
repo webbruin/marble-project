@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 1. 创建一个 axios 实例，配置基础地址和超时时间
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL + '/pinball',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 15000,
 });
 

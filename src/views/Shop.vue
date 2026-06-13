@@ -124,7 +124,7 @@ const init = async () => {
 // 查询当前用户积分卡余额
 const getPointCardAmount = async () => {
   try {
-    const res = await api.post('/user/account/getPointCardAmount')
+    const res = await api.post('/pinball/user/account/getPointCardAmount')
     if (res.code === 200) {
       cardAmount.value = +res.data
     } else {
@@ -141,7 +141,7 @@ const loadMore = () => {
 
 const getCategoryList = async () => {
   try {
-    const res = await api.post('/shop/category/list', {})
+    const res = await api.post('/pinball/shop/category/list', {})
     if (res.code === 200) {
       categorys.value = res.data || []
     } else {
@@ -161,7 +161,7 @@ const getProductList = async (init) => {
   }
   try {
     loading.value = true
-    const res = await api.post('/shop/product/page', params.value)
+    const res = await api.post('/pinball/shop/product/page', params.value)
     loading.value = false
     if (res.code === 200) {
       const list = res.data.data || []
@@ -216,7 +216,7 @@ const clickProduct = ({ productId }) => {
 
 const addCart = async ({ productId, minSkuId }) => {
   try {
-    const res = await api.post('/shop/cart/add', { productId, skuId: minSkuId, quantity: 1 })
+    const res = await api.post('/pinball/shop/cart/add', { productId, skuId: minSkuId, quantity: 1 })
     if (res.code === 200) {
       $toast.info('加入购物车成功')
     } else {

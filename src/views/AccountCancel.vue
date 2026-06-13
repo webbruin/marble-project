@@ -40,7 +40,7 @@ const cancel = (url) => {
 
 const logout = async () => {
   $toast.loading('退出中')
-  const res = await api.post('/user/auth/logout')
+  const res = await api.post('/pinball/user/auth/logout')
   if (res.code === 200) {
     $toast.info('退出登陆成功')
     localStorage.removeItem('token')

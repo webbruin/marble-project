@@ -27,7 +27,7 @@ yarn format         # prettier --write src/
 src/
   main.js            # 应用入口，注册全局变量（window.$toast、window.$modal、window.api）
   App.vue            # 根组件，仅包含 <RouterView>
-  api/index.js       # Axios 实例（基础路径 /pinball，15 秒超时，token 拦截器，401 处理）
+  api/index.js       # Axios 实例（15 秒超时，token 拦截器，401 处理）
   router/index.js    # 路由配置 + beforeEach 登录守卫
   components/        # 公共组件：Header、Footer、InfiniteScroll、各类弹窗、Toast/、Modal/、FormData/
   views/             # 页面组件（29 个页面）
@@ -46,15 +46,15 @@ src/
 
 ## API 规范
 
-- 所有接口统一使用 POST 请求，完整路径为 `VITE_API_BASE_URL + '/pinball' + 接口路径`
-- 请求示例：`api.post('/路径/接口名', 参数)`
+- 所有接口统一使用 POST 请求，完整路径为 `VITE_API_BASE_URL + 接口路径`，接口路径以 `/pinball/` 开头
+- 请求示例：`api.post('/pinball/路径/接口名', 参数)`
 - 响应格式：`{ code: 200, data: ..., message: '...' }` —— 始终先判断 `res.code === 200`
 - 401 处理：清除 token，1 秒后跳转到 `/login`
 - 错误处理模式：
 
 ```js
 try {
-  const res = await api.post('/路径', params)
+  const res = await api.post('/pinball/路径', params)
   if (res.code === 200) {
     // 处理成功
   } else {

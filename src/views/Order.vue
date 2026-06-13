@@ -109,7 +109,7 @@ const getOrderList = async (init) => {
   }
   try {
     loading.value = true
-    const res = await api.post('/shop/order/page', params)
+    const res = await api.post('/pinball/shop/order/page', params)
     loading.value = false
     if (res.code === 200) {
       const list = res.data.data || []

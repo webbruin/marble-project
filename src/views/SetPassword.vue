@@ -47,7 +47,7 @@ const clickConfirm = async () => {
   let body = {
     password: encrypt(password1.value)
   }
-  const res = await api.post('/user/info/setPassword', body)
+  const res = await api.post('/pinball/user/info/setPassword', body)
   if (res.code === 200) {
     router.push({ name: 'home' })
   } else {

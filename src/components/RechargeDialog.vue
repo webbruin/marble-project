@@ -77,7 +77,7 @@ onUnmounted(() => {
 })
 
 const getRechargeList = async () => {
-  const res = await api.post('/recharge/listPackages')
+  const res = await api.post('/pinball/recharge/listPackages')
   if (res.code === 200) {
     rechargeList.value = res.data
   } else {
@@ -95,7 +95,7 @@ const clickConfirm = async () => {
     return;
   }
   const body = { packageId: selectedRechargePackage.value }
-  const res = await api.post('/recharge/createWapPayOrder', body)
+  const res = await api.post('/pinball/recharge/createWapPayOrder', body)
   if (res.code === 200) {
     const { payForm, orderId, payAmount } = res.data
     const payWindow = window.open('', '_blank')
@@ -126,7 +126,7 @@ const clickConfirm = async () => {
  */
 const getPayStateCallback = (body) => {
   timer.value = setInterval(async () => {
-    const res = await api.post('/recharge/queryAlipayOrder', body)
+    const res = await api.post('/pinball/recharge/queryAlipayOrder', body)
     if (res.code === 200) {
       const { tradeStatus } = res.data
       // 支付成功

@@ -36,7 +36,7 @@ onMounted(() => {
 
 const clickConfirm = async () => {
   $toast.loading()
-  const res = await api.post('/user/auth/smsLogin', formdata.value)
+  const res = await api.post('/pinball/user/auth/smsLogin', formdata.value)
   if (res.code === 200) {
     $toast.close()
     const { access_token, hasPassword } = res.data

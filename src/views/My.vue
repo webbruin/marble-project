@@ -97,7 +97,7 @@ const init = async () => {
 }
 
 const getUserInfo = async () => {
-  const res = await api.post('/user/info/getUserInfo')
+  const res = await api.post('/pinball/user/info/getUserInfo')
   if (res.code === 200) {
     userInfo.value = res.data
     localStorage.setItem('userInfo', JSON.stringify(userInfo.value))

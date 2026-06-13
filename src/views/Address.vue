@@ -62,7 +62,7 @@ const init = async () => {
 
 const getAddressList = async () => {
   try {
-    const res = await api.post('/shop/address/list', {})
+    const res = await api.post('/pinball/shop/address/list', {})
     if (res.code === 200) {
       addressList.value = res.data
     } else {
@@ -75,7 +75,7 @@ const getAddressList = async () => {
 
 const deleteAddress = async (addressId) => {
   try {
-    const res = await api.post('/shop/address/delete', { addressId })
+    const res = await api.post('/pinball/shop/address/delete', { addressId })
     if (res.code === 200) {
       $toast.info('地址删除成功')
       addressList.value = addressList.value.filter(item => item.addressId != addressId)
