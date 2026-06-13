@@ -36,7 +36,7 @@
         <div class="aggrement" @click="isAgree = !isAgree">
           <i class="select" :class="{ 'selected': isAgree }"></i>
           <div class="text">
-            为注册手机号将自动注册，勾选代表您已阅读并同意
+            未注册手机号将自动注册，勾选代表您已阅读并同意
             <span class="bold" @click.stop="clickAggrement('yhxy')">《用户协议》</span>
             和
             <span class="bold" @click.stop="clickAggrement('ysxy')">《隐私协议》</span>
