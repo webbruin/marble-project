@@ -17,12 +17,8 @@
         <div class="status" v-if="sendStatus">{{ sendStatus }}</div>
         <div class="status" v-else-if="countdown">倒计时：{{ countdown }}S</div>
 
-        <div class="audience-list">
-          <div
-            class="user"
-            v-for="(item, index) in Math.min(roomInfo.currentPlayerCount, 3)"
-            :key="index"
-          >
+        <div class="audience-list" v-if="roomInfo.currentPlayerCount">
+          <div class="user" v-for="(item, index) in Math.min(roomInfo.currentPlayerCount, 3)" :key="index">
             <img class="icon" src="@/assets/images/avatar.png" alt="" />
           </div>
           <div class="user">
@@ -63,12 +59,7 @@
             <i class="icon">
               <img src="@/assets/images/room/icon3.png" alt="" />
             </i>
-            <img
-              src="@/assets/images/room/text/music-off.png"
-              alt=""
-              class="text-icon"
-              v-if="musicOn"
-            />
+            <img src="@/assets/images/room/text/music-off.png" alt="" class="text-icon" v-if="musicOn" />
             <img src="@/assets/images/room/text/music-on.png" alt="" class="text-icon" v-else />
           </div>
           <div class="button">
@@ -88,12 +79,7 @@
           <i class="icon">
             <img src="@/assets/images/room/icon6.png" alt="" :class="{ rotate: collapse }" />
           </i>
-          <img
-            src="@/assets/images/room/text/collapse-on.png"
-            alt=""
-            class="text-icon"
-            v-if="collapse"
-          />
+          <img src="@/assets/images/room/text/collapse-on.png" alt="" class="text-icon" v-if="collapse" />
           <img src="@/assets/images/room/text/collapse-off.png" alt="" class="text-icon" v-else />
         </div>
       </div>
@@ -106,12 +92,7 @@
         </div>
         <div class="send">
           <div class="input">
-            <input
-              type="text"
-              placeholder="发点弹幕吧~"
-              v-model="danmakuContent"
-              @change="sendDanmaku"
-            />
+            <input type="text" placeholder="发点弹幕吧~" v-model="danmakuContent" @change="sendDanmaku" />
           </div>
           <span class="collapse" @click="danmakuCollapse = !danmakuCollapse">
             {{ danmakuCollapse ? '收起' : '展开' }}
@@ -162,12 +143,8 @@
               切换{{ handIsLeft ? '右手' : '左手' }}
             </div>
             <div class="joy-stick">
-              <i
-                class="stick"
-                :class="{ left: handIsLeft, right: !handIsLeft }"
-                ref="stickRef"
-                :style="{ transform: `translateY(${stickMovePercent}%)` }"
-              ></i>
+              <i class="stick" :class="{ left: handIsLeft, right: !handIsLeft }" ref="stickRef"
+                :style="{ transform: `translateY(${stickMovePercent}%)` }"></i>
               <span class="percent">{{ stickMovePercent }}%</span>
             </div>
           </div>
@@ -175,13 +152,7 @@
         <div class="start" v-else>
           <!-- 暂时无法游戏,其他人在游戏中 -->
           <div v-if="watchGame" class="watch-game">暂时无法游戏,其他人在游戏中</div>
-          <img
-            v-else
-            src="@/assets/images/room/start-game.png"
-            alt=""
-            class="button"
-            @click="clickStart"
-          />
+          <img v-else src="@/assets/images/room/start-game.png" alt="" class="button" @click="clickStart" />
         </div>
       </div>
     </div>
@@ -196,27 +167,14 @@
     </div>
   </div>
 
-  <WarnningDialog
-    :show="showWarnningDialog"
-    :level="roomTypeEnum[roomInfo.roomTypeId]"
-    :ball="roomInfo.entryFee"
-    @toggleShow="closeWarnningDialog"
-  >
+  <WarnningDialog :show="showWarnningDialog" :level="roomTypeEnum[roomInfo.roomTypeId]" :ball="roomInfo.entryFee"
+    @toggleShow="closeWarnningDialog">
   </WarnningDialog>
-  <ConfirmDialog
-    :show="showConfirmDialog"
-    :level="roomInfo.roomName"
-    :ball="roomInfo.entryFee"
-    :marbleAmount="marbleAmount"
-    @close="closeConfirmDialog"
-    @confirm="clickConfirmDialog"
-  ></ConfirmDialog>
-  <BallSuccess
-    :show="showBallSuccess"
+  <ConfirmDialog :show="showConfirmDialog" :level="roomInfo.roomName" :ball="roomInfo.entryFee"
+    :marbleAmount="marbleAmount" @close="closeConfirmDialog" @confirm="clickConfirmDialog"></ConfirmDialog>
+  <BallSuccess :show="showBallSuccess"
     :ball="launchInfo.winPointCard > 0 ? launchInfo.winPointCard : launchInfo.winMarble"
-    :type="launchInfo.winPointCard > 0 ? 2 : 1"
-    @toggleShow="showBallSuccess = $event"
-  ></BallSuccess>
+    :type="launchInfo.winPointCard > 0 ? 2 : 1" @toggleShow="showBallSuccess = $event"></BallSuccess>
 </template>
 
 <script setup>
@@ -616,9 +574,9 @@ const initStickEvent = () => {
     isMoveStick.value = false
     stickMovePercent.value = 0
     // 删除时间监听
-    stickRef.value.removeEventListener('touchstart', () => {})
-    window.removeEventListener('touchmove', () => {})
-    stickRef.value.removeEventListener('touchend', () => {})
+    stickRef.value.removeEventListener('touchstart', () => { })
+    window.removeEventListener('touchmove', () => { })
+    stickRef.value.removeEventListener('touchend', () => { })
   })
 }
 
