@@ -2,17 +2,17 @@
   <main class="record">
     <Header title="充值记录"></Header>
     <div class="body">
-      <InfiniteScroll :loading="loading" :loadOver="loadOver" @load="loadMore">
+      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
         <template #content>
           <div class="record-list">
             <div class="item" v-for="(item, index) in recordList" :key="index">
               <div class="info">
                 <p class="text">充值记录</p>
-                <p class="date">2025-15-21 15:21:21</p>
+                <p class="date">{{ item.createTime }}</p>
               </div>
               <div class="right">
-                <p class="price">+100元</p>
-                <p class="status">已完成</p>
+                <p class="price">+{{ formatNumberWithCommas(item.payAmount) }}元</p>
+                <p class="status">{{ getRechargeStatusName(item.orderStatus) }}</p>
               </div>
             </div>
           </div>
@@ -26,25 +26,66 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import { formatNumberWithCommas } from '@/utils'
 
-const recordList = ref([{}, {}, {}, {}, {}, {}])
+const params = ref({
+  current: 1,
+  pageSize: 20,
+  orderStatus: '', // 状态：0-待支付，1-支付成功，2-支付失败，3-已关闭
+})
+const rechargeStatusMap = {
+  0: '待支付',
+  1: '支付成功',
+  2: '支付失败',
+  3: '已关闭',
+}
+const getRechargeStatusName = (status) => {
+  return rechargeStatusMap[status] || '未知'
+}
+// 记录列表
+const recordList = ref([])
 const loading = ref(false)
 const loadOver = ref(false)
+const isEmpty = ref(false)
 
-onMounted(() => {})
+onMounted(() => {
+  init()
+})
 
-const clickTab = (item) => {
-  tab.value = item.type
+const init = async () => {
+  $toast.loading()
+  await getList(true)
+  $toast.close()
 }
 
 const loadMore = () => {
-  loading.value = true
-  const timer = setTimeout(() => {
-    clearTimeout(timer)
+  getList()
+}
+
+const getList = async (init) => {
+  if (init) {
+    params.value.current = 1
+    recordList.value = []
+    loadOver.value = false
+    isEmpty.value = false
+  }
+  try {
+    loading.value = true
+    const res = await api.post('/pinball/recharge/pageMarbleRechargeOrder', params.value)
     loading.value = false
-    // loadOver.value = true
-    recordList.value = [...recordList.value, ...[{}, {}, {}, {}, {}]]
-  }, 1000)
+    if (res.code === 200) {
+      const list = res.data.data || []
+      recordList.value = [...recordList.value, ...list]
+      params.value.current++
+      // 加载完毕
+      loadOver.value = recordList.value.length >= res.data.total
+      // 空列表
+      isEmpty.value = loadOver.value && recordList.value.length === 0
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+    loading.value = false
+  }
 }
 </script>
 
@@ -108,6 +149,7 @@ const loadMore = () => {
             line-height: .vw(16) [];
             font-weight: 500;
             font-style: normal;
+            text-align: center;
             margin-bottom: .vw(8) [];
           }
 
@@ -118,6 +160,7 @@ const loadMore = () => {
             line-height: .vw(12) [];
             font-weight: 400;
             font-style: normal;
+            text-align: center;
           }
         }
       }

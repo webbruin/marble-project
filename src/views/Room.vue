@@ -17,12 +17,17 @@
         <div class="status" v-if="sendStatus">{{ sendStatus }}</div>
         <div class="status" v-else-if="countdown">倒计时：{{ countdown }}S</div>
 
-        <div class="audience-list" v-if="roomInfo.currentPlayerCount">
-          <div class="user" v-for="(item, index) in Math.min(roomInfo.currentPlayerCount, 3)" :key="index">
-            <img class="icon" src="@/assets/images/avatar.png" alt="" />
+        <div class="audience-list" v-if="memberList.length">
+          <div class="user" v-for="(item, index) in Math.min(memberList, 3)" :key="index" @click="clickMember(item)">
+            <template v-if="item.avatar">
+              <img class="icon" :src="item.avatar" alt="" />
+            </template>
+            <template v-else>
+              <img class="icon" src="@/assets/images/avatar.png" alt="" />
+            </template>
           </div>
           <div class="user">
-            <span class="count">{{ roomInfo.currentPlayerCount }}</span>
+            <span class="count">{{ memberList.length }}</span>
           </div>
         </div>
       </div>
@@ -167,7 +172,7 @@
     </div>
   </div>
 
-  <WarnningDialog :show="showWarnningDialog" :level="roomTypeEnum[roomInfo.roomTypeId]" :ball="roomInfo.entryFee"
+  <WarnningDialog :show="showWarnningDialog" :level="getRoomLevelName(roomInfo.roomTypeId)" :ball="roomInfo.entryFee"
     @toggleShow="closeWarnningDialog">
   </WarnningDialog>
   <ConfirmDialog :show="showConfirmDialog" :level="roomInfo.roomName" :ball="roomInfo.entryFee"
@@ -193,7 +198,7 @@ import TRTC from 'trtc-sdk-v5'
 import WarnningDialog from '@/components/WarnningDialog.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import BallSuccess from '@/components/BallSuccess.vue'
-import { formatNumberWithCommas } from '@/utils'
+import { formatNumberWithCommas, getRoomLevelName } from '@/utils'
 // TRTC资源包
 import '../trtc/lib-generate-test-usersig.min'
 import genTestUserSig from '../trtc/generateTestUserSig'
@@ -207,13 +212,6 @@ const roomUseStatusEnum = {
   1: '使用中',
   10: '故障',
   11: '下线',
-}
-
-// 房间使用状态枚举：1-初级房间，2-中级房间，3-高级房间
-const roomTypeEnum = {
-  1: '初级房间',
-  2: '中级房间',
-  3: '高级房间',
 }
 
 const SDK_APP_ID = 1600137711
@@ -255,6 +253,7 @@ const startTimer = ref(null)
 const watchGame = ref(false)
 const sendStatus = ref('')
 const musicOn = ref(true)
+const memberList = ref([])
 
 onMounted(() => {
   roomId.value = +route.params.id
@@ -348,6 +347,7 @@ const getRoomDetail = async () => {
       stepBall.value = roomInfo.value.entryFee
       // 查询弹幕列表
       queryDanmaku()
+      getMemberList()
       // 当前是否观战
       if (res.data.self === 0 && res.data.useStatus === 1) {
         watchGame.value = true
@@ -483,12 +483,10 @@ const sendDanmaku = async () => {
     return
   }
   try {
-    $toast.loading('发送中')
     const res = await api.post('/pinball/room/sendDanmaku', {
       roomId: roomId.value,
       content: danmakuContent.value,
     })
-    $toast.close()
     if (res.code === 200) {
       danmakuList.value = [...danmakuList.value, res.data] //.splice(-5)
       danmakuContent.value = ''
@@ -525,6 +523,22 @@ const unlockRoom = async () => {
     })
     if (res.code === 200) {
       // ...
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 查询成员列表（Next分页）
+const getMemberList = async () => {
+  try {
+    const res = await api.post('/pinball/room/memberList', {
+      next: '',
+      pageSize: 3,
+      roomId: roomId.value
+    })
+    if (res.code === 200) {
+      memberList.value = res.data.memberList || []
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -616,16 +630,24 @@ const setCountdown = () => {
     if (countdown.value > 0) {
       return
     }
-    countdown.value = 0
-    clearInterval(startTimer.value)
+    // 倒计时结束，自动发射弹珠
+    launchBall()
+    isMoveStick.value = false
+    stickMovePercent.value = 0
+    // countdown.value = 0
+    // clearInterval(startTimer.value)
     // 重置订单信息
-    gameInfo.value = {}
-    isStartGame.value = false
+    // gameInfo.value = {}
+    // isStartGame.value = false
   }, 1000)
 }
 
 const toggleMusic = () => {
   musicOn.value = !musicOn.value
+}
+
+const clickMember = (item) => {
+  $toast.info(item.nickName)
 }
 </script>
 

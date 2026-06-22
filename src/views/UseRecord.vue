@@ -2,27 +2,27 @@
   <main class="record">
     <Header title="使用记录"></Header>
     <div class="body">
-      <InfiniteScroll :loading="loading" :loadOver="loadOver" @load="loadMore">
+      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
         <template #content>
           <div class="record-list">
             <div class="item" v-for="(item, index) in recordList" :key="index">
-              <div class="date">下单时间：2026.03.11 15:21:22</div>
+              <div class="date">下单时间：{{ item.createTime }}</div>
               <div class="module">
                 <div class="cover">
                   <img src="@/assets/images/home/room-bg.png" alt="" />
                 </div>
                 <div class="info">
-                  <p class="room-level">初级房间</p>
-                  <p class="use-ball">消耗弹珠 X25</p>
+                  <p class="room-level">{{ getRoomLevelName(item.roomLevel) }}</p>
+                  <p class="use-ball">消耗弹珠 X{{ formatNumberWithCommas(item.actualMarble) || '-' }}</p>
                   <div class="have">
                     <span class="text">获得</span>
                     <span class="text">
                       <img src="@/assets/images/ball.png" alt="" class="icon" />
-                      X45.00
+                      X{{ formatNumberWithCommas(item.winMarble) || '-' }}
                     </span>
                     <span class="text">
                       <img src="@/assets/images/point.png" alt="" class="icon" />
-                      X145.00
+                      X{{ formatNumberWithCommas(item.winPointCard) || '-' }}
                     </span>
                   </div>
                 </div>
@@ -39,21 +39,57 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import { formatNumberWithCommas, getRoomLevelName } from '@/utils'
 
-const recordList = ref([{}, {}, {}, {}, {}, {}, {}])
+const params = ref({
+  current: 1,
+  pageSize: 20,
+  orderStatus: '', // 状态：0-待发射，1-完成，2-超时完成，9-异常
+})
+// 记录列表
+const recordList = ref([])
 const loading = ref(false)
 const loadOver = ref(false)
+const isEmpty = ref(false)
 
-onMounted(() => {})
+onMounted(() => {
+  init()
+})
+
+const init = async () => {
+  $toast.loading()
+  await getList(true)
+  $toast.close()
+}
 
 const loadMore = () => {
-  loading.value = true
-  const timer = setTimeout(() => {
-    clearTimeout(timer)
+  getList()
+}
+
+const getList = async (init) => {
+  if (init) {
+    params.value.current = 1
+    recordList.value = []
+    loadOver.value = false
+    isEmpty.value = false
+  }
+  try {
+    loading.value = true
+    const res = await api.post('/pinball/room/pageGameOrder', params.value)
     loading.value = false
-    // loadOver.value = true
-    recordList.value = [...recordList.value, ...[{}, {}, {}, {}, {}]]
-  }, 1000)
+    if (res.code === 200) {
+      const list = res.data.data || []
+      recordList.value = [...recordList.value, ...list]
+      params.value.current++
+      // 加载完毕
+      loadOver.value = recordList.value.length >= res.data.total
+      // 空列表
+      isEmpty.value = loadOver.value && recordList.value.length === 0
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+    loading.value = false
+  }
 }
 </script>
 
@@ -102,11 +138,14 @@ const loadMore = () => {
           .cover {
             width: .vw(120) [];
             height: .vw(88) [];
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
             margin-right: .vw(12) [];
 
             img {
               width: 100%;
-              max-height: 100%;
             }
           }
 

@@ -2,23 +2,13 @@
   <main class="record">
     <Header title="弹珠记录"></Header>
     <div class="tab">
-      <div
-        class="item"
-        :class="{ selected: params.changeType === item.type }"
-        v-for="(item, index) in tabList"
-        :key="index"
-        @click="clickTab(item.type)"
-      >
+      <div class="item" :class="{ selected: params.changeType === item.type }" v-for="(item, index) in tabList"
+        :key="index" @click="clickTab(item.type)">
         {{ item.name }}
       </div>
     </div>
     <div class="body">
-      <InfiniteScroll
-        :loading="loading"
-        :loadOver="loadOver"
-        :empty="isEmpty"
-        @load="getRecordList"
-      >
+      <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="getRecordList">
         <template #content>
           <div class="record-list">
             <div class="item" v-for="(item, index) in recordList" :key="index">
@@ -26,8 +16,8 @@
                 <p class="text">{{ item.remark }}</p>
                 <p class="date">{{ item.createTime }}</p>
               </div>
-              <div class="count" :class="{ red: index % 2 === 1 }">
-                {{ item.changeType === 1 ? '+' : '-' }}{{ item.changeAmount }}弹珠
+              <div class="count" :class="{ red: item.changeType != 1 }">
+                {{ item.changeType === 1 ? '+' : '' }}{{ formatNumberWithCommas(item.changeAmount) }}弹珠
               </div>
             </div>
           </div>
@@ -41,6 +31,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import { formatNumberWithCommas } from '@/utils'
 
 const tabList = ref([
   { name: '全部', type: '' },

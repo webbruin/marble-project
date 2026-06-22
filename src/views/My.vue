@@ -19,17 +19,15 @@
       <div class="info">
         <div class="level">
           <img src="@/assets/images/my/crown.png" alt="" class="icon" />
-          <span class="text">当前会员等级 V{{ userInfo.levelValue }}</span>
+          <span class="text">当前会员等级为：{{ userLevelInfo.levelName }}</span>
         </div>
         <div class="progress">
-          <p
-            :style="{ width: `${userInfo.pointCardAmount / userInfo.memberPointTotalAmount}%` }"
-          ></p>
+          <p :style="{ width: `${userLevelInfo.totalRechargeAmount / userLevelInfo.needRechargeAmount}%` }"></p>
         </div>
         <div class="count">
-          {{ userInfo.pointCardAmount }}/{{ userInfo.memberPointTotalAmount }}
+          {{ userLevelInfo.totalRechargeAmount }}/{{ userLevelInfo.needRechargeAmount }}
         </div>
-        <i class="vip-icon" :class="`level${userInfo.levelValue}`"></i>
+        <i class="vip-icon" :class="`level${userLevelInfo.levelValue}`"></i>
       </div>
     </div>
     <div class="order">
@@ -65,20 +63,28 @@
           <i class="icon service1"></i>
           <p class="text">使用记录</p>
         </div>
+        <div class="item" @click="clickRouter('recharge-record')">
+          <i class="icon service6"></i>
+          <p class="text">充值记录</p>
+        </div>
+        <div class="item" @click="clickRouter('ball-record')">
+          <i class="icon service3"></i>
+          <p class="text">弹珠记录</p>
+        </div>
+        <div class="item" @click="clickRouter('point-card-record')">
+          <i class="icon service7"></i>
+          <p class="text">积分记录</p>
+        </div>
+      </div>
+      <div class="status">
         <div class="item" @click="clickRouter('address')">
           <i class="icon service2"></i>
           <p class="text">地址管理</p>
         </div>
         <div class="item">
-          <i class="icon service3"></i>
-          <p class="text">兑换记录</p>
-        </div>
-        <div class="item">
           <i class="icon service4"></i>
           <p class="text">故障记录</p>
         </div>
-      </div>
-      <div class="status">
         <div class="item" @click="clickRouter('setting')">
           <i class="icon service5"></i>
           <p class="text">设置</p>
@@ -94,6 +100,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
 const userInfo = ref({})
+const userLevelInfo = ref({})
 
 onMounted(() => {
   init()
@@ -110,6 +117,16 @@ const getUserInfo = async () => {
   if (res.code === 200) {
     userInfo.value = res.data
     localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+    getLevelInfo(userInfo.value)
+  }
+}
+
+// 查询用户等级详情
+const getLevelInfo = async ({ userId, levelValue }) => {
+  const res = await api.post('/pinball/level/user/getLevelInfo', { userId, levelValue })
+  if (res.code === 200) {
+    userLevelInfo.value = res.data
+    localStorage.setItem('userLevelInfo', JSON.stringify(userLevelInfo.value))
   }
 }
 
@@ -284,6 +301,10 @@ const clickRouter = (name, params = {}, query = {}) => {
         &.level5 {
           background-image: url(@/assets/images/my/vip-icon5.png);
         }
+
+        &.level6 {
+          background-image: url(@/assets/images/my/vip-icon6.png);
+        }
       }
     }
   }
@@ -428,7 +449,6 @@ const clickRouter = (name, params = {}, query = {}) => {
     .status {
       display: flex;
       align-items: center;
-      justify-content: space-between;
 
       &:not(:last-of-type) {
         margin-bottom: .vw(16) [];
@@ -439,6 +459,11 @@ const clickRouter = (name, params = {}, query = {}) => {
         display: flex;
         align-items: center;
         flex-direction: column;
+        margin-right: .vw(33)[];
+
+        &:last-of-type {
+          margin-right: 0;
+        }
 
         .icon {
           width: .vw(24) [];
@@ -466,6 +491,14 @@ const clickRouter = (name, params = {}, query = {}) => {
 
           &.service5 {
             background-image: url(@/assets/images/my/service5.png);
+          }
+
+          &.service6 {
+            background-image: url(@/assets/images/my/service6.png);
+          }
+
+          &.service7 {
+            background-image: url(@/assets/images/my/service7.png);
           }
         }
 

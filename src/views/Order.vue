@@ -2,13 +2,8 @@
   <main class="order">
     <Header title="订单"></Header>
     <div class="tab">
-      <div
-        class="item"
-        :class="{ selected: params.orderStatus === item.orderStatus }"
-        v-for="(item, index) in tabList"
-        :key="index"
-        @click="clickTab(item.orderStatus)"
-      >
+      <div class="item" :class="{ selected: params.orderStatus === item.orderStatus }" v-for="(item, index) in tabList"
+        :key="index" @click="clickTab(item.orderStatus)">
         {{ item.name }}
       </div>
     </div>
@@ -16,25 +11,20 @@
       <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
         <template #content>
           <div class="order-list">
-            <div
-              class="item"
-              v-for="(item, index) in orderList"
-              :key="index"
-              @click="toOrderDetail(item)"
-            >
+            <div class="item" v-for="(item, index) in orderList" :key="index" @click="toOrderDetail(item)">
               <div class="address">
-                <!-- <span class="text">北京市朝阳区凤凰汇6栋1584市</span> -->
-                <span class="text">{{ item.firstProductName }}</span>
+                <span class="text">{{ item.recipientAddress }}</span>
                 <i class="arrow"></i>
               </div>
               <div class="product">
                 <div class="cover-list">
-                  <div class="cover">
-                    <img :src="item.firstProductImage" alt="" />
+                  <div class="cover" v-for="(skuItem, skuIndex) in item.items" :key="skuIndex">
+                    <img :src="skuItem.productImage" alt="" />
+                    <span class="num">X{{ skuItem.quantity }}</span>
                   </div>
                 </div>
                 <div class="info">
-                  <p class="point">积分{{ formatNumberWithCommas(item.pointCardAmount) }}</p>
+                  <p class="point">积分{{ formatNumberWithCommas(item.totalAmount) }}</p>
                   <p class="count">共{{ item.totalQuantity }}件</p>
                 </div>
               </div>
@@ -86,15 +76,7 @@ const tabList = ref([
   { name: '已退款', orderStatus: 5 },
   { name: '已关闭', orderStatus: 6 },
 ])
-const orderList = ref([
-  // { coverList: ['', '', '', '', '', '', '', ''] },
-  // { coverList: ['', '', '', ''] },
-  // { coverList: ['', '', '', ''] },
-  // { coverList: ['', '', '', ''] },
-  // { coverList: ['', '', '', ''] },
-  // { coverList: ['', '', '', ''] },
-  // { coverList: ['', '', '', ''] },
-])
+const orderList = ref([])
 const loading = ref(false)
 const loadOver = ref(false)
 const isEmpty = ref(false)
@@ -131,7 +113,6 @@ const getOrderList = async (init) => {
       isEmpty.value = loadOver.value && orderList.value.length === 0
     }
   } catch (e) {
-    console.log(222, e)
     $toast.info('系统错误')
     loading.value = false
   }
@@ -151,8 +132,11 @@ const loadMore = () => {
   getOrderList()
 }
 
-const toOrderDetail = (item) => {
-  console.log(111, item)
+const toOrderDetail = ({ orderId, orderStatus }) => {
+  if (!orderId) {
+    return
+  }
+  router.push({ name: 'order-detail', params: { orderId }, query: { orderStatus } })
 }
 </script>
 
@@ -255,6 +239,7 @@ const toOrderDetail = (item) => {
         .product {
           display: flex;
           align-items: center;
+          padding-left: .vw(15) [];
           padding-right: .vw(15) [];
           margin-bottom: .vw(8) [];
 
@@ -270,10 +255,28 @@ const toOrderDetail = (item) => {
               min-width: .vw(56) [];
               width: .vw(56) [];
               height: .vw(56) [];
+              position: relative;
 
               img {
                 max-width: 100%;
                 max-height: 100%;
+                border-radius: .vw(6)[];
+              }
+
+              .num {
+                color: #FF7716;
+                font-family: 'PingFang SC';
+                font-size: .vw(7) [];
+                line-height: .vw(7) [];
+                font-weight: 400;
+                font-style: normal;
+                border-radius: .vw(45)[];
+                border: .vw(1)[] solid #fff;
+                background-color: #FFE3E3;
+                padding: .vw(1)[] .vw(3)[];
+                position: absolute;
+                left: .vw(8)[];
+                bottom: .vw(4)[];
               }
             }
           }

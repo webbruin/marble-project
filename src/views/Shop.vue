@@ -2,19 +2,20 @@
   <main class="shop">
     <div class="header">
       <div class="title">商城兑换</div>
-      <div class="point">
-        <p class="text">我的积分</p>
-        <p class="count">{{ formatNumberWithCommas(cardAmount) }}</p>
+      <div class="info">
+        <div class="point">
+          <p class="text">我的积分</p>
+          <p class="count">{{ formatNumberWithCommas(pointCardAmount) || '-' }}</p>
+        </div>
+        <div class="point">
+          <p class="text">宾果豆（会员专享）</p>
+          <p class="count">{{ formatNumberWithCommas(memberPointAmount) || '-' }}</p>
+        </div>
       </div>
     </div>
     <div class="body">
       <div class="tab">
-        <div
-          class="item"
-          v-for="(item, index) in categorys"
-          :key="index"
-          @click="clickCategory(item)"
-        >
+        <div class="item" v-for="(item, index) in categorys" :key="index" @click="clickCategory(item)">
           <div class="icon">
             <img :src="item.icon" alt="" v-if="item.icon" />
           </div>
@@ -22,21 +23,18 @@
         </div>
       </div>
       <div class="banner">
-        <img src="@/assets/images/home/banner.png" alt="" />
+        <van-swipe class="my-swipe" :autoplay="5000" indicator-color="#FFFFFF" lazy-render>
+          <van-swipe-item v-for="(item, index) in bannerList" :key="index" @click="clickBanner(item)">
+            <img :src="item.imgUrl" />
+          </van-swipe-item>
+        </van-swipe>
       </div>
       <div class="filter">
-        <div
-          class="item"
-          :class="{ light: params.sortType === item.type }"
-          v-for="(item, index) in sortTypeList"
-          :key="index"
-        >
+        <div class="item" :class="{ light: params.sortType === item.type }" v-for="(item, index) in sortTypeList"
+          :key="index">
           <span @click="clickFilter(item)">{{ item.name }}</span>
           <template v-if="item.sort">
-            <div
-              class="sort"
-              :class="{ low: params.order === 'low', hight: params.order === 'hight' }"
-            ></div>
+            <div class="sort" :class="{ low: params.order === 'low', hight: params.order === 'hight' }"></div>
           </template>
         </div>
       </div>
@@ -72,33 +70,10 @@ import { formatNumberWithCommas } from '@/utils'
 const route = useRoute()
 const router = useRouter()
 
-const cardAmount = ref(0)
-const categorys = ref([
-  // {
-  //   name: '休闲零食',
-  //   icon: new URL(`@/assets/images/shop/tab1.png`, import.meta.url).href,
-  // },
-  // {
-  //   name: '酒水饮料',
-  //   icon: new URL(`@/assets/images/shop/tab2.png`, import.meta.url).href,
-  // },
-  // {
-  //   name: '儿童玩具',
-  //   icon: new URL(`@/assets/images/shop/tab3.png`, import.meta.url).href,
-  // },
-  // {
-  //   name: '电子数码',
-  //   icon: new URL(`@/assets/images/shop/tab4.png`, import.meta.url).href,
-  // },
-  // {
-  //   name: '数码产品',
-  //   icon: new URL(`@/assets/images/shop/tab5.png`, import.meta.url).href,
-  // },
-  // {
-  //   name: '美妆用品',
-  //   icon: new URL(`@/assets/images/shop/tab6.png`, import.meta.url).href,
-  // },
-])
+const pointCardAmount = ref(0)
+const memberPointAmount = ref(0)
+const bannerList = ref([])
+const categorys = ref([])
 const sortTypeList = ref([
   { name: '推荐', type: 'recommend' },
   { name: '热度', type: 'hot' },
@@ -124,6 +99,8 @@ const hasVipEntry = ref(false)
 
 onMounted(() => {
   getPointCardAmount()
+  getMemberPointAmount()
+  getBannerList()
   init()
 })
 
@@ -138,7 +115,30 @@ const getPointCardAmount = async () => {
   try {
     const res = await api.post('/pinball/user/account/getPointCardAmount')
     if (res.code === 200) {
-      cardAmount.value = +res.data
+      pointCardAmount.value = +res.data
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 查询当前用户会员积分余额
+const getMemberPointAmount = async () => {
+  try {
+    const res = await api.post('/pinball/user/account/getMemberPointAmount')
+    if (res.code === 200) {
+      memberPointAmount.value = +res.data
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const getBannerList = async () => {
+  try {
+    const res = await api.post('/pinball/banner/listBanner', { bannerType: 2 })
+    if (res.code === 200) {
+      bannerList.value = res.data || []
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -180,10 +180,10 @@ const getProductList = async (init) => {
       // 空列表
       isEmpty.value = loadOver.value && productList.value.length === 0
       // 数组的第二个，插入vip专区入口
-      if (productList.value.length >= 1 && !hasVipEntry.value) {
-        hasVipEntry.value = true
-        productList.value.splice(1, 0, { vipEntry: true })
-      }
+      // if (productList.value.length >= 1 && !hasVipEntry.value) {
+      //   hasVipEntry.value = true
+      //   productList.value.splice(1, 0, { vipEntry: true })
+      // }
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -197,6 +197,13 @@ const clickCategory = (item) => {
   }
   params.value.categoryId = item.categoryId
   getProductList(true)
+}
+
+const clickBanner = (item) => {
+  // console.log(222, item);
+  // if (item.jumpUrl) {
+  //   router.push(item.jumpUrl)
+  // }
 }
 
 const clickFilter = (item) => {
@@ -243,11 +250,25 @@ const addCart = async ({ productId, minSkuId }) => {
 
 .shop {
   .header {
-    height: .vw(160) [];
+    height: .vw(160)[];
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
     background-image: url(@/assets/images/shop/shop-bg.png);
+    position: relative;
+
+    &::after {
+      content: '';
+      width: .vw(140)[];
+      height: .vw(140)[];
+      background-size: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-image: url(@/assets/images/shop/shop-bg-icon.png);
+      position: absolute;
+      right: 0;
+      top: .vw(40)[];
+    }
 
     .title {
       color: var(--light-text--);
@@ -259,27 +280,32 @@ const addCart = async ({ productId, minSkuId }) => {
       margin-bottom: .vw(8) [];
     }
 
-    .point {
-      padding: 0 .vw(18) [];
-      margin-bottom: .vw(17) [];
+    .info {
+      display: flex;
+      align-items: center;
 
-      .text {
-        color: var(--text--);
-        font-family: 'PingFang SC';
-        font-size: .vw(16) [];
-        line-height: .vw(16) [];
-        font-weight: 200;
-        font-style: normal;
-        margin-bottom: .vw(10) [];
-      }
+      .point {
+        padding: 0 .vw(18) [];
+        margin-bottom: .vw(17) [];
 
-      .count {
-        color: var(--light-text--);
-        font-family: 'PingFang SC';
-        font-size: .vw(26) [];
-        line-height: .vw(26) [];
-        font-weight: 900;
-        font-style: normal;
+        .text {
+          color: var(--text--);
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(16) [];
+          font-weight: 200;
+          font-style: normal;
+          margin-bottom: .vw(10) [];
+        }
+
+        .count {
+          color: var(--light-text--);
+          font-family: 'PingFang SC';
+          font-size: .vw(26) [];
+          line-height: .vw(26) [];
+          font-weight: 900;
+          font-style: normal;
+        }
       }
     }
   }
@@ -289,6 +315,8 @@ const addCart = async ({ productId, minSkuId }) => {
     background-color: var(--white--);
     padding-top: .vw(23) [];
     margin-top: .vw(-20) [];
+    position: relative;
+    z-index: 1;
 
     .tab {
       display: flex;
@@ -335,13 +363,23 @@ const addCart = async ({ productId, minSkuId }) => {
     }
 
     .banner {
+      height: .vw(100)[];
       padding: 0 .vw(16) [];
       margin-bottom: .vw(16) [];
 
-      img {
-        width: 100%;
-        border-radius: .vw(16) [];
+      .my-swipe {
+        height: 100%;
+        border-radius: .vw(16)[];
         overflow: hidden;
+
+        .van-swipe-item {
+          height: 100%;
+
+          img {
+            width: 100%;
+            max-height: 100%;
+          }
+        }
       }
     }
 

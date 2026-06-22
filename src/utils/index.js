@@ -93,6 +93,32 @@ function formatToTwoDecimals(input) {
   return num.toFixed(2)
 }
 
+// 订单状态枚举
+const orderStatusMap = {
+  0: '待支付',
+  1: '已支付',
+  2: '已发货',
+  3: '已收货',
+  4: '退款中',
+  5: '已退款',
+  6: '已关闭',
+}
+
+const getOrderStatusName = (status) => {
+  return orderStatusMap[status] || ''
+}
+
+// 房间等级枚举
+const roomLevelMap = {
+  1: '初级房间',
+  2: '中级房间',
+  3: '高级房间',
+}
+
+const getRoomLevelName = (level) => {
+  return roomLevelMap[level] || ''
+}
+
 export {
   passwordRegExp,
   phoneRegExp,
@@ -100,4 +126,8 @@ export {
   maskPhoneNumber,
   formatNumberWithCommas,
   formatToTwoDecimals,
+  orderStatusMap,
+  getOrderStatusName,
+  roomLevelMap,
+  getRoomLevelName,
 }

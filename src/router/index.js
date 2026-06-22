@@ -96,6 +96,11 @@ const router = createRouter({
       name: 'product-detail',
       component: () => import('../views/ProductDetail.vue'),
     },
+    {
+      path: '/order-detail/:orderId',
+      name: 'order-detail',
+      component: () => import('../views/OrderDetail.vue'),
+    },
     // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/404.vue') },
   ],

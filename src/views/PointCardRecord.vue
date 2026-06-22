@@ -1,14 +1,9 @@
 <template>
   <main class="record">
-    <Header title="奖励卡记录"></Header>
+    <Header title="积分卡记录"></Header>
     <div class="tab">
-      <div
-        class="item"
-        :class="{ selected: params.changeType === item.type }"
-        v-for="(item, index) in tabList"
-        :key="index"
-        @click="clickTab(item.type)"
-      >
+      <div class="item" :class="{ selected: params.changeType === item.type }" v-for="(item, index) in tabList"
+        :key="index" @click="clickTab(item.type)">
         {{ item.name }}
       </div>
     </div>
@@ -24,8 +19,8 @@
                 </p>
                 <p class="date">{{ item.createTime }}</p>
               </div>
-              <div class="count" :class="{ red: true }">
-                {{ item.changeType === 1 ? '+' : '-' }}{{ item.changeAmount }}
+              <div class="count" :class="{ red: item.changeType != 1 }">
+                {{ item.changeType === 1 ? '+' : '-' }}{{ formatNumberWithCommas(item.changeAmount) }}
               </div>
             </div>
           </div>
@@ -39,6 +34,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import { formatNumberWithCommas } from '@/utils'
 
 const params = ref({
   changeType: '', // null-全部，1-收入，2-支出
@@ -200,16 +196,16 @@ const clickTab = (type) => {
           display: flex;
           align-items: center;
 
-          &::after {
-            content: '';
-            width: .vw(16) [];
-            height: .vw(16) [];
-            background-size: 100%;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-image: url(@/assets/images/arrow-right.png);
-            margin-left: .vw(4) [];
-          }
+          // &::after {
+          //   content: '';
+          //   width: .vw(16) [];
+          //   height: .vw(16) [];
+          //   background-size: 100%;
+          //   background-position: center;
+          //   background-repeat: no-repeat;
+          //   background-image: url(@/assets/images/arrow-right.png);
+          //   margin-left: .vw(4) [];
+          // }
 
           &.red {
             color: #f20c32;

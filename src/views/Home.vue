@@ -8,35 +8,23 @@
       </div>
     </div>
     <div class="room-tab" v-if="roomLevelList.length">
-      <div
-        class="item"
-        :class="{ light: params.roomTypeId === item.roomTypeId }"
-        v-for="(item, index) in roomLevelList"
-        :key="index"
-        @click="clickRoomTab(item)"
-      >
+      <div class="item" :class="{ light: params.roomTypeId === item.roomTypeId }" v-for="(item, index) in roomLevelList"
+        :key="index" @click="clickRoomTab(item)">
         <img class="icon" src="@/assets/images/home/low-icon.png" alt="" v-if="index === 0" />
-        <img
-          class="icon"
-          src="@/assets/images/home/middle-icon.png"
-          alt=""
-          v-else-if="index === 1"
-        />
-        <img
-          class="icon"
-          src="@/assets/images/home/hight-icon.png"
-          alt=""
-          v-else-if="index === 2"
-        />
+        <img class="icon" src="@/assets/images/home/middle-icon.png" alt="" v-else-if="index === 1" />
+        <img class="icon" src="@/assets/images/home/hight-icon.png" alt="" v-else-if="index === 2" />
         <img class="icon" src="@/assets/images/home/other-icon.png" alt="" v-else />
         <span class="text" :class="{ light: params.roomTypeId == item.roomTypeId }">{{
           item.roomTypeName
         }}</span>
       </div>
-      <!-- <div class="more" @click="moreRoomTab">更多</div> -->
     </div>
     <div class="banner">
-      <img src="@/assets/images/home/banner.png" alt="" />
+      <van-swipe class="my-swipe" :autoplay="5000" indicator-color="#FFFFFF" lazy-render>
+        <van-swipe-item v-for="(item, index) in bannerList" :key="index" @click="clickBanner(item)">
+          <img :src="item.imgUrl" />
+        </van-swipe-item>
+      </van-swipe>
     </div>
     <div class="entry">
       <div class="left">
@@ -60,18 +48,11 @@
       </div>
     </div>
     <div class="filter">
-      <div
-        class="item"
-        :class="{ light: params.sortType === item.type }"
-        v-for="(item, index) in sortTypeList"
-        :key="index"
-      >
+      <div class="item" :class="{ light: params.sortType === item.type }" v-for="(item, index) in sortTypeList"
+        :key="index">
         <span @click="clickFilter(item)">{{ item.name }}</span>
         <template v-if="item.sort">
-          <div
-            class="sort"
-            :class="{ low: params.order === 'low', hight: params.order === 'hight' }"
-          ></div>
+          <div class="sort" :class="{ low: params.order === 'low', hight: params.order === 'hight' }"></div>
         </template>
       </div>
     </div>
@@ -80,21 +61,12 @@
         <div class="room-list">
           <div class="item" v-for="(item, index) in roomList" :key="index" @click="clickRoom(item)">
             <div class="status">
-              <img
-                v-if="item.useStatus === 1"
-                class="icon"
-                src="@/assets/images/home/room-gaming.png"
-                alt=""
-              />
+              <img v-if="item.useStatus === 1" class="icon" src="@/assets/images/home/room-gaming.png" alt="" />
               <img v-else class="icon" src="@/assets/images/home/room-idle.png" alt="" />
               <span class="text">{{ roomUseStatusEnum[item.useStatus] }}</span>
             </div>
             <div class="user-list" v-if="item.currentPlayerCount">
-              <div
-                class="user"
-                v-for="userIndex in Math.min(item.currentPlayerCount, 3)"
-                :key="userIndex"
-              >
+              <div class="user" v-for="userIndex in Math.min(item.currentPlayerCount, 3)" :key="userIndex">
                 <img class="avatar" src="@/assets/images/avatar.png" alt="" />
               </div>
               <div class="user">
@@ -111,10 +83,7 @@
       </template>
     </InfiniteScroll>
     <div class="ba">沪ICP备2026013317号-1</div>
-    <RechargeDialog
-      :show="showRechargeDialog"
-      @toggleShow="showRechargeDialog = $event"
-    ></RechargeDialog>
+    <RechargeDialog :show="showRechargeDialog" @toggleShow="showRechargeDialog = $event"></RechargeDialog>
   </main>
 </template>
 
@@ -143,7 +112,7 @@ const sortTypeList = ref([
   { name: '空闲', type: 'idle' },
   { name: '价格', type: 'price', sort: true },
 ])
-
+const bannerList = ref([])
 const params = ref({
   current: 1,
   pageSize: 20,
@@ -167,7 +136,7 @@ onMounted(() => {
 
 const init = async () => {
   $toast.loading()
-  await Promise.all([getRoomType(), getRoomList(true)])
+  await Promise.all([getRoomType(), getBannerList(), getRoomList(true)])
   $toast.close()
 }
 
@@ -176,6 +145,17 @@ const getRoomType = async () => {
     const res = await api.post('/pinball/homepage/listRoomTypes')
     if (res.code === 200) {
       roomLevelList.value = res.data || []
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+const getBannerList = async () => {
+  try {
+    const res = await api.post('/pinball/banner/listBanner', { bannerType: 1 })
+    if (res.code === 200) {
+      bannerList.value = res.data || []
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -217,6 +197,13 @@ const clickRoomTab = (item) => {
   getRoomList(true)
 }
 
+const clickBanner = (item) => {
+  // console.log(111, item);
+  // if (item.jumpUrl) {
+  //   router.push(item.jumpUrl)
+  // }
+}
+
 const clickFilter = (item) => {
   params.value.sortType = item.type
   // 价格排序
@@ -228,10 +215,6 @@ const clickFilter = (item) => {
     }
   }
   getRoomList(true)
-}
-
-const moreRoomTab = () => {
-  // router.push('');
 }
 
 const clickCheckIn = () => {
@@ -285,7 +268,7 @@ const getUserMarbleAmount = async () => {
     top: 0;
   }
 
-  > div {
+  >div {
     position: relative;
   }
 
@@ -407,14 +390,23 @@ const getUserMarbleAmount = async () => {
   }
 
   .banner {
+    height: .vw(100)[];
     padding: 0 .vw(16) [];
     margin-bottom: .vw(16) [];
 
-    img {
-      width: 100%;
-      border-radius: .vw(16) [];
-      border: .vw(2) [] solid var(--light-text--);
+    .my-swipe {
+      height: 100%;
+      border-radius: .vw(16)[];
       overflow: hidden;
+
+      .van-swipe-item {
+        height: 100%;
+
+        img {
+          width: 100%;
+          max-height: 100%;
+        }
+      }
     }
   }
 
