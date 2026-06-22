@@ -12,7 +12,7 @@
                   <img src="@/assets/images/home/room-bg.png" alt="" />
                 </div>
                 <div class="info">
-                  <p class="room-level">{{ getRoomLevelName(item.roomLevel) }}</p>
+                  <p class="room-level">{{ item.roomName }}</p>
                   <p class="use-ball">消耗弹珠 X{{ formatNumberWithCommas(item.actualMarble) || '-' }}</p>
                   <div class="have">
                     <span class="text">获得</span>
