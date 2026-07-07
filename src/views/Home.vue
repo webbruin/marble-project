@@ -2,7 +2,7 @@
   <main class="home">
     <div class="title">
       <p class="text">弹珠潮玩</p>
-      <div class="ball-count" v-if="marbleAmount">
+      <div class="ball-count">
         <img class="icon" src="@/assets/images/ball.png" alt="" />
         <span class="count">剩余：{{ formatNumberWithCommas(marbleAmount) }}</span>
       </div>

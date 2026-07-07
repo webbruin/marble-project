@@ -55,6 +55,10 @@ onMounted(() => {
   getRecordList(true)
 })
 
+const loadMore = () => {
+  getRecordList()
+}
+
 const getRecordList = async (init) => {
   if (init) {
     params.value.current = 1

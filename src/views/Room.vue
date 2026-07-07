@@ -32,7 +32,7 @@
         </div>
       </div>
       <div class="left-button-list">
-        <div class="button">
+        <div class="button" @click="clickRouter('fault-feedback')">
           <i class="icon">
             <img src="@/assets/images/room/icon7.png" alt="" />
           </i>
@@ -44,6 +44,12 @@
             <i class="check" v-if="false"></i>
           </i>
           <img src="@/assets/images/room/text/ljsb.png" alt="" class="text-icon" />
+        </div>
+        <div class="button">
+          <i class="icon">
+            <img src="@/assets/images/room/icon4.png" alt="" />
+          </i>
+          <img src="@/assets/images/room/text/lxkf.png" alt="" class="text-icon" />
         </div>
       </div>
       <div class="right-button-list" :class="{ collapse: collapse }">
@@ -66,12 +72,6 @@
             </i>
             <img src="@/assets/images/room/text/music-off.png" alt="" class="text-icon" v-if="musicOn" />
             <img src="@/assets/images/room/text/music-on.png" alt="" class="text-icon" v-else />
-          </div>
-          <div class="button">
-            <i class="icon">
-              <img src="@/assets/images/room/icon4.png" alt="" />
-            </i>
-            <img src="@/assets/images/room/text/lxkf.png" alt="" class="text-icon" />
           </div>
           <div class="button" @click="init">
             <i class="icon">
@@ -774,7 +774,7 @@ const clickMember = (item) => {
       align-items: center;
       flex-direction: column;
       position: absolute;
-      top: .vw(190) [];
+      top: .vw(120) [];
       left: .vw(16) [];
 
       .button {
@@ -839,7 +839,7 @@ const clickMember = (item) => {
       align-items: center;
       flex-direction: column;
       position: absolute;
-      top: .vw(104) [];
+      top: .vw(120) [];
       right: .vw(16) [];
 
       &.collapse {
@@ -857,8 +857,8 @@ const clickMember = (item) => {
         }
 
         .icon {
-          width: .vw(48) [];
-          height: .vw(48) [];
+          width: .vw(42) [];
+          height: .vw(42) [];
           display: flex;
           align-items: center;
           justify-content: center;
@@ -867,8 +867,8 @@ const clickMember = (item) => {
           margin-bottom: .vw(4) [];
 
           img {
-            width: .vw(36) [];
-            height: .vw(36) [];
+            width: .vw(28) [];
+            height: .vw(28) [];
           }
         }
 

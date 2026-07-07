@@ -1,50 +1,42 @@
 <template>
   <div class="ranking">
-    <Header title="排行榜"></Header>
+    <Header :title="pickerName" @click="showPicker = true"></Header>
     <div class="top">
       <div class="tabbar">
-        <i
-          class="selected"
-          :style="{ transform: `translateX(calc(86 / 375 * 100vw * ${tabType - 1}))` }"
-        ></i>
-        <div
-          class="item"
-          v-for="(item, index) in tabList"
-          :key="index"
-          @click="clickTab(item.type)"
-        >
+        <i class="selected" :style="{ transform: `translateX(calc(86 / 375 * 100vw * ${tabType - 1}))` }"></i>
+        <div class="item" v-for="(item, index) in tabList" :key="index" @click="clickTab(item.type)">
           {{ item.name }}
         </div>
       </div>
       <div class="rank-level">
         <div class="user" v-if="rankList.length">
-          <div class="item second">
+          <div class="item second" v-if="rankList[1]">
             <div class="avatar">
-              <img src="@/assets/images/avatar.png" alt="" />
+              <img :src="rankList[1].avatar" alt="" />
             </div>
             <p class="name">{{ rankList[1].nickName }}</p>
             <p class="point">
-              <i class="icon"></i>
+              <img :src="iconType" alt="">
               <span class="text">X{{ rankList[1].totalAmount }}</span>
             </p>
           </div>
-          <div class="item first">
+          <div class="item first" v-if="rankList[0]">
             <div class="avatar">
-              <img src="@/assets/images/avatar.png" alt="" />
+              <img :src="rankList[0].avatar" alt="" />
             </div>
             <p class="name">{{ rankList[0].nickName }}</p>
             <p class="point">
-              <i class="icon"></i>
+              <img :src="iconType" alt="">
               <span class="text">X{{ rankList[0].totalAmount }}</span>
             </p>
           </div>
-          <div class="item third">
+          <div class="item third" v-if="rankList[2]">
             <div class="avatar">
-              <img src="@/assets/images/avatar.png" alt="" />
+              <img :src="rankList[2].avatar" alt="" />
             </div>
             <p class="name">{{ rankList[2].nickName }}</p>
             <p class="point">
-              <i class="icon"></i>
+              <img :src="iconType" alt="">
               <span class="text">X{{ rankList[2].totalAmount }}</span>
             </p>
           </div>
@@ -62,43 +54,64 @@
         </div>
         <div class="name">{{ item.nickName }}</div>
         <div class="point">
-          <i class="icon"></i>
+          <img :src="iconType" alt="">
           <span class="text">X{{ item.totalAmount }}</span>
         </div>
       </div>
     </div>
     <div class="footer">
       <div class="user">
-        <div class="index">未上榜</div>
+        <div class="index">{{ selfRank.rank }}</div>
         <div class="avatar">
-          <img src="@/assets/images/avatar.png" alt="" />
+          <img :src="userInfo.avatar" alt="" />
         </div>
-        <div class="name">艾斯君</div>
+        <div class="name">{{ userInfo.nickName }}</div>
         <div class="point">
-          <i class="icon"></i>
-          <span class="text">X823</span>
+          <img :src="iconType" alt="">
+          <span class="text">X{{ formatNumberWithCommas(selfRank.totalAmount) }}</span>
         </div>
       </div>
     </div>
   </div>
+
+  <van-popup v-model:show="showPicker" round position="bottom">
+    <van-picker :columns="enableOpts" show-toolbar title="排行榜类型" @confirm="onPickerConfirm"
+      @cancel="showPicker = false" />
+  </van-popup>
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import Header from '@/components/Header.vue'
+import { formatNumberWithCommas } from '@/utils'
 
-const url = ref('marble') // marble-弹珠中奖排行榜  pointCard-积分卡中奖排行榜
+const url = ref('') // marble-弹珠中奖排行榜  pointCard-积分卡中奖排行榜
 const tabList = ref([
   { name: '日榜', type: 1 },
   { name: '周榜', type: 2 },
   { name: '月榜', type: 3 },
 ])
-const tabType = ref(null)
+const tabType = ref(1)
 const rankList = ref([])
+const userInfo = ref({})
+const showPicker = ref(false)
+const pickerName = ref('')
+
+const enableOpts = [
+  { text: '弹珠中奖排行榜', value: 'marble' },
+  { text: '积分卡中奖排行榜', value: 'pointCard' },
+]
 
 onMounted(() => {
-  clickTab(1)
+  init()
+  userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
 })
+
+const init = async () => {
+  $toast.loading()
+  selectType(enableOpts[0])
+  $toast.close()
+}
 
 const clickTab = (index) => {
   tabType.value = index
@@ -117,6 +130,35 @@ const getRankList = async () => {
     $toast.info('系统错误')
   }
 }
+
+const onPickerConfirm = ({ selectedOptions }) => {
+  showPicker.value = false
+  selectType(selectedOptions[0])
+}
+
+const selectType = (data) => {
+  if (url.value === data.value) {
+    return
+  }
+  url.value = data.value
+  pickerName.value = data.text
+  getRankList()
+}
+
+const iconType = computed(() => {
+  const ball = new URL(`@/assets/images/ball.png`, import.meta.url).href
+  const point = new URL(`@/assets/images/point.png`, import.meta.url).href
+  if (url.value === 'marble') {
+    return ball
+  }
+  if (url.value === 'pointCard') {
+    return point
+  }
+})
+
+const selfRank = computed(() => {
+  return rankList.value.find(item => item.isCurrentUser) || {}
+})
 </script>
 
 <style scoped lang="less">
@@ -224,18 +266,22 @@ const getRankList = async () => {
           .avatar {
             width: .vw(48) [];
             height: .vw(48) [];
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: .vw(48) [];
             border: .vw(2) [] solid #fff;
             box-shadow: 0 .vw(4) [] .vw(4) [] 0 rgba(0, 0, 0, 0.15);
+            overflow: hidden;
             margin-bottom: .vw(8) [];
 
             img {
               width: 100%;
-              height: 100%;
             }
           }
 
           .name {
+            height: .vw(14) [];
             color: var(--light-text--);
             font-family: 'PingFang SC';
             font-size: .vw(14) [];
@@ -249,13 +295,9 @@ const getRankList = async () => {
             display: flex;
             align-items: center;
 
-            .icon {
+            img {
               width: .vw(24) [];
               height: .vw(24) [];
-              background-size: 100%;
-              background-position: center;
-              background-repeat: no-repeat;
-              background-image: url(@/assets/images/point.png);
             }
 
             .text {
@@ -356,11 +398,15 @@ const getRankList = async () => {
       .avatar {
         width: .vw(30) [];
         height: .vw(30) [];
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: .vw(48) [];
+        overflow: hidden;
         margin-right: .vw(8) [];
 
         img {
           width: 100%;
-          height: 100%;
         }
       }
 
@@ -379,13 +425,9 @@ const getRankList = async () => {
         display: flex;
         align-items: center;
 
-        .icon {
+        img {
           width: .vw(24) [];
           height: .vw(24) [];
-          background-size: 100%;
-          background-position: center;
-          background-repeat: no-repeat;
-          background-image: url(@/assets/images/point.png);
         }
 
         .text {
@@ -425,11 +467,15 @@ const getRankList = async () => {
       .avatar {
         width: .vw(30) [];
         height: .vw(30) [];
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: .vw(48) [];
+        overflow: hidden;
         margin-right: .vw(8) [];
 
         img {
           width: 100%;
-          height: 100%;
         }
       }
 
@@ -448,13 +494,9 @@ const getRankList = async () => {
         display: flex;
         align-items: center;
 
-        .icon {
+        img {
           width: .vw(24) [];
           height: .vw(24) [];
-          background-size: 100%;
-          background-position: center;
-          background-repeat: no-repeat;
-          background-image: url(@/assets/images/point.png);
         }
 
         .text {

@@ -19,10 +19,19 @@
       <!-- 地址 -->
       <div class="address">
         <div class="title">
-          <span class="text">请选择地址</span>
-          <i class="arrow"></i>
+          <span class="text">收货地址</span>
+          <!-- <i class="arrow"></i> -->
         </div>
         <div class="info">地址：{{ orderData.recipientAddress }}</div>
+      </div>
+      <!-- 物流 -->
+      <div class="address" v-if="orderData.logistics">
+        <div class="title">
+          <span class="text">物流信息</span>
+        </div>
+        <div class="info">运输状态：{{ orderData.logistics.logisticsStatus }}</div>
+        <div class="info">物流公司：{{ orderData.logistics.logisticsCompany }}</div>
+        <div class="info">物流单号：{{ orderData.logistics.logisticsNo }}</div>
       </div>
       <!-- 配送时间及商品信息 -->
       <div class="sku">
@@ -30,23 +39,23 @@
           <span class="text">{{ orderData.orderStatus <= 1 ? '配送时间' : '送达时间' }}</span>
               <span class="date">(预计3月21日 11:21送达)</span>
         </div>
-        <div class="info" v-if="orderData.items.length">
+        <div class="info" v-if="orderData.items && orderData.items.length">
           <div class="cover-list">
             <div class="cover" v-for="(item, index) in orderData.items" :key="index">
               <img :src="item.productImage" alt="">
               <span class="num">X{{ item.quantity }}</span>
             </div>
           </div>
-          <div class="count">共8件</div>
+          <div class="count">共{{ allCount }}件</div>
         </div>
       </div>
       <!-- 积分 -->
       <div class="total-point">
         <div class="text">合计积分</div>
-        <div class="count">{{ formatNumberWithCommas(formatToTwoDecimals(5513)) }}</div>
+        <div class="count">{{ formatNumberWithCommas(formatToTwoDecimals(orderData.totalAmount)) }}</div>
       </div>
       <!-- 退货审批 -->
-      <div class="return-audit" v-if="orderData.orderStatus >= 4">
+      <div class="return-audit" v-if="orderData.refund">
         <div class="title">退货审批</div>
         <div class="progress">
           <div class="point" :class="{ 'light': true }">提交申请</div>
@@ -58,7 +67,7 @@
         </div>
       </div>
       <!-- 退款信息 -->
-      <div class="return-info">
+      <div class="return-info" v-if="orderData.refund">
         <div class="title">退款信息</div>
         <div class="product-list">
           <div class="product" v-for="(item, index) in 2" :key="index">
@@ -80,7 +89,7 @@
         </div>
       </div>
       <!-- 其他信息 -->
-      <div class="other-info">
+      <div class="other-info" v-if="orderData.refund">
         <div class="row">
           <span class="key">退货原因</span>
           <span class="value bold">商品有破损</span>
@@ -132,6 +141,10 @@ const getOrderDetail = async () => {
     $toast.info('系统错误')
   }
 }
+
+const allCount = computed(() => {
+  return (orderData.value.items || []).map(item => item.quantity).reduce((a, b) => a + b)
+})
 </script>
 
 <style scoped lang="less">

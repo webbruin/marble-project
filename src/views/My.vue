@@ -81,9 +81,9 @@
           <i class="icon service2"></i>
           <p class="text">地址管理</p>
         </div>
-        <div class="item">
+        <div class="item" @click="clickRouter('feedback-record')">
           <i class="icon service4"></i>
-          <p class="text">故障记录</p>
+          <p class="text">反馈记录</p>
         </div>
         <div class="item" @click="clickRouter('setting')">
           <i class="icon service5"></i>
