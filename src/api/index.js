@@ -29,7 +29,10 @@ api.interceptors.response.use(
         location.href = '/login'
       }, 1000)
     } else if (code !== 200) {
-      window.$toast?.info(message || '请求失败')
+      const timer = setTimeout(() => {
+        window.$toast?.info(message || '请求失败')
+        clearTimeout(timer)
+      })
     }
     return response.data
   },

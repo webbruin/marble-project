@@ -2,7 +2,11 @@
   <main class="room">
     <div ref="live-stream" class="live-stream"></div>
     <div class="body">
-      <Header :disabledBack="true" @click="back"></Header>
+      <Header :disabledBack="true" @click="back">
+        <template #right>
+          <div class="room-id">房间：{{ `${tencentRoomId}`.slice(-4) }}</div>
+        </template>
+      </Header>
       <div class="tabbar">
         <div class="room-status">
           <template v-if="userInfo.avatar">
@@ -13,10 +17,8 @@
           </template>
           <span class="text">{{ roomUseStatusEnum[roomInfo.useStatus] }}</span>
         </div>
-
         <div class="status" v-if="sendStatus">{{ sendStatus }}</div>
         <div class="status" v-else-if="countdown">倒计时：{{ countdown }}S</div>
-
         <div class="audience-list" v-if="memberList.length">
           <div class="user" v-for="(item, index) in Math.min(memberList, 3)" :key="index" @click="clickMember(item)">
             <template v-if="item.avatar">
@@ -31,7 +33,27 @@
           </div>
         </div>
       </div>
-      <div class="left-button-list">
+      <!-- 顶部背景板 -->
+      <div class="bg-panel" :class="{ 'no-self-room': watchGame }">
+        <i class="bg"></i>
+        <i class="icon1"></i>
+        <i class="icon2"></i>
+        <div class="info" v-if="!watchGame">
+          <div class="item">
+            <span class="text">倍率</span>
+            <span class="value">{{ gameInfo.multiplier || 1 }}</span>
+          </div>
+          <div class="item">
+            <span class="text">预计积分</span>
+            <span class="value">{{ formatNumberWithCommas(gameInfo.expectedWinPointCard) || 0 }}</span>
+          </div>
+          <div class="item">
+            <span class="text">预计弹珠</span>
+            <span class="value">{{ formatNumberWithCommas(gameInfo.expectedWinMarble) || 0 }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="left-button-list" :class="{ 'no-self-room': watchGame }">
         <div class="button" @click="clickRouter('fault-feedback')">
           <i class="icon">
             <img src="@/assets/images/room/icon7.png" alt="" />
@@ -52,15 +74,15 @@
           <img src="@/assets/images/room/text/lxkf.png" alt="" class="text-icon" />
         </div>
       </div>
-      <div class="right-button-list" :class="{ collapse: collapse }">
+      <div class="right-button-list" :class="{ 'no-self-room': watchGame }">
         <template v-if="!collapse">
-          <div class="button">
+          <div class="button" @click="showGameRule = true">
             <i class="icon">
               <img src="@/assets/images/room/icon1.png" alt="" />
             </i>
             <img src="@/assets/images/room/text/yygz.png" alt="" class="text-icon" />
           </div>
-          <div class="button" @click="clickRouter('point-card-record')">
+          <div class="button" @click="openWinRecord">
             <i class="icon">
               <img src="@/assets/images/room/icon2.png" alt="" />
             </i>
@@ -114,11 +136,11 @@
             <i class="point"></i>
             <span class="count">X{{ formatNumberWithCommas(cardAmount) }}</span>
           </div>
-          <div class="magnification" v-if="gameInfo.multiplier">{{ gameInfo.multiplier }}倍</div>
+          <div class="magnification">{{ gameInfo.multiplier || 1 }}倍</div>
         </div>
         <div class="gaming" :class="{ 'left-hand': handIsLeft }" v-if="isStartGame">
           <div class="left">
-            <p class="desc">已投入5枚弹珠，预计可获得5枚</p>
+            <p class="desc">已投入{{ gameInfo.actualMarble }}枚弹珠，预计可获得{{ gameInfo.expectedWinMarble }}枚</p>
             <div class="buttons">
               <div class="item">
                 <span @click="changeBall(5)">+5</span>
@@ -129,14 +151,14 @@
               <div class="item" @click="changeBall(50)">
                 <span>+50</span>
               </div>
-              <div class="item" @click="changeBall(marbleAmount)">
+              <div class="item" @click="changeBall(roomInfo.maxMarble)">
                 <span>+满</span>
               </div>
               <!-- <div class="item" @click="changeBall(-stepBall)">
                 <img class="sub" src="@/assets/images/room/sub-ball.png" alt="">
               </div> -->
               <div class="item">
-                <input type="number" v-model="ball" @input="ballChange" />
+                <input type="number" v-model="ball" @change="ballChange" />
               </div>
               <div class="item" @click="changeBall(stepBall)">
                 <img class="add" src="@/assets/images/room/add-ball.png" alt="" />
@@ -172,6 +194,57 @@
     </div>
   </div>
 
+  <div class="game-rule-dialog" v-if="showGameRule">
+    <div class="content">
+      <p class="text">游戏规则</p>
+      <div class="desc">
+        <p>一、活动时间</p>
+        <p>
+          即日起 ——
+          活动结束前（具体结束时间将通过小程序公告通知，逾期未参与/未兑换奖励视为自动放弃）
+        </p>
+        <p>二、参与对象 1. 邀请者：本小程序已注册并完成实名认证的用户（无违规记录）；</p>
+        <p>
+          2.
+          被邀请者：未注册过本小程序的新用户（同一手机号、同一设备、同一身份证号视为同一用户，不可重复参与）。
+        </p>
+        <p>三、拉新流程（超简单，3步搞定）</p>
+        <p>1. 邀请者登录小程序，进入【我的】-【拉新有礼】页面，获取专属拉新二维码/邀请链接；</p>
+        <p>2. 邀请者将二维码/链接分享给好友（微信好友、朋友圈均可），邀请好友注册；</p>
+        <p>
+          3.
+          被邀请者通过该二维码/链接，完成小程序注册+实名认证（若有），即视为拉新成功，双方即时解锁对应奖励。
+        </p>
+      </div>
+    </div>
+    <div class="confirm" @click="showGameRule = false">知道了</div>
+  </div>
+
+  <div class="win-record-dialog" v-if="showWinRecord">
+    <div class="content">
+      <p class="title">中奖记录</p>
+      <div class="list-content">
+        <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
+          <template #content>
+            <div class="list">
+              <div class="item" v-for="(item, index) in recordList" :key="index">
+                <div class="info">
+                  <p class="text">中奖时间</p>
+                  <p class="date">{{ item.winTime }}</p>
+                </div>
+                <div class="right">
+                  <p class="price" v-if="item.winCardCount">+{{ item.winCardCount }}积分</p>
+                  <p class="price" v-else-if="item.winMarble">+{{ item.winMarble }}弹珠</p>
+                </div>
+              </div>
+            </div>
+          </template>
+        </InfiniteScroll>
+      </div>
+    </div>
+    <div class="confirm" @click="showWinRecord = false">知道了</div>
+  </div>
+
   <WarnningDialog :show="showWarnningDialog" :level="getRoomLevelName(roomInfo.roomTypeId)" :ball="roomInfo.entryFee"
     @toggleShow="closeWarnningDialog">
   </WarnningDialog>
@@ -202,6 +275,7 @@ import { formatNumberWithCommas, getRoomLevelName } from '@/utils'
 // TRTC资源包
 import '../trtc/lib-generate-test-usersig.min'
 import genTestUserSig from '../trtc/generateTestUserSig'
+import InfiniteScroll from '@/components/InfiniteScroll.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -254,6 +328,14 @@ const watchGame = ref(false)
 const sendStatus = ref('')
 const musicOn = ref(true)
 const memberList = ref([])
+const showGameRule = ref(false)
+const showWinRecord = ref(false)
+// 中奖记录列表
+const recordList = ref([])
+const loading = ref(false)
+const loadOver = ref(false)
+const isEmpty = ref(false)
+
 
 onMounted(() => {
   roomId.value = +route.params.id
@@ -359,7 +441,10 @@ const getRoomDetail = async () => {
           isLockRoom.value = true
         }
         isStartGame.value = true
-        gameInfo.value = res.data.pendingOrder
+        gameInfo.value = {
+          ...gameInfo.value,
+          ...res.data.pendingOrder
+        }
         countdown.value = res.data.lockCountdown
         setCountdown()
         nextTick(() => {
@@ -367,7 +452,11 @@ const getRoomDetail = async () => {
         })
         updateCount()
       } else {
-        showWarnningDialog.value = true
+        const entryRoom = localStorage.getItem('entryRoom')
+        if (entryRoom) {
+          showWarnningDialog.value = true
+          localStorage.removeItem('entryRoom')
+        }
       }
     }
   } catch (e) {
@@ -385,6 +474,7 @@ const startGame = async () => {
       if (!isLockRoom.value) {
         isLockRoom.value = true
       }
+      roomInfo.value.useStatus = 1
       isStartGame.value = true
       gameInfo.value = res.data
       countdown.value = res.data.lockCountdown
@@ -409,7 +499,15 @@ const addMarble = async (marbleCount) => {
       orderId: gameInfo.value.orderId,
     })
     if (res.code === 200) {
-      ball.value = res.data.actualMarble
+      const { actualMarble, lockCountdown, expectedWinMarble, expectedWinPointCard, orderId } = res.data
+      ball.value = actualMarble
+      countdown.value = lockCountdown
+      gameInfo.value = {
+        ...gameInfo.value,
+        expectedWinMarble,
+        expectedWinPointCard,
+        orderId
+      }
       updateCount()
     }
   } catch (e) {
@@ -501,18 +599,41 @@ const sendDanmaku = async () => {
 
 // 中奖记录查询（瀑布式分页）
 const winRecordList = async () => {
+  // 最后一条记录的游戏订单ID
+  const lastOrderId = recordList.value[recordList.value.length - 1]?.orderId || ''
+  if (!lastOrderId) {
+    recordList.value = []
+    loadOver.value = false
+    isEmpty.value = false
+  }
   try {
+    loading.value = true
+    const pageSize = 20
     const res = await api.post('/pinball/room/winRecordList', {
       roomId: roomId.value,
-      pageSize: 20,
-      lastOrderId: null, // 上一页最后一条记录的游戏订单ID（第一页传空）
+      pageSize,
+      lastOrderId, // 上一页最后一条记录的游戏订单ID（第一页传空）
     })
+    loading.value = false
     if (res.code === 200) {
-      // ...
+      const list = res.data.data || []
+      recordList.value = [...recordList.value, ...list]
+      // 加载完毕
+      loadOver.value = list.length < pageSize
+      // 空列表
+      isEmpty.value = loadOver.value && recordList.value.length === 0
+    } else {
+      loadOver.value = true
+      isEmpty.value = true
     }
   } catch (e) {
     $toast.info('系统错误')
+    loading.value = false
   }
+}
+
+const loadMore = () => {
+  winRecordList()
 }
 
 // 解锁
@@ -551,8 +672,8 @@ const changeBall = (value) => {
 
 const ballChange = (event) => {
   let value = +event.target.value
-  value = Math.max(0, value)
-  value = Math.min(marbleAmount.value, value)
+  value = Math.max(roomInfo.value.minMarble, value)
+  value = Math.min(roomInfo.value.maxMarble, value)
   addMarble(value)
 }
 
@@ -627,18 +748,14 @@ const setCountdown = () => {
   }
   startTimer.value = setInterval(() => {
     countdown.value--
-    if (countdown.value > 0) {
+    if (countdown.value > 1) {
       return
     }
     // 倒计时结束，自动发射弹珠
+    stickMovePercent.value = 50
     launchBall()
     isMoveStick.value = false
     stickMovePercent.value = 0
-    // countdown.value = 0
-    // clearInterval(startTimer.value)
-    // 重置订单信息
-    // gameInfo.value = {}
-    // isStartGame.value = false
   }, 1000)
 }
 
@@ -648,6 +765,11 @@ const toggleMusic = () => {
 
 const clickMember = (item) => {
   $toast.info(item.nickName)
+}
+
+const openWinRecord = () => {
+  showWinRecord.value = true
+  winRecordList()
 }
 </script>
 
@@ -679,9 +801,23 @@ const clickMember = (item) => {
 
     .header {
       background-color: transparent;
+      z-index: 1;
+
+      .room-id {
+        color: rgba(#fff, 0.8);
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(14) [];
+        font-weight: 400;
+        font-style: normal;
+        border-radius: .vw(45)[];
+        background-color: rgba(#000, 0.45);
+        padding: .vw(8)[] .vw(16)[];
+      }
     }
 
     .tabbar {
+      height: .vw(30) [];
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -689,6 +825,7 @@ const clickMember = (item) => {
       top: .vw(54) [];
       left: .vw(16) [];
       right: .vw(16) [];
+      z-index: 1;
 
       .room-status {
         height: .vw(30) [];
@@ -697,6 +834,8 @@ const clickMember = (item) => {
         border-radius: .vw(45) [];
         background-color: rgba(#272933, 0.75);
         padding: .vw(3) [] .vw(10) [] .vw(3) [] .vw(4) [];
+        position: absolute;
+        left: 0;
 
         .icon {
           width: .vw(24) [];
@@ -728,11 +867,16 @@ const clickMember = (item) => {
         border-radius: .vw(45) [];
         background-color: rgba(#272933, 0.75);
         padding: .vw(0) [] .vw(12) [];
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
       }
 
       .audience-list {
         display: flex;
         align-items: center;
+        position: absolute;
+        right: 0;
 
         .user {
           width: .vw(24) [];
@@ -768,14 +912,110 @@ const clickMember = (item) => {
       }
     }
 
+    .bg-panel {
+      width: 100%;
+      height: .vw(170)[];
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: #EFA436;
+      overflow: hidden;
+
+      &.no-self-room {
+        height: .vw(110)[];
+      }
+
+      .bg {
+        width: .vw(262)[];
+        height: .vw(298)[];
+        background-size: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-image: url(@/assets/images/room/bg-panel.png);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .icon1 {
+        width: .vw(60)[];
+        height: .vw(77)[];
+        background-size: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-image: url(@/assets/images/room/bg-panel-icon.png);
+        position: absolute;
+        left: .vw(80)[];
+        top: .vw(5)[];
+      }
+
+      .icon2 {
+        width: .vw(111)[];
+        height: .vw(64)[];
+        background-size: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-image: url(@/assets/images/room/bg-panel-text.png);
+        position: absolute;
+        left: .vw(147)[];
+        top: .vw(8)[];
+      }
+
+      .info {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        position: absolute;
+        top: .vw(90)[];
+
+        .item {
+          display: flex;
+          flex-direction: column;
+
+          .text {
+            color: #641D03;
+            font-family: 'PingFang SC';
+            font-size: .vw(16) [];
+            line-height: .vw(16) [];
+            font-weight: 600;
+            font-style: normal;
+            margin-bottom: .vw(6)[];
+          }
+
+          .value {
+            width: .vw(92)[];
+            height: .vw(48)[];
+            color: #FFD5D5;
+            font-family: 'PingFang SC';
+            font-size: .vw(24) [];
+            line-height: .vw(24) [];
+            font-weight: 600;
+            font-style: normal;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: .vw(8)[];
+            border: 1px solid #FF7716;
+            background-color: #641D03;
+          }
+        }
+      }
+    }
+
     .left-button-list {
       width: .vw(64) [];
       display: flex;
       align-items: center;
       flex-direction: column;
       position: absolute;
-      top: .vw(120) [];
+      top: .vw(190) [];
       left: .vw(16) [];
+
+      &.no-self-room {
+        top: .vw(130) [];
+      }
 
       .button {
         width: 100%;
@@ -839,11 +1079,11 @@ const clickMember = (item) => {
       align-items: center;
       flex-direction: column;
       position: absolute;
-      top: .vw(120) [];
+      top: .vw(190) [];
       right: .vw(16) [];
 
-      &.collapse {
-        top: .vw(190) [];
+      &.no-self-room {
+        top: .vw(130) [];
       }
 
       .button {
@@ -1327,6 +1567,227 @@ const clickMember = (item) => {
       border: 1px solid #ff3a64;
       background: linear-gradient(90deg, #fd689a 0%, #ffab2d 100%);
     }
+  }
+}
+
+.game-rule-dialog {
+  width: 100vw;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgba(#000311, 0.45);
+  position: fixed;
+  z-index: 10001;
+  left: 0;
+  top: 0;
+
+  .content {
+    width: .vw(358) [];
+    height: .vw(553) [];
+    display: flex;
+    flex-direction: column;
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(@/assets/images/invitation/new-user-dialog-bg.png);
+    position: relative;
+    z-index: 10002;
+    padding: .vw(32) [] .vw(19) [] .vw(16) [] .vw(19) [];
+    margin-bottom: .vw(13) [];
+
+    &::before {
+      content: '';
+      width: .vw(96) [];
+      height: .vw(85) [];
+      background-size: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-image: url(@/assets/images/invitation/new-user-dialog-icon.png);
+      position: absolute;
+      top: .vw(-7) [];
+      right: .vw(14) [];
+    }
+
+    .text {
+      color: var(--light-text--);
+      font-family: 'PingFang SC';
+      font-size: .vw(30) [];
+      line-height: .vw(30) [];
+      letter-spacing: .vw(5) [];
+      font-weight: 900;
+      font-style: normal;
+      margin-left: .vw(9) [];
+      margin-bottom: .vw(17) [];
+    }
+
+    .desc {
+      flex: 1;
+      border-radius: .vw(24) [];
+      border: .vw(2) [] solid var(--white--);
+      background: linear-gradient(180deg,
+          rgba(255, 255, 255, 0.24) 0%,
+          rgba(255, 255, 255, 0.75) 100%);
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: .vw(16) [] .vw(20) [];
+
+      p {
+        color: #50525c;
+        font-family: 'PingFang SC';
+        font-size: .vw(14) [];
+        line-height: .vw(22) [];
+        font-weight: 500;
+        font-style: normal;
+      }
+    }
+  }
+
+  .confirm {
+    width: .vw(292) [];
+    height: .vw(48) [];
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white--);
+    font-size: .vw(16) [];
+    line-height: .vw(16) [];
+    font-weight: 500;
+    font-style: normal;
+    border-radius: .vw(45) [];
+    border: 1px solid #ff3a64;
+    background: linear-gradient(90deg, #fd689a 0%, #ffab2d 100%);
+  }
+}
+
+.win-record-dialog {
+  width: 100vw;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgba(#000311, 0.45);
+  position: fixed;
+  z-index: 10001;
+  left: 0;
+  top: 0;
+
+  .content {
+    width: .vw(358) [];
+    height: .vw(553) [];
+    display: flex;
+    flex-direction: column;
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(@/assets/images/invitation/new-user-dialog-bg.png);
+    position: relative;
+    z-index: 10002;
+    padding: .vw(32) [] .vw(19) [] .vw(16) [] .vw(19) [];
+    margin-bottom: .vw(13) [];
+
+    &::before {
+      content: '';
+      width: .vw(96) [];
+      height: .vw(85) [];
+      background-size: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-image: url(@/assets/images/invitation/new-user-dialog-icon.png);
+      position: absolute;
+      top: .vw(-7) [];
+      right: .vw(14) [];
+    }
+
+    .title {
+      color: var(--light-text--);
+      font-family: 'PingFang SC';
+      font-size: .vw(30) [];
+      line-height: .vw(30) [];
+      letter-spacing: .vw(5) [];
+      font-weight: 900;
+      font-style: normal;
+      margin-left: .vw(9) [];
+      margin-bottom: .vw(17) [];
+    }
+
+    .list-content {
+      flex: 1;
+      border-radius: .vw(24) [];
+      border: .vw(2) [] solid var(--white--);
+      background: linear-gradient(180deg,
+          rgba(255, 255, 255, 0.24) 0%,
+          rgba(255, 255, 255, 0.75) 100%);
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: .vw(13) [] .vw(16) [];
+
+      .list {
+        .item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-radius: .vw(9) [];
+          background-color: #fff;
+          padding: .vw(16) [];
+
+          &:not(:last-of-type) {
+            margin-bottom: .vw(8) [];
+          }
+
+          .info {
+            .text {
+              color: var(--light-text--);
+              font-family: 'PingFang SC';
+              font-size: .vw(16) [];
+              line-height: .vw(16) [];
+              font-weight: 500;
+              font-style: normal;
+              margin-bottom: .vw(8) [];
+            }
+
+            .date {
+              color: var(--text--);
+              font-family: 'PingFang SC';
+              font-size: .vw(14) [];
+              line-height: .vw(14) [];
+              font-weight: 400;
+              font-style: normal;
+            }
+          }
+
+          .right {
+            .price {
+              color: #f20c32;
+              font-family: 'PingFang SC';
+              font-size: .vw(16) [];
+              line-height: .vw(16) [];
+              font-weight: 500;
+              font-style: normal;
+              text-align: center;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .confirm {
+    width: .vw(292) [];
+    height: .vw(48) [];
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white--);
+    font-size: .vw(16) [];
+    line-height: .vw(16) [];
+    font-weight: 500;
+    font-style: normal;
+    border-radius: .vw(45) [];
+    border: 1px solid #ff3a64;
+    background: linear-gradient(90deg, #fd689a 0%, #ffab2d 100%);
   }
 }
 </style>

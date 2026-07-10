@@ -28,13 +28,7 @@
       </div>
       <div class="item">
         <p class="text">生日</p>
-        <Input
-          v-model="formdata.birthday"
-          :readonly="true"
-          type="text"
-          placeholder="请输入"
-          @click="clickBirthday"
-        >
+        <Input v-model="formdata.birthday" :readonly="true" type="text" placeholder="请输入" @click="clickBirthday">
           <template #right>
             <img src="@/assets/images/calendar.png" alt="" class="icon" />
           </template>
@@ -48,14 +42,8 @@
   </main>
 
   <van-popup v-model:show="showDatePicker" round position="bottom">
-    <van-date-picker
-      title="选择日期"
-      :min-date="minDate"
-      :max-date="maxDate"
-      :value="formdata.birthday"
-      @cancel="birthdayVisible"
-      @confirm="birthdayChange"
-    />
+    <van-date-picker title="选择日期" :min-date="minDate" :max-date="maxDate" :value="formdata.birthday"
+      @cancel="birthdayVisible" @confirm="birthdayChange" />
   </van-popup>
 </template>
 

@@ -16,7 +16,7 @@
         <img class="icon" src="@/assets/images/home/other-icon.png" alt="" v-else />
         <span class="text" :class="{ light: params.roomTypeId == item.roomTypeId }">{{
           item.roomTypeName
-        }}</span>
+          }}</span>
       </div>
     </div>
     <div class="banner">
@@ -73,6 +73,7 @@
                 <span class="count">{{ item.currentPlayerCount }}</span>
               </div>
             </div>
+            <div class="room-id">房间：{{ item.tencentRoomId.slice(-4) }}</div>
             <div class="room-name">{{ item.roomName }}</div>
             <div class="room-ball">
               <img class="icon" src="@/assets/images/ball.png" alt="" />
@@ -232,6 +233,7 @@ const clickRoom = (item) => {
   }
   const { id, tencentRoomId } = item
   router.push({ name: 'room', params: { id }, query: { tencentRoomId } })
+  localStorage.setItem('entryRoom', true)
 }
 
 // 查询当前用户弹珠余额
@@ -744,6 +746,21 @@ const getUserMarbleAmount = async () => {
             background-color: rgba(#000000, 0.75);
           }
         }
+      }
+
+      .room-id {
+        color: var(--white--);
+        font-family: 'PingFang SC';
+        font-size: .vw(12) [];
+        line-height: .vw(12) [];
+        font-weight: 400;
+        font-style: normal;
+        border-radius: .vw(45)[];
+        background-color: rgba(#272933, 0.75);
+        padding: .vw(3) [] .vw(8) [];
+        position: absolute;
+        top: .vw(12) [];
+        right: .vw(6) [];
       }
 
       .room-name {

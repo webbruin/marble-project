@@ -10,13 +10,13 @@
         <div class="title">邀请好友</div>
         <div class="info">
           <div class="people">
-            <div class="count">{{ inviteInfo.invitedCount }}</div>
+            <div class="count">{{ inviteInfo.invitedCount || 0 }}</div>
             <div class="desc">已邀请人数</div>
           </div>
           <div class="price">
             <div class="count">
-              ￥{{ formatNumberWithCommas(1135) }}
-              <span class="withdrawal">提现</span>
+              ￥{{ formatNumberWithCommas(inviteInfo.totalWithdrawAmount || 0) }}
+              <span class="withdrawal" @click="clickWithdraw">提现</span>
             </div>
             <div class="desc">已奖励金额</div>
           </div>
@@ -39,11 +39,11 @@
                     <img src="@/assets/images/avatar.png" alt="" />
                   </div>
                   <div class="info">
-                    <p class="name">{{ item.inviteeNickName }}</p>
+                    <p class="name">{{ item.inviteeNickName || '-' }}</p>
                     <p class="id">ID：{{ item.inviteeUserId }}</p>
                   </div>
                 </div>
-                <div class="price">￥{{ formatNumberWithCommas(84511) }}</div>
+                <div class="price">￥{{ formatNumberWithCommas(8888) }}</div>
                 <div class="date">{{ item.inviteTime }}</div>
               </div>
             </template>
@@ -113,9 +113,10 @@ const router = useRouter()
 const params = ref({
   current: 1,
   pageSize: 20,
-  activityId: 1, // 活动ID
+  activityId: '', // 活动ID
   recordStatus: '', // 整体状态：1-进行中，2-成功，3-失败
 })
+const activityList = ref([])
 const inviteInfo = ref({})
 const inviteList = ref([])
 const loading = ref(false)
@@ -132,6 +133,7 @@ onMounted(() => {
 
 const init = async () => {
   $toast.loading()
+  await getInvitationActivityCurrent()
   await getInvitationSummary()
   await getInvitationList(true)
   $toast.close()
@@ -139,6 +141,18 @@ const init = async () => {
 
 const loadMore = () => {
   getInvitationList()
+}
+
+const getInvitationActivityCurrent = async () => {
+  try {
+    const res = await api.post('/pinball/invitation/activity/current')
+    if (res.code === 200) {
+      activityList.value = res.data
+      params.value.activityId = activityList.value[0].activityId
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
 }
 
 const getInvitationSummary = async () => {
@@ -154,6 +168,9 @@ const getInvitationSummary = async () => {
 }
 
 const getInvitationList = async (init) => {
+  if (!params.value.activityId) {
+    return
+  }
   if (init) {
     params.value.current = 1
     inviteList.value = []
@@ -180,10 +197,6 @@ const getInvitationList = async (init) => {
 }
 
 const clickShare = async () => {
-  // if (false) {
-  //   showRealNameAuth.value = true
-  //   return
-  // }
   try {
     const { activityId } = params.value
     const res = await api.post('/pinball/invitation/code/generate', { activityId })
@@ -199,6 +212,10 @@ const clickShare = async () => {
 const clickRealNameAuth = () => {
   showRealNameAuth.value = false
   router.push({ name: 'real-name-auth' })
+}
+
+const clickWithdraw = async () => {
+  // router.push({ name: 'withdraw' })
 }
 </script>
 
@@ -628,11 +645,9 @@ const clickRealNameAuth = () => {
       flex: 1;
       border-radius: .vw(24) [];
       border: .vw(2) [] solid var(--white--);
-      background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.24) 0%,
-        rgba(255, 255, 255, 0.75) 100%
-      );
+      background: linear-gradient(180deg,
+          rgba(255, 255, 255, 0.24) 0%,
+          rgba(255, 255, 255, 0.75) 100%);
       overflow-x: hidden;
       overflow-y: auto;
       padding: .vw(16) [] .vw(20) [];

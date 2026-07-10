@@ -101,8 +101,21 @@ const router = createRouter({
       name: 'order-detail',
       component: () => import('../views/OrderDetail.vue'),
     },
-    { path: '/feedback-record', name: 'feedback-record', component: () => import('../views/FeedbackRecord.vue') },
-    { path: '/fault-feedback', name: 'fault-feedback', component: () => import('../views/FaultFeedback.vue') },
+    {
+      path: '/feedback-record',
+      name: 'feedback-record',
+      component: () => import('../views/FeedbackRecord.vue'),
+    },
+    {
+      path: '/fault-feedback',
+      name: 'fault-feedback',
+      component: () => import('../views/FaultFeedback.vue'),
+    },
+    {
+      path: '/alipay-callback',
+      name: 'alipay-callback',
+      component: () => import('../views/AlipayCallback.vue'),
+    },
     // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/404.vue') },
   ],
