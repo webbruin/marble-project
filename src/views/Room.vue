@@ -140,7 +140,7 @@
         </div>
         <div class="gaming" :class="{ 'left-hand': handIsLeft }" v-if="isStartGame">
           <div class="left">
-            <p class="desc">已投入{{ gameInfo.actualMarble }}枚弹珠，预计可获得{{ gameInfo.expectedWinMarble }}枚</p>
+            <p class="desc">已投入{{ ball }}枚弹珠，预计可获得{{ gameInfo.expectedWinMarble }}枚</p>
             <div class="buttons">
               <div class="item">
                 <span @click="changeBall(5)">+5</span>
@@ -167,7 +167,7 @@
           </div>
           <div class="right">
             <div class="change-hand" @click="handIsLeft = !handIsLeft">
-              切换{{ handIsLeft ? '右手' : '左手' }}
+              切换{{ handIsLeft ? '右手' : '左手' }}-{{ addMax }}
             </div>
             <div class="joy-stick">
               <i class="stick" :class="{ left: handIsLeft, right: !handIsLeft }" ref="stickRef"
@@ -335,6 +335,8 @@ const recordList = ref([])
 const loading = ref(false)
 const loadOver = ref(false)
 const isEmpty = ref(false)
+// 本局剩余投递上线
+const addMax = ref(0)
 
 
 onMounted(() => {
@@ -426,6 +428,7 @@ const getRoomDetail = async () => {
     if (res.code === 200) {
       roomInfo.value = res.data
       ball.value = roomInfo.value.entryFee
+      addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
       stepBall.value = roomInfo.value.entryFee
       // 查询弹幕列表
       queryDanmaku()
@@ -492,6 +495,10 @@ const startGame = async () => {
 
 // 弹珠加投
 const addMarble = async (marbleCount) => {
+  if (marbleCount < 1) {
+    $toast.info(`本局已加投${ball.value}颗弹珠，已达本局加投上限`)
+    return
+  }
   try {
     const res = await api.post('/pinball/room/addMarble', {
       roomId: roomId.value,
@@ -501,6 +508,7 @@ const addMarble = async (marbleCount) => {
     if (res.code === 200) {
       const { actualMarble, lockCountdown, expectedWinMarble, expectedWinPointCard, orderId } = res.data
       ball.value = actualMarble
+      addMax.value = roomInfo.value.maxMarble - actualMarble
       countdown.value = lockCountdown
       gameInfo.value = {
         ...gameInfo.value,
@@ -548,6 +556,7 @@ const launchBall = async () => {
       // 重置订单信息
       gameInfo.value = {}
       isStartGame.value = false
+      addMax.value = 0
     }
   } catch (e) {
     gaming.value = false
@@ -666,14 +675,17 @@ const getMemberList = async () => {
   }
 }
 
-const changeBall = (value) => {
+const changeBall = (event) => {
+  let value = event
+  value = Math.max(roomInfo.value.minMarble, value)
+  value = Math.min(addMax.value, value)
   addMarble(value)
 }
 
 const ballChange = (event) => {
   let value = +event.target.value
   value = Math.max(roomInfo.value.minMarble, value)
-  value = Math.min(roomInfo.value.maxMarble, value)
+  value = Math.min(addMax.value, value)
   addMarble(value)
 }
 
