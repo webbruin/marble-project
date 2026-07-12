@@ -36,21 +36,21 @@
         <p class="entry" @click="clickRouter('order')">查看全部订单</p>
       </div>
       <div class="status">
-        <div class="item" @click="clickRouter('order', { type: 'pending' })">
+        <div class="item" @click="clickRouter('order', { status: 1 })">
           <i class="icon status1"></i>
-          <p class="text">待付款</p>
+          <p class="text">已支付</p>
         </div>
-        <div class="item" @click="clickRouter('order', { type: 'shipment' })">
+        <div class="item" @click="clickRouter('order', { status: 2 })">
           <i class="icon status2"></i>
-          <p class="text">待发货</p>
+          <p class="text">已发货</p>
         </div>
-        <div class="item" @click="clickRouter('order', { type: 'beReceived' })">
+        <div class="item" @click="clickRouter('order', { status: 3 })">
           <i class="icon status3"></i>
-          <p class="text">待收货</p>
+          <p class="text">已收货</p>
         </div>
-        <div class="item" @click="clickRouter('order', { type: 'refunded' })">
+        <div class="item" @click="clickRouter('order', { status: 4 })">
           <i class="icon status4"></i>
-          <p class="text">退款/售后</p>
+          <p class="text">退款中</p>
         </div>
       </div>
     </div>
@@ -82,7 +82,7 @@
           <p class="text">地址管理</p>
         </div>
         <div class="item" @click="clickRouter('invitation')">
-          <i class="icon service5"></i>
+          <i class="icon service8"></i>
           <p class="text">邀请好友</p>
         </div>
         <div class="item" @click="clickRouter('feedback-record')">
@@ -138,7 +138,7 @@ const clickRouter = (name, params = {}, query = {}) => {
   if (!name) {
     return
   }
-  router.push({ name, params, query })
+  router.push({ name, params: params, query: query })
 }
 </script>
 
@@ -503,6 +503,10 @@ const clickRouter = (name, params = {}, query = {}) => {
 
           &.service7 {
             background-image: url(@/assets/images/my/service7.png);
+          }
+
+          &.service8 {
+            background-image: url(@/assets/images/my/service8.png);
           }
         }
 

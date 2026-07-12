@@ -9,12 +9,14 @@
       </Header>
       <div class="tabbar">
         <div class="room-status">
-          <template v-if="userInfo.avatar">
-            <img class="icon" :src="userInfo.avatar" alt="" />
-          </template>
-          <template v-else>
-            <img class="icon" src="@/assets/images/avatar.png" alt="" />
-          </template>
+          <div class="icon">
+            <template v-if="roomInfo.currentPlayer?.avatar">
+              <img :src="roomInfo.currentPlayer.avatar" alt="" />
+            </template>
+            <template v-else>
+              <img src="@/assets/images/avatar.png" alt="" />
+            </template>
+          </div>
           <span class="text">{{ roomUseStatusEnum[roomInfo.useStatus] }}</span>
         </div>
         <div class="status" v-if="sendStatus">{{ sendStatus }}</div>
@@ -41,7 +43,7 @@
         <div class="info" v-if="!watchGame">
           <div class="item">
             <span class="text">倍率</span>
-            <span class="value">{{ gameInfo.multiplier || 1 }}</span>
+            <span class="value">{{ gameInfo.multiplier || 0 }}</span>
           </div>
           <div class="item">
             <span class="text">预计积分</span>
@@ -54,13 +56,13 @@
         </div>
       </div>
       <div class="left-button-list" :class="{ 'no-self-room': watchGame }">
-        <div class="button" @click="clickRouter('fault-feedback')">
+        <div class="button" v-if="!watchGame" @click="clickRouter('fault-feedback')">
           <i class="icon">
             <img src="@/assets/images/room/icon7.png" alt="" />
           </i>
           <img src="@/assets/images/room/text/gzbg.png" alt="" class="text-icon" />
         </div>
-        <div class="button" @click="showBluetoothConnect = true">
+        <div class="button" v-if="!watchGame" @click="showBluetoothConnect = true">
           <i class="icon">
             <img src="@/assets/images/room/icon8.png" alt="" />
             <i class="check" v-if="false"></i>
@@ -82,7 +84,7 @@
             </i>
             <img src="@/assets/images/room/text/yygz.png" alt="" class="text-icon" />
           </div>
-          <div class="button" @click="openWinRecord">
+          <div class="button" v-if="!watchGame" @click="openWinRecord">
             <i class="icon">
               <img src="@/assets/images/room/icon2.png" alt="" />
             </i>
@@ -95,12 +97,6 @@
             <img src="@/assets/images/room/text/music-off.png" alt="" class="text-icon" v-if="musicOn" />
             <img src="@/assets/images/room/text/music-on.png" alt="" class="text-icon" v-else />
           </div>
-          <div class="button" @click="init">
-            <i class="icon">
-              <img src="@/assets/images/room/icon5.png" alt="" />
-            </i>
-            <img src="@/assets/images/room/text/sx.png" alt="" class="text-icon" />
-          </div>
         </template>
         <div class="button" @click="collapse = !collapse">
           <i class="icon">
@@ -112,7 +108,7 @@
       </div>
       <!-- 弹幕 -->
       <div class="danmaku" :class="{ 'start-game': isStartGame }">
-        <div ref="danmaku-list" class="list" v-if="danmakuCollapse && danmakuList.length">
+        <div ref="danmaku-list" class="list" v-show="danmakuCollapse && danmakuList.length">
           <div class="item" v-for="(item, index) in danmakuList" :key="index">
             {{ item.content }}
           </div>
@@ -136,9 +132,8 @@
             <i class="point"></i>
             <span class="count">X{{ formatNumberWithCommas(cardAmount) }}</span>
           </div>
-          <div class="magnification">{{ gameInfo.multiplier || 1 }}倍</div>
         </div>
-        <div class="gaming" :class="{ 'left-hand': handIsLeft }" v-if="isStartGame">
+        <div class="gaming" :class="{ 'left-hand': handIsLeft, 'no-game': gaming }" v-if="isStartGame">
           <div class="left">
             <p class="desc">已投入{{ ball }}枚弹珠，预计可获得{{ gameInfo.expectedWinMarble }}枚</p>
             <div class="buttons">
@@ -154,9 +149,6 @@
               <div class="item" @click="changeBall(roomInfo.maxMarble)">
                 <span>+满</span>
               </div>
-              <!-- <div class="item" @click="changeBall(-stepBall)">
-                <img class="sub" src="@/assets/images/room/sub-ball.png" alt="">
-              </div> -->
               <div class="item">
                 <input type="number" v-model="ball" @change="ballChange" />
               </div>
@@ -167,7 +159,7 @@
           </div>
           <div class="right">
             <div class="change-hand" @click="handIsLeft = !handIsLeft">
-              切换{{ handIsLeft ? '右手' : '左手' }}-{{ addMax }}
+              切换{{ handIsLeft ? '右手' : '左手' }}
             </div>
             <div class="joy-stick">
               <i class="stick" :class="{ left: handIsLeft, right: !handIsLeft }" ref="stickRef"
@@ -271,10 +263,10 @@ import TRTC from 'trtc-sdk-v5'
 import WarnningDialog from '@/components/WarnningDialog.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import BallSuccess from '@/components/BallSuccess.vue'
-import { formatNumberWithCommas, getRoomLevelName } from '@/utils'
+import { formatNumberWithCommas, getRoomLevelName, formatTimestamp } from '@/utils'
 // TRTC资源包
-import '../trtc/lib-generate-test-usersig.min'
-import genTestUserSig from '../trtc/generateTestUserSig'
+import '@/trtc/lib-generate-test-usersig.min'
+import genTestUserSig from '@/trtc/generateTestUserSig'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
 
 const route = useRoute()
@@ -283,17 +275,18 @@ const router = useRouter()
 // 房间使用状态枚举：0-空闲，1-使用中，10-故障，11-下线
 const roomUseStatusEnum = {
   0: '空闲',
-  1: '使用中',
+  1: '游戏中',
   10: '故障',
   11: '下线',
+  12: '调试中',
 }
 
 const SDK_APP_ID = 1600137711
 const SDK_SECRET_KEY = '46d4f2ecbf0e69bd53f7403056d9c0fe9319bc69e8bdadc2ea529de8ca051ec7'
 
-const roomId = ref(null)
-const tencentRoomId = ref(null)
-const userInfo = ref({})
+const roomId = ref(+route.params.id)
+const tencentRoomId = ref(+route.query.tencentRoomId)
+const userInfo = ref(JSON.parse(localStorage.getItem('userInfo')) || {})
 const marbleAmount = ref(0)
 const cardAmount = ref(0)
 const collapse = ref(false)
@@ -337,16 +330,31 @@ const loadOver = ref(false)
 const isEmpty = ref(false)
 // 本局剩余投递上线
 const addMax = ref(0)
+// 进入房间时间
+const enterRoomTime = ref(formatTimestamp(new Date()))
+const pollingRoomStatusTimer = ref(null)
+const pollingDanmakuTimer = ref(null)
 
 
 onMounted(() => {
-  roomId.value = +route.params.id
-  tencentRoomId.value = +route.query.tencentRoomId
-  userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
   init()
+  // 轮询：房间当前状态
+  pollingRoomStatusTimer.value = setInterval(() => {
+    getRoomStatus()
+  }, 5000)
+  // 轮询：弹幕列表
+  pollingDanmakuTimer.value = setInterval(() => {
+    queryDanmaku()
+  }, 5000)
 })
 
 onBeforeUnmount(() => {
+  if (pollingRoomStatusTimer.value) {
+    clearInterval(pollingRoomStatusTimer.value)
+  }
+  if (pollingDanmakuTimer.value) {
+    clearInterval(pollingDanmakuTimer.value)
+  }
   if (startTimer.value) {
     clearInterval(startTimer.value)
   }
@@ -366,8 +374,13 @@ const back = () => {
 
 const init = async () => {
   $toast.loading()
-  updateCount()
   await Promise.all([getRoomDetail(), createRoom()])
+  $toast.close()
+}
+
+const reload = async () => {
+  $toast.loading()
+  await getRoomDetail()
   $toast.close()
 }
 
@@ -426,34 +439,44 @@ const getRoomDetail = async () => {
   try {
     const res = await api.post('/pinball/room/getRoomDetail', { roomId: roomId.value })
     if (res.code === 200) {
+      const { useStatus, self, pendingOrder, lockCountdown } = res.data
+      if (useStatus > 1) {
+        $modal.show({
+          content: `房间${roomUseStatusEnum[useStatus]}，请选择其他房间`,
+          showCancel: false,
+          onConfirm: () => {
+            router.back()
+          },
+        })
+        return
+      }
+      sendStatus.value = ''
       roomInfo.value = res.data
       ball.value = roomInfo.value.entryFee
       addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
       stepBall.value = roomInfo.value.entryFee
-      // 查询弹幕列表
-      queryDanmaku()
+      // 查询观战人列表
       getMemberList()
       // 当前是否观战
-      if (res.data.self === 0 && res.data.useStatus === 1) {
+      if (self === 0 && useStatus === 1) {
         watchGame.value = true
         return
       }
       // 存在已开局的游戏
-      if (res.data.pendingOrder) {
+      if (pendingOrder) {
         if (!isLockRoom.value) {
           isLockRoom.value = true
         }
         isStartGame.value = true
         gameInfo.value = {
           ...gameInfo.value,
-          ...res.data.pendingOrder
+          ...pendingOrder
         }
-        countdown.value = res.data.lockCountdown
+        countdown.value = lockCountdown
         setCountdown()
         nextTick(() => {
           initStickEvent()
         })
-        updateCount()
       } else {
         const entryRoom = localStorage.getItem('entryRoom')
         if (entryRoom) {
@@ -461,6 +484,10 @@ const getRoomDetail = async () => {
           localStorage.removeItem('entryRoom')
         }
       }
+      updateCount()
+    } else {
+      // 把当前房间状态置为故障
+      roomInfo.value.useStatus = 10
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -478,6 +505,10 @@ const startGame = async () => {
         isLockRoom.value = true
       }
       roomInfo.value.useStatus = 1
+      if (!roomInfo.value.currentPlayer) {
+        const { avatar, nickName, userId } = userInfo.value
+        roomInfo.value.currentPlayer = { avatar, nickName, userId }
+      }
       isStartGame.value = true
       gameInfo.value = res.data
       countdown.value = res.data.lockCountdown
@@ -487,6 +518,9 @@ const startGame = async () => {
         initStickEvent()
       })
       updateCount()
+    }
+    else if (res.code === 500 && res.message === '房间已被占用') {
+      reload()
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -556,21 +590,32 @@ const launchBall = async () => {
       // 重置订单信息
       gameInfo.value = {}
       isStartGame.value = false
-      addMax.value = 0
+      addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
+      ball.value = roomInfo.value.entryFee
     }
   } catch (e) {
-    gaming.value = false
     $toast.info('系统错误')
+    sendStatus.value = ''
+    gaming.value = false
+    // 重置订单信息
+    gameInfo.value = {}
+    isStartGame.value = false
+    addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
+    ball.value = roomInfo.value.entryFee
   }
 }
 
 // 查询弹幕消息列表
 const queryDanmaku = async () => {
+  const { danmakuId, createTime } = danmakuList.value[danmakuList.value.length - 1] || {}
   try {
     const res = await api.post('/pinball/room/queryDanmaku', {
       roomId: roomId.value,
       limit: 100, // 查询条数（最大100）
       sortType: 0, // 0-创建时间倒序（默认），1-创建时间正序
+      enterRoomTime: enterRoomTime.value,
+      // lastCreateTime: createTime,
+      // lastDanmakuId: danmakuId,
     })
     if (res.code === 200) {
       danmakuList.value = res.data || []
@@ -675,6 +720,32 @@ const getMemberList = async () => {
   }
 }
 
+// 获取房间使用状态
+const getRoomStatus = async () => {
+  try {
+    const res = await api.post('/pinball/room/getRoomStatus', {
+      roomId: roomId.value,
+    })
+    if (res.code === 200) {
+      if (res.data === 0) {
+        reload()
+      }
+      if (res.data > 1) {
+        clearInterval(pollingRoomStatusTimer.value)
+        $modal.show({
+          content: `房间${roomUseStatusEnum[res.data]}，请选择其他房间`,
+          showCancel: false,
+          onConfirm: () => {
+            router.back()
+          },
+        })
+      }
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
 const changeBall = (event) => {
   let value = event
   value = Math.max(roomInfo.value.minMarble, value)
@@ -760,7 +831,7 @@ const setCountdown = () => {
   }
   startTimer.value = setInterval(() => {
     countdown.value--
-    if (countdown.value > 1) {
+    if (countdown.value > 2) {
       return
     }
     // 倒计时结束，自动发射弹珠
@@ -810,6 +881,7 @@ const openWinRecord = () => {
     height: 100%;
     position: relative;
     z-index: 1;
+    overflow: hidden;
 
     .header {
       background-color: transparent;
@@ -851,9 +923,17 @@ const openWinRecord = () => {
 
         .icon {
           width: .vw(24) [];
-          max-height: .vw(24) [];
+          height: .vw(24) [];
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
           border-radius: 50%;
           margin-right: .vw(6) [];
+
+          img {
+            width: .vw(24) [];
+          }
         }
 
         .text {
@@ -926,7 +1006,7 @@ const openWinRecord = () => {
 
     .bg-panel {
       width: 100%;
-      height: .vw(170)[];
+      height: .vw(160)[];
       position: absolute;
       left: 0;
       top: 0;
@@ -998,7 +1078,7 @@ const openWinRecord = () => {
 
           .value {
             width: .vw(92)[];
-            height: .vw(48)[];
+            height: .vw(38)[];
             color: #FFD5D5;
             font-family: 'PingFang SC';
             font-size: .vw(24) [];
@@ -1022,11 +1102,11 @@ const openWinRecord = () => {
       align-items: center;
       flex-direction: column;
       position: absolute;
-      top: .vw(190) [];
+      top: .vw(180) [];
       left: .vw(16) [];
 
       &.no-self-room {
-        top: .vw(130) [];
+        top: .vw(120) [];
       }
 
       .button {
@@ -1036,12 +1116,12 @@ const openWinRecord = () => {
         flex-direction: column;
 
         &:not(:last-of-type) {
-          margin-bottom: .vw(18) [];
+          margin-bottom: .vw(12) [];
         }
 
         .icon {
-          width: .vw(48) [];
-          height: .vw(48) [];
+          width: .vw(42) [];
+          height: .vw(42) [];
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1051,8 +1131,8 @@ const openWinRecord = () => {
           margin-bottom: .vw(4) [];
 
           img {
-            width: .vw(36) [];
-            height: .vw(36) [];
+            width: .vw(28) [];
+            height: .vw(28) [];
           }
 
           .check {
@@ -1091,11 +1171,11 @@ const openWinRecord = () => {
       align-items: center;
       flex-direction: column;
       position: absolute;
-      top: .vw(190) [];
+      top: .vw(180) [];
       right: .vw(16) [];
 
       &.no-self-room {
-        top: .vw(130) [];
+        top: .vw(120) [];
       }
 
       .button {
@@ -1105,7 +1185,7 @@ const openWinRecord = () => {
         flex-direction: column;
 
         &:not(:last-of-type) {
-          margin-bottom: .vw(18) [];
+          margin-bottom: .vw(12) [];
         }
 
         .icon {
@@ -1289,6 +1369,24 @@ const openWinRecord = () => {
         box-shadow: 0 0 0 .vw(8) [] #f7b058 inset;
         padding-top: .vw(18) [];
         padding-bottom: .vw(8) [];
+        position: relative;
+
+        &.no-game {
+          &::after {
+            content: '发射中，无法操作';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: .vw(20)[];
+            background-color: rgba(#000, 0.25);
+          }
+        }
 
         .left {
           padding-left: .vw(20) [];

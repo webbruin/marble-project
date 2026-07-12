@@ -61,18 +61,25 @@
         <div class="room-list">
           <div class="item" v-for="(item, index) in roomList" :key="index" @click="clickRoom(item)">
             <div class="status">
-              <img v-if="item.useStatus === 1" class="icon" src="@/assets/images/home/room-gaming.png" alt="" />
-              <img v-else class="icon" src="@/assets/images/home/room-idle.png" alt="" />
+              <template v-if="item.useStatus === 0">
+                <img class="icon" src="@/assets/images/home/room-idle.png" alt="" />
+              </template>
+              <template v-else-if="item.useStatus === 1">
+                <img class="icon" src="@/assets/images/home/room-gaming.png" alt="" />
+              </template>
+              <template v-else>
+                <img class="icon" src="@/assets/images/home/room-idle.png" alt="" />
+              </template>
               <span class="text">{{ roomUseStatusEnum[item.useStatus] }}</span>
             </div>
-            <div class="user-list" v-if="item.currentPlayerCount">
+            <!-- <div class="user-list" v-if="item.currentPlayerCount">
               <div class="user" v-for="userIndex in Math.min(item.currentPlayerCount, 3)" :key="userIndex">
                 <img class="avatar" src="@/assets/images/avatar.png" alt="" />
               </div>
               <div class="user">
                 <span class="count">{{ item.currentPlayerCount }}</span>
               </div>
-            </div>
+            </div> -->
             <div class="room-id">房间：{{ item.tencentRoomId.slice(-4) }}</div>
             <div class="room-name">{{ item.roomName }}</div>
             <div class="room-ball">
@@ -101,9 +108,10 @@ const router = useRouter()
 // 房间使用状态枚举：0-空闲，1-使用中，10-故障，11-下线
 const roomUseStatusEnum = {
   0: '空闲',
-  1: '使用中',
+  1: '游戏中',
   10: '故障',
   11: '下线',
+  12: '调试中',
 }
 
 const roomLevelList = ref([])
@@ -199,7 +207,6 @@ const clickRoomTab = (item) => {
 }
 
 const clickBanner = (item) => {
-  // console.log(111, item);
   // if (item.jumpUrl) {
   //   router.push(item.jumpUrl)
   // }
@@ -228,7 +235,7 @@ const clickRanking = () => {
 
 const clickRoom = (item) => {
   if (item.useStatus === 10 || item.useStatus === 11) {
-    $toast.info(`该房间目前处于${roomUseStatusEnum[item.useStatus]}中`)
+    $toast.info(`该房间目前处于${roomUseStatusEnum[item.useStatus]}`)
     return
   }
   const { id, tencentRoomId } = item

@@ -10,12 +10,12 @@
         <div class="title">邀请好友</div>
         <div class="info">
           <div class="people">
-            <div class="count">{{ inviteInfo.invitedCount || 0 }}</div>
+            <div class="count">{{ formatNumberWithCommas(inviteInfo.invitedCount || 0) }}</div>
             <div class="desc">已邀请人数</div>
           </div>
           <div class="price">
             <div class="count">
-              ￥{{ formatNumberWithCommas(inviteInfo.totalWithdrawAmount || 0) }}
+              ￥{{ formatNumberWithCommas(formatToTwoDecimals(inviteInfo.totalWithdrawAmount || 0)) }}
               <span class="withdrawal" @click="clickWithdraw">提现</span>
             </div>
             <div class="desc">已奖励金额</div>
@@ -40,10 +40,11 @@
                   </div>
                   <div class="info">
                     <p class="name">{{ item.inviteeNickName || '-' }}</p>
-                    <p class="id">ID：{{ item.inviteeUserId }}</p>
+                    <p class="id">ID：{{ item.inviteeUserId || '-' }}</p>
                   </div>
                 </div>
-                <div class="price">￥{{ formatNumberWithCommas(8888) }}</div>
+                <div class="price">￥{{ formatNumberWithCommas(formatToTwoDecimals(item.totalRechargeAmount || 0)) }}
+                </div>
                 <div class="date">{{ item.inviteTime }}</div>
               </div>
             </template>
@@ -105,7 +106,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { generateQRCode, getQRCodeDataURL } from '@/utils/qrcode'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
-import { formatNumberWithCommas } from '@/utils'
+import { formatNumberWithCommas, formatToTwoDecimals } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -266,6 +267,9 @@ const clickWithdraw = async () => {
     }
 
     .share {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
       border-radius: .vw(30) [];
       border: .vw(1) [] solid var(--white--);
       background: linear-gradient(180deg, #ff6464 0%, #fffaf0 100%);
@@ -277,7 +281,6 @@ const clickWithdraw = async () => {
         height: .vw(48) [];
         display: flex;
         align-items: center;
-        justify-self: center;
         justify-content: center;
         color: var(--light-text--);
         font-family: 'PingFang SC';
@@ -293,6 +296,7 @@ const clickWithdraw = async () => {
       }
 
       .info {
+        width: 100%;
         display: flex;
         align-items: center;
         margin-bottom: .vw(34) [];
@@ -378,6 +382,9 @@ const clickWithdraw = async () => {
     }
 
     .invite-list {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
       border-radius: .vw(30) [];
       border: .vw(1) [] solid var(--white--);
       background: linear-gradient(180deg, #ff6464 -43.18%, #fffaf0 99.95%);
@@ -389,7 +396,6 @@ const clickWithdraw = async () => {
         height: .vw(48) [];
         display: flex;
         align-items: center;
-        justify-self: center;
         justify-content: center;
         color: var(--light-text--);
         font-family: 'PingFang SC';
@@ -405,8 +411,9 @@ const clickWithdraw = async () => {
       }
 
       .invite-table {
-        margin-left: .vw(20) [];
-        margin-right: .vw(18) [];
+        width: 100%;
+        padding-left: .vw(20) [];
+        padding-right: .vw(18) [];
 
         .header-row {
           display: flex;

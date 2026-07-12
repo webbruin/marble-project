@@ -47,7 +47,7 @@ const icons = ref([
 ])
 const currentRoute = ref(route.name)
 
-onMounted(() => {})
+onMounted(() => { })
 
 watch(
   () => route.name,
@@ -68,6 +68,7 @@ const clickIcon = (item) => {
 
 footer {
   height: .vw(60) [];
+  background-color: #fff;
 
   .icons {
     height: 100%;

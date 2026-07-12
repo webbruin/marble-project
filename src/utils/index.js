@@ -119,6 +119,29 @@ const getRoomLevelName = (level) => {
   return roomLevelMap[level] || ''
 }
 
+/**
+ * 将时间戳转换为年月日时分秒格式
+ * @param {number|string} timestamp - 时间戳（毫秒或秒）
+ * @param {string} [separator='-'] - 日期分隔符，默认 '-'
+ * @returns {string} 格式化后的时间字符串，如 "2026-07-11 14:30:00"
+ */
+function formatTimestamp(timestamp, separator = '-') {
+  if (timestamp === null || timestamp === undefined || timestamp === '') return ''
+  let ts = Number(timestamp)
+  if (isNaN(ts) || ts <= 0) return ''
+  // 自动识别秒级时间戳（10位）并转为毫秒
+  if (ts < 1e12) ts *= 1000
+  const d = new Date(ts)
+  if (isNaN(d.getTime())) return ''
+  const Y = d.getFullYear()
+  const M = String(d.getMonth() + 1).padStart(2, '0')
+  const D = String(d.getDate()).padStart(2, '0')
+  const h = String(d.getHours()).padStart(2, '0')
+  const m = String(d.getMinutes()).padStart(2, '0')
+  const s = String(d.getSeconds()).padStart(2, '0')
+  return `${Y}${separator}${M}${separator}${D} ${h}:${m}:${s}`
+}
+
 export {
   passwordRegExp,
   phoneRegExp,
@@ -130,4 +153,5 @@ export {
   getOrderStatusName,
   roomLevelMap,
   getRoomLevelName,
+  formatTimestamp,
 }

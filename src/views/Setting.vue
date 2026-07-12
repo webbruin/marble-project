@@ -4,11 +4,8 @@
     <div class="body">
       <div class="module" v-for="(item, index) in rows" :key="index">
         <template v-for="(childItem, childIndex) in item" :key="childIndex">
-          <div
-            class="item"
-            v-if="childItem.show"
-            @click="clickRouter(childItem.router, childItem.params, childItem.query)"
-          >
+          <div class="item" v-if="childItem.show"
+            @click="clickRouter(childItem.router, childItem.params, childItem.query)">
             <span class="text">{{ childItem.name }}</span>
             <i class="icon"></i>
           </div>
@@ -24,10 +21,15 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+// alipay资源包
+import '@/alipay/alipayjsapi.min'
 import Button from '@/components/FormData/Button.vue'
 
+
+const route = useRoute()
 const router = useRouter()
 
+const userInfo = ref(JSON.parse(localStorage.getItem('userInfo')) || {})
 const rows = ref([
   [
     { name: '购买说明', show: true, router: 'aggrement', params: { type: 'gmsm' } },
@@ -37,19 +39,116 @@ const rows = ref([
   [
     { name: '蓝牙连接', show: true, router: 'bluetooth' },
     { name: '实名认证', show: true, router: 'real-name-auth' },
+    { name: '绑定支付宝', show: !userInfo.value.alipayBound, router: 'zfb' },
+    { name: '解绑支付宝', show: userInfo.value.alipayBound, router: 'zfb' },
+    { name: '实名认证', show: true, router: 'real-name-auth' },
     { name: '设置登录密码', show: true, router: 'set-password' },
     { name: '修改登录密码', show: true, router: 'change-password' },
     { name: '账号注销', show: true, router: 'account-cancel' },
   ],
 ])
+// 支付宝appid
+const appId = '2021006143643068'
+const authCode = ref('')
 
-onMounted(() => {})
+onMounted(() => {
+  // 确保 AlipayJSBridge 已加载
+  if (window.AlipayJSBridge) {
+    doGetAuthCode();
+  } else {
+    document.addEventListener('AlipayJSBridgeReady', doGetAuthCode, false);
+  }
+  if (userInfo.value.alipayBound) {
+    getBindInfo()
+  }
+})
 
 const clickRouter = (name, params = {}, query = {}) => {
   if (!name) {
     return
   }
+  if (name === 'real-name-auth' && userInfo.value.realNameFlag === 1) {
+    $toast.info('您已完成实名认证')
+    return
+  }
+  if (name === 'zfb') {
+    if (userInfo.value.alipayBound) {
+      clickUnBound()
+    } else {
+      clickToAlipay()
+    }
+    return
+  }
   router.push({ name, params, query })
+}
+
+const doGetAuthCode = () => {
+  ap.getAuthCode({
+    appId,
+    scopes: ['auth_user'],
+  }, function (res) {
+    authCode.value = res.authCode
+    clickBound()
+  });
+}
+
+// 跳转支付宝
+const clickToAlipay = () => {
+  const url = encodeURIComponent('https://www.bingobangai.com/setting')
+  window.location.href = `alipays://platformapi/startapp?appId=20000067&url=${url}`
+}
+
+// 绑定支付宝
+const clickBound = async () => {
+  try {
+    $toast.loading()
+    const res = await api.post('/pinball/user/alipay/bind', { authCode: authCode.value })
+    $toast.close()
+    if (res.code === 200) {
+      ap.alert(`444: ${JSON.stringify(res)}`);
+      getUserInfo()
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 解绑支付宝
+const clickUnBound = async () => {
+  try {
+    $toast.loading()
+    const res = await api.post('/pinball/user/alipay/unbind')
+    $toast.close()
+    if (res.code === 200) {
+      $toast.info('支付宝解绑成功')
+      getUserInfo()
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 查询支付宝绑定信息
+const getBindInfo = async () => {
+  try {
+    $toast.loading()
+    const res = await api.post('/pinball/user/alipay/getBindInfo')
+    $toast.close()
+    if (res.code === 200) {
+      console.log(111, res.data);
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 更新本地缓存：个人信息
+const getUserInfo = async () => {
+  const res = await api.post('/pinball/user/info/getUserInfo')
+  if (res.code === 200) {
+    localStorage.setItem('userInfo', JSON.stringify(res.data))
+    userInfo.value = res.data
+  }
 }
 
 const loginConfirm = () => {

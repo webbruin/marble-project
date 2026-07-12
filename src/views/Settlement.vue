@@ -27,7 +27,7 @@
           <div class="info">
             <p class="name">{{ item.productName }}</p>
             <p class="desc">规格：{{ item.skuName }}</p>
-            <p class="point">积分 {{ formatNumberWithCommas(item.price) }}</p>
+            <p class="point">{{ formatNumberWithCommas(formatToTwoDecimals(item.price)) }}积分</p>
           </div>
           <div class="count">X{{ item.quantity }}</div>
         </div>
@@ -38,7 +38,7 @@
           <img :src="item.icon" alt="" class="icon" />
           <span class="text">
             {{ item.name }}
-            {{ item.type === 'point' ? `（剩余：${cardAmount}）` : '' }}
+            {{ item.type === 'point' ? `（剩余：${formatNumberWithCommas(formatToTwoDecimals(cardAmount))}）` : '' }}
           </span>
           <span class="select" :class="{ selected: payType === item.type }"></span>
         </div>
@@ -56,7 +56,7 @@
     <div class="footer">
       <div class="info">
         <span class="text">共计：</span>
-        <span class="count">{{ formatNumberWithCommas(selectedPrice) }}积分</span>
+        <span class="count">{{ formatNumberWithCommas(formatToTwoDecimals(selectedPrice)) }}积分</span>
       </div>
       <div class="pay" @click="clickPay">确定支付</div>
     </div>
@@ -66,7 +66,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { formatNumberWithCommas } from '@/utils'
+import { formatNumberWithCommas, formatToTwoDecimals } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -103,7 +103,7 @@ onMounted(() => {
 
 const init = async () => {
   settlementList.value = JSON.parse(localStorage.getItem('selectCart')) || []
-  if (route.params.source === 'cart') {
+  if (route.params.source === 'cart' || route.params.source === 'order') {
     params.value.cartIds = settlementList.value.map((item) => item.cartId)
   }
   if (route.params.source === 'product-detail') {
@@ -113,7 +113,7 @@ const init = async () => {
   }
   if (localStorage.getItem('selectAddress')) {
     address.value = JSON.parse(localStorage.getItem('selectAddress'))
-    if (route.params.source === 'cart') {
+    if (route.params.source === 'cart' || route.params.source === 'order') {
       params.value.addressId = address.value.addressId || ''
     }
     if (route.params.source === 'product-detail') {
@@ -129,7 +129,7 @@ const getDefaultAddress = async () => {
     const res = await api.post('/pinball/shop/address/list', {})
     if (res.code === 200) {
       address.value = res.data.find((item) => item.isDefault === 1) || {}
-      if (route.params.source === 'cart') {
+      if (route.params.source === 'cart' || route.params.source === 'order') {
         params.value.addressId = address.value.addressId || ''
       }
       if (route.params.source === 'product-detail') {
@@ -196,7 +196,7 @@ const clickPay = () => {
     })
     return
   }
-  if (route.params.source === 'cart') {
+  if (route.params.source === 'cart' || route.params.source === 'order') {
     createByCart()
   }
   if (route.params.source === 'product-detail') {

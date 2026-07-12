@@ -14,6 +14,7 @@
             <div class="item" v-for="(item, index) in orderList" :key="index" @click="toOrderDetail(item)">
               <div class="address">
                 <span class="text">{{ item.recipientAddress }}</span>
+                <span class="status">{{ getOrderStatusName(item.orderStatus) }}</span>
                 <i class="arrow"></i>
               </div>
               <div class="product">
@@ -29,15 +30,22 @@
                 </div>
               </div>
               <div class="button-list">
-                <template v-if="item.orderStatus === 0">
-                  <div class="button" :class="{ disabled: false }">待支付</div>
+                <template v-if="item.orderStatus === 1">
+                  <div class="button button1">申请退款</div>
                 </template>
-                <template v-if="item.orderStatus === 1"></template>
-                <template v-if="item.orderStatus === 2"></template>
-                <template v-if="item.orderStatus === 3"></template>
-                <template v-if="item.orderStatus === 4"></template>
-                <template v-if="item.orderStatus === 5 || item.orderStatus === 6">
-                  <div class="button" :class="{ disabled: true }">已完成</div>
+                <template v-if="item.orderStatus === 2">
+                  <div class="button button1">申请退款</div>
+                  <div class="button button2">确认收货</div>
+                </template>
+                <template v-if="item.orderStatus === 3">
+                  <div class="button button1">再来一单</div>
+                  <div class="button button2">确认收货</div>
+                </template>
+                <template v-if="item.orderStatus === 4">
+                  <div class="button button2">取消退款</div>
+                </template>
+                <template v-if="item.orderStatus === 5">
+                  <div class="button button1">再来一单</div>
                 </template>
               </div>
             </div>
@@ -52,7 +60,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
-import { formatNumberWithCommas } from '@/utils'
+import { formatNumberWithCommas, getOrderStatusName } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -60,7 +68,7 @@ const router = useRouter()
 const params = reactive({
   current: 1,
   pageSize: 20,
-  orderStatus: null, // 0-待支付，1-已支付，2-已发货，3-已收货，4-退款中，5-已退款，6-已关闭
+  orderStatus: null, // 1-已支付，2-已发货，3-已完成，4-退款中，5-已退款
   createTimeStart: '', // 创建时间起（含）
   createTimeEnd: '', // 创建时间止（含）
   orderId: '', // 订单号（模糊查询）
@@ -68,13 +76,11 @@ const params = reactive({
 })
 const tabList = ref([
   { name: '全部', orderStatus: null },
-  { name: '待支付', orderStatus: 0 },
   { name: '已支付', orderStatus: 1 },
   { name: '已发货', orderStatus: 2 },
-  { name: '已收货', orderStatus: 3 },
+  { name: '已完成', orderStatus: 3 },
   { name: '退款中', orderStatus: 4 },
   { name: '已退款', orderStatus: 5 },
-  { name: '已关闭', orderStatus: 6 },
 ])
 const orderList = ref([])
 const loading = ref(false)
@@ -226,6 +232,15 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
             font-style: normal;
           }
 
+          .status {
+            color: var(--text--);
+            font-family: 'PingFang SC';
+            font-size: .vw(14) [];
+            line-height: .vw(14) [];
+            font-weight: 500;
+            font-style: normal;
+          }
+
           .arrow {
             width: .vw(14) [];
             height: .vw(14) [];
@@ -233,6 +248,7 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
             background-position: center;
             background-repeat: no-repeat;
             background-image: url(@/assets/images/arrow-right.png);
+            margin-left: .vw(5)[];
           }
         }
 
@@ -324,10 +340,16 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
               margin-right: .vw(8) [];
             }
 
-            &.disabled {
-              pointer-events: none;
-              color: var(--text--);
-              background-color: #e3e3e4;
+            &.button1 {
+              font-weight: 400;
+              border: 1px solid #EDEDF0;
+              background-color: #fff;
+            }
+
+            &.button2 {
+              font-weight: 500;
+              border: 1px solid transparent;
+              background-color: #FFB169;
             }
           }
         }
