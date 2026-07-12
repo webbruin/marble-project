@@ -27,7 +27,7 @@
           <div class="info">
             <p class="name">{{ item.productName }}</p>
             <p class="desc">规格：{{ item.skuName }}</p>
-            <p class="point">{{ formatNumberWithCommas(formatToTwoDecimals(item.price)) }}积分</p>
+            <p class="point">{{ formatNumberWithCommas(item.price) }}积分</p>
           </div>
           <div class="count">X{{ item.quantity }}</div>
         </div>
@@ -38,7 +38,7 @@
           <img :src="item.icon" alt="" class="icon" />
           <span class="text">
             {{ item.name }}
-            {{ item.type === 'point' ? `（剩余：${formatNumberWithCommas(formatToTwoDecimals(cardAmount))}）` : '' }}
+            {{ item.type === 'point' ? `（剩余：${formatNumberWithCommas(cardAmount)}）` : '' }}
           </span>
           <span class="select" :class="{ selected: payType === item.type }"></span>
         </div>
@@ -56,7 +56,7 @@
     <div class="footer">
       <div class="info">
         <span class="text">共计：</span>
-        <span class="count">{{ formatNumberWithCommas(formatToTwoDecimals(selectedPrice)) }}积分</span>
+        <span class="count">{{ formatNumberWithCommas(selectedPrice) }}积分</span>
       </div>
       <div class="pay" @click="clickPay">确定支付</div>
     </div>

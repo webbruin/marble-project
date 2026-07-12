@@ -15,7 +15,7 @@
           </div>
           <div class="price">
             <div class="count">
-              ￥{{ formatNumberWithCommas(formatToTwoDecimals(inviteInfo.totalWithdrawAmount || 0)) }}
+              ￥{{ formatNumberWithCommas(inviteInfo.totalWithdrawAmount || 0) }}
               <span class="withdrawal" @click="clickWithdraw">提现</span>
             </div>
             <div class="desc">已奖励金额</div>

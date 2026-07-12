@@ -39,7 +39,7 @@
         <!-- 合计积分 -->
         <div class="total-point">
           <div class="text">合计积分</div>
-          <div class="count">{{ formatNumberWithCommas(formatToTwoDecimals(orderData.totalAmount)) }}</div>
+          <div class="count">{{ formatNumberWithCommas(orderData.totalAmount) }}</div>
         </div>
       </template>
 
@@ -52,12 +52,12 @@
           </div>
           <div class="info" v-if="orderData.orderStatus === 4">您已提交退款申请，请联系客服处理</div>
           <div class="info" v-if="orderData.orderStatus === 5">您的退款申请{{ refundAudit.refundStatus === 2 ? '失败' : '成功'
-            }}，请联系客服处理</div>
+          }}，请联系客服处理</div>
         </div>
         <!-- 退积分 -->
         <div class="total-point">
           <div class="text">退积分</div>
-          <div class="count">{{ formatNumberWithCommas(formatToTwoDecimals(orderData.totalAmount)) }}</div>
+          <div class="count">{{ formatNumberWithCommas(orderData.totalAmount) }}</div>
         </div>
         <!-- 退款审批 -->
         <div class="return-audit">
@@ -66,7 +66,7 @@
             <div class="point" :class="{ 'light': refundAudit.refundStatus >= 0 }">
               提交申请
             </div>
-            <div class="point" :class="{ 'light': refundAudit.refundStatus >= 2 }">
+            <div class="point" :class="{ 'light': refundAudit.refundStatus >= 1 }">
               审核{{ refundAudit.refundStatus === 2 ? '拒绝' : '通过' }}
             </div>
             <div class="point" :class="{ 'light': refundAudit.refundStatus >= 3 }">
@@ -88,17 +88,17 @@
               <div class="info">
                 <span class="spu-name">{{ item.productName }}</span>
                 <span class="text">规格：{{ item.skuName }}</span>
-                <span class="text">单价：{{ formatNumberWithCommas(formatToTwoDecimals(item.price)) }}{{ item.pointType ===
+                <span class="text">单价：{{ formatNumberWithCommas(item.price) }}{{ item.pointType ===
                   0 ? '积分' : '会员积分'
-                }}</span>
+                  }}</span>
                 <span class="text">数量：{{ item.quantity }}</span>
               </div>
-              <div class="point">积分{{ formatNumberWithCommas(formatToTwoDecimals(item.quantity * item.price)) }}</div>
+              <div class="point">积分{{ formatNumberWithCommas(item.quantity * item.price) }}</div>
             </div>
           </div>
           <div class="total">
             <span class="text">合计积分</span>
-            <span class="point">{{ formatNumberWithCommas(formatToTwoDecimals(allPoint)) }}</span>
+            <span class="point">{{ formatNumberWithCommas(allPoint) }}</span>
           </div>
         </div>
       </template>

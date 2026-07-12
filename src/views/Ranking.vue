@@ -12,7 +12,12 @@
         <div class="user" v-if="rankList.length">
           <div class="item second" v-if="rankList[1]">
             <div class="avatar">
-              <img :src="rankList[1].avatar" alt="" />
+              <template v-if="rankList[1].avatar">
+                <img :src="rankList[1].avatar" alt="">
+              </template>
+              <template v-else>
+                <img src="@/assets/images/avatar.png" alt="" />
+              </template>
             </div>
             <p class="name">{{ rankList[1].nickName }}</p>
             <p class="point">
@@ -22,7 +27,12 @@
           </div>
           <div class="item first" v-if="rankList[0]">
             <div class="avatar">
-              <img :src="rankList[0].avatar" alt="" />
+              <template v-if="rankList[0].avatar">
+                <img :src="rankList[0].avatar" alt="">
+              </template>
+              <template v-else>
+                <img src="@/assets/images/avatar.png" alt="" />
+              </template>
             </div>
             <p class="name">{{ rankList[0].nickName }}</p>
             <p class="point">
@@ -32,7 +42,12 @@
           </div>
           <div class="item third" v-if="rankList[2]">
             <div class="avatar">
-              <img :src="rankList[2].avatar" alt="" />
+              <template v-if="rankList[2].avatar">
+                <img :src="rankList[2].avatar" alt="">
+              </template>
+              <template v-else>
+                <img src="@/assets/images/avatar.png" alt="" />
+              </template>
             </div>
             <p class="name">{{ rankList[2].nickName }}</p>
             <p class="point">
@@ -50,7 +65,12 @@
       <div class="user" v-for="(item, index) in rankList.slice(3)" :key="index">
         <div class="index">{{ index + 3 >= 10 ? index + 3 : `0${index + 3}` }}</div>
         <div class="avatar">
-          <img src="@/assets/images/avatar.png" alt="" />
+          <template v-if="item.avatar">
+            <img :src="item.avatar" alt="">
+          </template>
+          <template v-else>
+            <img src="@/assets/images/avatar.png" alt="" />
+          </template>
         </div>
         <div class="name">{{ item.nickName }}</div>
         <div class="point">
@@ -63,7 +83,12 @@
       <div class="user">
         <div class="index">{{ selfRank.rank }}</div>
         <div class="avatar">
-          <img :src="userInfo.avatar" alt="" />
+          <template v-if="userInfo.avatar">
+            <img :src="userInfo.avatar" alt="">
+          </template>
+          <template v-else>
+            <img src="@/assets/images/avatar.png" alt="" />
+          </template>
         </div>
         <div class="name">{{ userInfo.nickName }}</div>
         <div class="point">

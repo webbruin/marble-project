@@ -5,18 +5,10 @@
       <p class="title">欢迎来到弹珠潮玩</p>
     </div>
     <div class="body">
-      <div
-        class="module"
-        :class="{ left: loginType === 'msgCode', right: loginType === 'password' }"
-      >
+      <div class="module" :class="{ left: loginType === 'msgCode', right: loginType === 'password' }">
         <div class="tabs">
-          <div
-            class="item"
-            :class="{ selected: loginType === item.type }"
-            v-for="(item, index) in tabList"
-            :key="index"
-            @click="clickTab(item)"
-          >
+          <div class="item" :class="{ selected: loginType === item.type }" v-for="(item, index) in tabList" :key="index"
+            @click="clickTab(item)">
             {{ item.name }}
           </div>
         </div>
@@ -27,12 +19,7 @@
           <!-- 验证码登陆 -->
           <template v-if="loginType === 'msgCode'">
             <div class="item">
-              <Input
-                v-model="formdata.msgCode"
-                :mobile="formdata.mobile"
-                type="code"
-                placeholder="请输入验证码"
-              ></Input>
+              <Input v-model="formdata.msgCode" :mobile="formdata.mobile" type="code" placeholder="请输入验证码"></Input>
             </div>
           </template>
           <!-- 密码登陆 -->
@@ -45,13 +32,8 @@
         </div>
         <!-- 表单提交 -->
         <div class="submit">
-          <Button
-            :disabled="
-              !(formdata.mobile && (loginType === 'msgCode' ? formdata.msgCode : formdata.password))
-            "
-            buttonText="立即登录"
-            @click="clickLogin"
-          ></Button>
+          <Button :disabled="!(formdata.mobile && (loginType === 'msgCode' ? formdata.msgCode : formdata.password))
+            " buttonText="立即登录" @click="clickLogin"></Button>
         </div>
         <div class="aggrement" @click="isAgree = !isAgree">
           <i class="select" :class="{ selected: isAgree }"></i>
@@ -90,7 +72,7 @@ const formdata = ref({
 })
 const isAgree = ref(false)
 
-onMounted(() => {})
+onMounted(() => { })
 
 const clickTab = (item) => {
   loginType.value = item.type
@@ -126,7 +108,7 @@ const clickLogin = async () => {
   if (res.code === 200) {
     const { access_token, hasPassword } = res.data
     localStorage.setItem('token', access_token)
-    if (hasPassword) {
+    if (loginType.value === 'msgCode' && !hasPassword) {
       router.push({ name: 'set-password' })
     } else {
       router.push({ name: 'home' })

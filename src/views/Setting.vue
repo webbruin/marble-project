@@ -6,7 +6,10 @@
         <template v-for="(childItem, childIndex) in item" :key="childIndex">
           <div class="item" v-if="childItem.show"
             @click="clickRouter(childItem.router, childItem.params, childItem.query)">
-            <span class="text">{{ childItem.name }}</span>
+            <span class="text">
+              <template v-if="childItem.router === 'zfb'">{{ userInfo.alipayBound ? '解绑' : '绑定' }}</template>{{
+                childItem.name }}
+            </span>
             <i class="icon"></i>
           </div>
         </template>
@@ -16,6 +19,21 @@
       <Button buttonText="退出登陆" @click="loginConfirm"></Button>
     </div>
   </main>
+
+  <!-- 支付宝绑定信息  -->
+  <van-popup v-model:show="showAplipayBindInfoPopup" position="bottom" closeable>
+    <div class="popup-content">
+      <div class="title">支付宝绑定信息</div>
+      <div class="info">
+        <div class="avatar">
+          <img :src="bindInfo.avatar" alt="">
+        </div>
+        <van-cell title="昵称" :value="bindInfo.nickName" />
+        <van-cell title="绑定时间" :value="bindInfo.bindTime" />
+        <van-button type="primary" block color="#FFB169" @click="clickUnBound">解绑支付宝</van-button>
+      </div>
+    </div>
+  </van-popup>
 </template>
 
 <script setup>
@@ -39,19 +57,20 @@ const rows = ref([
   [
     { name: '蓝牙连接', show: true, router: 'bluetooth' },
     { name: '实名认证', show: true, router: 'real-name-auth' },
-    { name: '绑定支付宝', show: !userInfo.value.alipayBound, router: 'zfb' },
-    { name: '解绑支付宝', show: userInfo.value.alipayBound, router: 'zfb' },
-    { name: '实名认证', show: true, router: 'real-name-auth' },
-    { name: '设置登录密码', show: true, router: 'set-password' },
-    { name: '修改登录密码', show: true, router: 'change-password' },
+    { name: '支付宝', show: true, router: 'zfb' },
+    { name: '设置登录密码', show: !userInfo.value.hasPassword, router: 'set-password' },
+    { name: '修改登录密码', show: userInfo.value.hasPassword, router: 'change-password' },
     { name: '账号注销', show: true, router: 'account-cancel' },
   ],
 ])
 // 支付宝appid
 const appId = '2021006143643068'
 const authCode = ref('')
+const bindInfo = ref({})
+const showAplipayBindInfoPopup = ref(false)
 
 onMounted(() => {
+  getUserInfo()
   // 确保 AlipayJSBridge 已加载
   if (window.AlipayJSBridge) {
     doGetAuthCode();
@@ -73,7 +92,7 @@ const clickRouter = (name, params = {}, query = {}) => {
   }
   if (name === 'zfb') {
     if (userInfo.value.alipayBound) {
-      clickUnBound()
+      showAplipayBindInfoPopup.value = true
     } else {
       clickToAlipay()
     }
@@ -94,8 +113,24 @@ const doGetAuthCode = () => {
 
 // 跳转支付宝
 const clickToAlipay = () => {
-  const url = encodeURIComponent('https://www.bingobangai.com/setting')
-  window.location.href = `alipays://platformapi/startapp?appId=20000067&url=${url}`
+  // const url = encodeURIComponent('https://www.bingobangai.com/setting')
+  // window.location.href = `alipays://platformapi/startapp?appId=20000067&url=${url}`
+
+  // 配置参数
+  const redirectUri = encodeURIComponent('https://www.bingobangai.com/setting')
+  // const redirectUri = encodeURIComponent(window.location.href)
+  const scope = 'auth_user' // 或 'auth_base'
+  const state = ''
+
+  // 拼接授权URL
+  let authUrl = `https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=${appId}&scope=${scope}&redirect_uri=${redirectUri}&state=${state}`
+
+  // 使用"支付宝短链接"来唤起支付宝App
+  // authUrl = `alipays://platformapi/startapp?appId=20000067&url=${encodeURIComponent(authUrl)}`
+
+  // 用户点击按钮后，跳转到授权页
+  // window.location.href = authUrl
+  window.open(authUrl, '_blank')
 }
 
 // 绑定支付宝
@@ -105,8 +140,7 @@ const clickBound = async () => {
     const res = await api.post('/pinball/user/alipay/bind', { authCode: authCode.value })
     $toast.close()
     if (res.code === 200) {
-      ap.alert(`444: ${JSON.stringify(res)}`);
-      getUserInfo()
+      updateUserInfo()
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -121,7 +155,8 @@ const clickUnBound = async () => {
     $toast.close()
     if (res.code === 200) {
       $toast.info('支付宝解绑成功')
-      getUserInfo()
+      showAplipayBindInfoPopup.value = false
+      updateUserInfo()
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -135,19 +170,24 @@ const getBindInfo = async () => {
     const res = await api.post('/pinball/user/alipay/getBindInfo')
     $toast.close()
     if (res.code === 200) {
-      console.log(111, res.data);
+      bindInfo.value = res.data || {}
     }
   } catch (e) {
     $toast.info('系统错误')
   }
 }
 
-// 更新本地缓存：个人信息
+// 更新本地缓存：支付宝绑定信息
+const updateUserInfo = async () => {
+  userInfo.value = { ...userInfo.value, alipayBound: !userInfo.value.alipayBound }
+  localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+}
+
 const getUserInfo = async () => {
   const res = await api.post('/pinball/user/info/getUserInfo')
   if (res.code === 200) {
-    localStorage.setItem('userInfo', JSON.stringify(res.data))
     userInfo.value = res.data
+    localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
   }
 }
 
@@ -166,7 +206,6 @@ const logout = async () => {
     const res = await api.post('/pinball/user/auth/logout')
     $toast.close()
     if (res.code === 200) {
-      // $toast.info('退出登陆成功')
       localStorage.removeItem('token')
       localStorage.removeItem('userInfo')
       router.replace({ name: 'login' })
@@ -235,6 +274,44 @@ const logout = async () => {
 
     .button {
       background-color: #ededf0;
+    }
+  }
+}
+
+.popup-content {
+  max-height: 70vh;
+  padding: .vw(18)[] 0;
+
+  .title {
+    color: var(--light-text--);
+    font-family: 'PingFang SC';
+    font-size: .vw(18) [];
+    line-height: .vw(18) [];
+    font-weight: 500;
+    font-style: normal;
+    text-align: center;
+    margin-bottom: .vw(20)[];
+  }
+
+  .info {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: .vw(15)[] .vw(18)[];
+
+    .avatar {
+      width: .vw(60)[];
+      height: .vw(60)[];
+      border-radius: .vw(45)[];
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: .vw(12)[];
+
+      img {
+        width: 100%;
+      }
     }
   }
 }

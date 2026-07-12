@@ -5,11 +5,11 @@
       <div class="info">
         <div class="point">
           <p class="text">我的积分</p>
-          <p class="count">{{ formatNumberWithCommas(pointCardAmount) || '-' }}</p>
+          <p class="count">{{ formatNumberWithCommas(pointCardAmount) || 0 }}</p>
         </div>
         <div class="point">
           <p class="text">宾果豆（会员专享）</p>
-          <p class="count">{{ formatNumberWithCommas(memberPointAmount) || '-' }}</p>
+          <p class="count">{{ formatNumberWithCommas(memberPointAmount) || 0 }}</p>
         </div>
       </div>
     </div>

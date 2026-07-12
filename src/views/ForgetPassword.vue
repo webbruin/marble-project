@@ -7,12 +7,7 @@
         <Input v-model="formdata.mobile" type="tel" placeholder="请输入手机号"></Input>
       </div>
       <div class="item">
-        <Input
-          v-model="formdata.msgCode"
-          :mobile="formdata.mobile"
-          type="code"
-          placeholder="请输入验证码"
-        ></Input>
+        <Input v-model="formdata.msgCode" :mobile="formdata.mobile" type="code" placeholder="请输入验证码"></Input>
       </div>
       <div class="confirm">
         <Button :disabled="!(formdata.mobile && formdata.msgCode)" @click="clickConfirm"></Button>
@@ -35,7 +30,7 @@ const formdata = ref({
   msgCode: '',
 })
 
-onMounted(() => {})
+onMounted(() => { })
 
 const clickConfirm = async () => {
   $toast.loading()
@@ -44,7 +39,11 @@ const clickConfirm = async () => {
     $toast.close()
     const { access_token, hasPassword } = res.data
     localStorage.setItem('token', access_token)
-    router.push({ name: 'set-password' })
+    if (!hasPassword) {
+      router.push({ name: 'set-password' })
+    } else {
+      router.push({ name: 'home' })
+    }
   }
 }
 </script>

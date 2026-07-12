@@ -60,7 +60,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
-import { formatNumberWithCommas, getOrderStatusName } from '@/utils'
+import { formatNumberWithCommas, formatToTwoDecimals, getOrderStatusName } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
