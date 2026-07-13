@@ -13,10 +13,12 @@
       <div class="model">
         <div class="title">提现金额（元）</div>
         <div class="entry">
-          <input type="text" v-model="amount">
+          <input type="text" v-model="amount" @input="onAmountInput" />
         </div>
-        <div class="desc">可提现余额 {{ formatNumberWithCommas(formatToTwoDecimals(accountInfo.amount)) }} 元 <span
-            @click="clickEntryAll">全部提现</span></div>
+        <div class="desc">
+          可提现余额 {{ formatNumberWithCommas(formatToTwoDecimals(accountInfo.amount)) }} 元
+          <span @click="clickEntryAll">全部提现</span>
+        </div>
       </div>
     </div>
     <div class="footer">
@@ -36,7 +38,27 @@ const router = useRouter()
 
 const bindInfo = ref({})
 const accountInfo = ref({})
-const amount = ref(0)
+const amount = ref('')
+
+const onAmountInput = (e) => {
+  let val = e.target.value
+  // 移除非数字和小数点
+  val = val.replace(/[^\d.]/g, '')
+  // 只保留第一个小数点
+  const dotIndex = val.indexOf('.')
+  if (dotIndex !== -1) {
+    val = val.slice(0, dotIndex + 1) + val.slice(dotIndex + 1).replace(/\./g, '')
+  }
+  // 限制小数点后两位
+  if (dotIndex !== -1 && val.length - dotIndex > 3) {
+    val = val.slice(0, dotIndex + 3)
+  }
+  // 限制最大金额 99999
+  if (Number(val) > 99999) {
+    val = '99999'
+  }
+  amount.value = val
+}
 
 onMounted(() => {
   init()
@@ -79,7 +101,7 @@ const getWithdrawApply = async () => {
     const res = await api.post('/pinball/withdraw/apply', { amount: amount.value })
     if (res.code === 200) {
       $toast.info(amount.value > 50 ? '提现申请成功' : '提现成功')
-      amount.value = 0
+      amount.value = ''
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -91,7 +113,8 @@ const toWithdrawRecord = async () => {
 }
 
 const clickEntryAll = () => {
-  amount.value = accountInfo.value.amount || 0
+  const val = accountInfo.value.amount || 0
+  amount.value = String(val > 99999 ? 99999 : val)
 }
 
 const clickWithdraw = () => {
@@ -121,7 +144,7 @@ const clickWithdraw = () => {
     line-height: .vw(16) [];
     font-weight: 400;
     font-style: normal;
-    margin-right: .vw(12)[];
+    margin-right: .vw(12) [];
   }
 
   .body {
@@ -131,14 +154,14 @@ const clickWithdraw = () => {
     padding: .vw(16) [] .vw(18) [];
 
     .info {
-      height: .vw(56)[];
+      height: .vw(56) [];
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-radius: .vw(12)[];
+      border-radius: .vw(12) [];
       background-color: #fff;
-      padding: 0 .vw(12)[];
-      margin-bottom: .vw(16)[];
+      padding: 0 .vw(12) [];
+      margin-bottom: .vw(16) [];
 
       span {
         color: var(--light-text--);
@@ -151,9 +174,9 @@ const clickWithdraw = () => {
     }
 
     .model {
-      border-radius: .vw(12)[];
+      border-radius: .vw(12) [];
       background-color: #fff;
-      padding: 0 .vw(12)[];
+      padding: 0 .vw(12) [];
 
       .title {
         color: var(--light-text--);
@@ -162,11 +185,11 @@ const clickWithdraw = () => {
         line-height: .vw(16) [];
         font-weight: 500;
         font-style: normal;
-        padding: .vw(16)[] 0;
+        padding: .vw(16) [] 0;
       }
 
       .entry {
-        padding: .vw(16)[] 0;
+        padding: .vw(16) [] 0;
 
         input {
           border: none;
@@ -188,9 +211,9 @@ const clickWithdraw = () => {
         line-height: .vw(12) [];
         font-weight: 400;
         font-style: normal;
-        border-top: .vw(1)[] solid #EDEDF0;
-        padding-top: .vw(8)[];
-        padding-bottom: .vw(12)[];
+        border-top: .vw(1) [] solid #ededf0;
+        padding-top: .vw(8) [];
+        padding-bottom: .vw(12) [];
 
         span {
           color: var(--light-text--);
@@ -201,7 +224,7 @@ const clickWithdraw = () => {
 
   .footer {
     padding: .vw(12) [] .vw(18) [];
-    padding-bottom: .vw(20)[];
+    padding-bottom: .vw(20) [];
   }
 }
 </style>
