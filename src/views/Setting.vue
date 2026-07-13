@@ -106,31 +106,32 @@ const doGetAuthCode = () => {
     appId,
     scopes: ['auth_user'],
   }, function (res) {
-    authCode.value = res.authCode
-    clickBound()
+    // authCode.value = res.authCode
+    // clickBound()
+    router.push({ name: 'alipay-callback', query: { auth_code: res.authCode } })
   });
 }
 
 // 跳转支付宝
 const clickToAlipay = () => {
   // const url = encodeURIComponent('https://www.bingobangai.com/setting')
-  // window.location.href = `alipays://platformapi/startapp?appId=20000067&url=${url}`
+  const url = encodeURIComponent(window.location.href)
+  window.location.href = `alipays://platformapi/startapp?appId=20000067&url=${url}`
 
   // 配置参数
-  const redirectUri = encodeURIComponent('https://www.bingobangai.com/setting')
-  // const redirectUri = encodeURIComponent(window.location.href)
-  const scope = 'auth_user' // 或 'auth_base'
-  const state = ''
+  // const redirectUri = encodeURIComponent('https://www.bingobangai.com/setting')
+  // // const redirectUri = encodeURIComponent(window.location.href)
+  // const scope = 'auth_user' // 或 'auth_base'
+  // const state = ''
 
-  // 拼接授权URL
-  let authUrl = `https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=${appId}&scope=${scope}&redirect_uri=${redirectUri}&state=${state}`
+  // // 拼接授权URL
+  // let authUrl = `https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=${appId}&scope=${scope}&redirect_uri=${redirectUri}&state=${state}`
 
-  // 使用"支付宝短链接"来唤起支付宝App
-  authUrl = `alipays://platformapi/startapp?appId=20000067&url=${encodeURIComponent(authUrl)}`
+  // // 使用"支付宝短链接"来唤起支付宝App
+  // authUrl = `alipays://platformapi/startapp?appId=20000067&url=${encodeURIComponent(authUrl)}`
 
-  // 用户点击按钮后，跳转到授权页
-  // window.location.href = authUrl
-  window.open(authUrl, '_blank')
+  // // 用户点击按钮后，跳转到授权页
+  // window.open(authUrl, '_blank')
 }
 
 // 绑定支付宝

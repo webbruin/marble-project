@@ -4,25 +4,26 @@
       <!-- 加载中 -->
       <template v-if="status === 'loading'">
         <img class="icon" src="@/assets/images/recharge-success-icon.png" alt="" />
-        <p class="title">支付宝授权中...</p>
+        <p class="title">支付宝绑定中...</p>
       </template>
       <!-- 成功 -->
       <template v-if="status === 'success'">
         <img class="icon" src="@/assets/images/recharge-success-icon.png" alt="" />
-        <p class="title">授权成功</p>
+        <p class="title">支付宝绑定成功</p>
       </template>
       <!-- 失败 -->
       <template v-if="status === 'fail'">
         <img class="icon" src="@/assets/images/recharge-success-icon.png" alt="" />
-        <p class="title">授权失败</p>
+        <p class="title">支付宝绑定失败</p>
         <p class="desc">{{ errorMsg }}</p>
       </template>
     </div>
     <div class="footer" v-if="status !== 'loading'">
-      <div class="btn" :class="{ primary: status === 'success' }" @click="handleAction">
-        {{ status === 'success' ? '返回首页' : '重新授权' }}
+      <div class="btn primary">请手动切回浏览器</div>
+      <!-- <div class="btn" :class="{ primary: status === 'success' }" @click="handleAction">
+        {{ status === 'success' ? '请手动返回浏览器' : '重新绑定' }}
       </div>
-      <div class="btn" v-if="status === 'fail'" @click="goLogin">返回登录</div>
+      <div class="btn" v-if="status === 'fail'" @click="goLogin">返回登录</div> -->
     </div>
   </main>
 </template>
@@ -34,7 +35,7 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
-const status = ref('loading')
+const status = ref('success')
 const errorMsg = ref('')
 
 onMounted(() => {
@@ -45,20 +46,18 @@ const handleCallback = async () => {
   const authCode = route.query.auth_code
   if (!authCode) {
     status.value = 'fail'
-    errorMsg.value = '未获取到授权码'
+    errorMsg.value = '未获取到绑定码'
     return
   }
   try {
-    const res = await api.post('/pinball/user/auth/alipayAuth', { auth_code: authCode })
+    const res = await api.post('/pinball/user/alipay/bind', { authCode: authCode })
     if (res.code === 200) {
-      const { access_token } = res.data
-      localStorage.setItem('token', access_token)
       status.value = 'success'
-      await getUserInfo()
+      getUserInfo()
     }
   } catch (e) {
     status.value = 'fail'
-    errorMsg.value = '授权失败，请重试'
+    errorMsg.value = '绑定失败，请重试'
   }
 }
 

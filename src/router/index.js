@@ -112,11 +112,6 @@ const router = createRouter({
       component: () => import('../views/FaultFeedback.vue'),
     },
     {
-      path: '/alipay-callback',
-      name: 'alipay-callback',
-      component: () => import('../views/AlipayCallback.vue'),
-    },
-    {
       path: '/withdraw',
       name: 'withdraw',
       component: () => import('../views/Withdraw.vue'),
@@ -125,6 +120,11 @@ const router = createRouter({
       path: '/withdraw-record',
       name: 'withdraw-record',
       component: () => import('../views/WithdrawRecord.vue'),
+    },
+    {
+      path: '/alipay-callback',
+      name: 'alipay-callback',
+      component: () => import('../views/AlipayCallback.vue'),
     },
     // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/404.vue') },
@@ -159,6 +159,12 @@ const needLoginPage = [
   'edit-address',
   'pay-success',
   'pay-fail',
+  'product-detail',
+  'order-detail',
+  'feedback-record',
+  'fault-feedback',
+  'withdraw',
+  'withdraw-record',
 ]
 
 router.beforeEach((to, from, next) => {
