@@ -68,7 +68,7 @@
                 <img class="icon" src="@/assets/images/home/room-gaming.png" alt="" />
               </template>
               <template v-else>
-                <img class="icon" src="@/assets/images/home/room-idle.png" alt="" />
+                <img class="icon" src="@/assets/images/home/room-fault.png" alt="" />
               </template>
               <span class="text">{{ roomUseStatusEnum[item.useStatus] }}</span>
             </div>

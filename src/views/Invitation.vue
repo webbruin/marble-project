@@ -111,6 +111,7 @@ import { formatNumberWithCommas, formatToTwoDecimals } from '@/utils'
 const route = useRoute()
 const router = useRouter()
 
+const userInfo = ref(JSON.parse(localStorage.getItem('userInfo')) || {})
 const params = ref({
   current: 1,
   pageSize: 20,
@@ -216,7 +217,17 @@ const clickRealNameAuth = () => {
 }
 
 const clickWithdraw = async () => {
-  // router.push({ name: 'withdraw' })
+  if (!userInfo.value.alipayBound) {
+    $modal.show({
+      content: '暂未绑定支付宝',
+      confirmText: '去绑定',
+      onConfirm: () => {
+        router.push({ name: 'setting' })
+      },
+    })
+    return
+  }
+  router.push({ name: 'withdraw' })
 }
 </script>
 

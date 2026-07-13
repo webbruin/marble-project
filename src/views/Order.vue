@@ -1,9 +1,14 @@
 <template>
   <main class="order">
     <Header title="订单"></Header>
-    <div class="tab">
-      <div class="item" :class="{ selected: params.orderStatus === item.orderStatus }" v-for="(item, index) in tabList"
-        :key="index" @click="clickTab(item.orderStatus)">
+    <div class="tab" ref="tabRef">
+      <div
+        class="item"
+        :class="{ selected: params.orderStatus === item.orderStatus }"
+        v-for="(item, index) in tabList"
+        :key="index"
+        @click="clickTab(item.orderStatus)"
+      >
         {{ item.name }}
       </div>
     </div>
@@ -11,7 +16,12 @@
       <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
         <template #content>
           <div class="order-list">
-            <div class="item" v-for="(item, index) in orderList" :key="index" @click="toOrderDetail(item)">
+            <div
+              class="item"
+              v-for="(item, index) in orderList"
+              :key="index"
+              @click="toOrderDetail(item)"
+            >
               <div class="address">
                 <span class="text">{{ item.recipientAddress }}</span>
                 <span class="status">{{ getOrderStatusName(item.orderStatus) }}</span>
@@ -57,13 +67,15 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
 import { formatNumberWithCommas, formatToTwoDecimals, getOrderStatusName } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
+
+const tabRef = ref(null)
 
 const params = reactive({
   current: 1,
@@ -90,6 +102,7 @@ const isEmpty = ref(false)
 onMounted(() => {
   params.orderStatus = +route.params.status || null
   init()
+  scrollToSelectedTab()
 })
 
 const init = async () => {
@@ -124,6 +137,15 @@ const getOrderList = async (init) => {
   }
 }
 
+const scrollToSelectedTab = () => {
+  nextTick(() => {
+    const selected = tabRef.value?.querySelector('.item.selected')
+    if (selected) {
+      selected.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+    }
+  })
+}
+
 const clickTab = (orderStatus) => {
   if (params.orderStatus === orderStatus) {
     return
@@ -132,6 +154,7 @@ const clickTab = (orderStatus) => {
   // 修改路由订单状态
   router.replace({ name: 'order', params: { status: orderStatus } })
   getOrderList(true)
+  scrollToSelectedTab()
 }
 
 const loadMore = () => {
@@ -248,7 +271,7 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
             background-position: center;
             background-repeat: no-repeat;
             background-image: url(@/assets/images/arrow-right.png);
-            margin-left: .vw(5)[];
+            margin-left: .vw(5) [];
           }
         }
 
@@ -276,23 +299,23 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
               img {
                 max-width: 100%;
                 max-height: 100%;
-                border-radius: .vw(6)[];
+                border-radius: .vw(6) [];
               }
 
               .num {
-                color: #FF7716;
+                color: #ff7716;
                 font-family: 'PingFang SC';
                 font-size: .vw(7) [];
                 line-height: .vw(7) [];
                 font-weight: 400;
                 font-style: normal;
-                border-radius: .vw(45)[];
-                border: .vw(1)[] solid #fff;
-                background-color: #FFE3E3;
-                padding: .vw(1)[] .vw(3)[];
+                border-radius: .vw(45) [];
+                border: .vw(1) [] solid #fff;
+                background-color: #ffe3e3;
+                padding: .vw(1) [] .vw(3) [];
                 position: absolute;
-                left: .vw(8)[];
-                bottom: .vw(4)[];
+                left: .vw(8) [];
+                bottom: .vw(4) [];
               }
             }
           }
@@ -342,14 +365,14 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
 
             &.button1 {
               font-weight: 400;
-              border: 1px solid #EDEDF0;
+              border: 1px solid #ededf0;
               background-color: #fff;
             }
 
             &.button2 {
               font-weight: 500;
               border: 1px solid transparent;
-              background-color: #FFB169;
+              background-color: #ffb169;
             }
           }
         }

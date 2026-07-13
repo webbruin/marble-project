@@ -116,6 +116,16 @@ const router = createRouter({
       name: 'alipay-callback',
       component: () => import('../views/AlipayCallback.vue'),
     },
+    {
+      path: '/withdraw',
+      name: 'withdraw',
+      component: () => import('../views/Withdraw.vue'),
+    },
+    {
+      path: '/withdraw-record',
+      name: 'withdraw-record',
+      component: () => import('../views/WithdrawRecord.vue'),
+    },
     // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/404.vue') },
   ],

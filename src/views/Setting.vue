@@ -126,7 +126,7 @@ const clickToAlipay = () => {
   let authUrl = `https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=${appId}&scope=${scope}&redirect_uri=${redirectUri}&state=${state}`
 
   // 使用"支付宝短链接"来唤起支付宝App
-  // authUrl = `alipays://platformapi/startapp?appId=20000067&url=${encodeURIComponent(authUrl)}`
+  authUrl = `alipays://platformapi/startapp?appId=20000067&url=${encodeURIComponent(authUrl)}`
 
   // 用户点击按钮后，跳转到授权页
   // window.location.href = authUrl

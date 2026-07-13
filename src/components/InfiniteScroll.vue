@@ -66,8 +66,7 @@ onUnmounted(() => {
   @return: calc(@number / 375 * 100vw);
 }
 
-.pull {
-}
+.pull {}
 
 .load {
   width: 100%;
@@ -110,8 +109,8 @@ onUnmounted(() => {
   .text {
     color: var(--text--);
     font-family: 'PingFang SC';
-    font-size: .vw(12) [];
-    line-height: .vw(12) [];
+    font-size: .vw(14) [];
+    line-height: .vw(14) [];
     font-weight: 400;
     font-style: normal;
   }

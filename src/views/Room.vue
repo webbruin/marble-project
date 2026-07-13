@@ -55,57 +55,16 @@
           </div>
         </div>
       </div>
-      <div class="left-button-list" :class="{ 'no-self-room': watchGame }">
-        <div class="button" v-if="!watchGame" @click="clickRouter('fault-feedback')">
+      <div class="right-button-list">
+        <div class="button" @click="showSettingDialog = true">
           <i class="icon">
-            <img src="@/assets/images/room/icon7.png" alt="" />
+            <img src="@/assets/images/room/setting.png" alt="" />
           </i>
-          <img src="@/assets/images/room/text/gzbg.png" alt="" class="text-icon" />
-        </div>
-        <div class="button" v-if="!watchGame" @click="showBluetoothConnect = true">
-          <i class="icon">
-            <img src="@/assets/images/room/icon8.png" alt="" />
-            <i class="check" v-if="false"></i>
-          </i>
-          <img src="@/assets/images/room/text/ljsb.png" alt="" class="text-icon" />
-        </div>
-        <div class="button">
-          <i class="icon">
-            <img src="@/assets/images/room/icon4.png" alt="" />
-          </i>
-          <img src="@/assets/images/room/text/lxkf.png" alt="" class="text-icon" />
+          <img src="@/assets/images/room/text/setting.png" alt="" class="text-icon" />
         </div>
       </div>
-      <div class="right-button-list" :class="{ 'no-self-room': watchGame }">
-        <template v-if="!collapse">
-          <div class="button" @click="showGameRule = true">
-            <i class="icon">
-              <img src="@/assets/images/room/icon1.png" alt="" />
-            </i>
-            <img src="@/assets/images/room/text/yygz.png" alt="" class="text-icon" />
-          </div>
-          <div class="button" v-if="!watchGame" @click="openWinRecord">
-            <i class="icon">
-              <img src="@/assets/images/room/icon2.png" alt="" />
-            </i>
-            <img src="@/assets/images/room/text/zjjl.png" alt="" class="text-icon" />
-          </div>
-          <div class="button" @click="toggleMusic">
-            <i class="icon">
-              <img src="@/assets/images/room/icon3.png" alt="" />
-            </i>
-            <img src="@/assets/images/room/text/music-off.png" alt="" class="text-icon" v-if="musicOn" />
-            <img src="@/assets/images/room/text/music-on.png" alt="" class="text-icon" v-else />
-          </div>
-        </template>
-        <div class="button" @click="collapse = !collapse">
-          <i class="icon">
-            <img src="@/assets/images/room/icon6.png" alt="" :class="{ rotate: collapse }" />
-          </i>
-          <img src="@/assets/images/room/text/collapse-on.png" alt="" class="text-icon" v-if="collapse" />
-          <img src="@/assets/images/room/text/collapse-off.png" alt="" class="text-icon" v-else />
-        </div>
-      </div>
+
+
       <!-- 弹幕 -->
       <div class="danmaku" :class="{ 'start-game': isStartGame }">
         <div ref="danmaku-list" class="list" v-show="danmakuCollapse && danmakuList.length">
@@ -176,7 +135,75 @@
       </div>
     </div>
   </main>
-
+  <!-- 功能弹窗 -->
+  <div class="setting-dialog" v-show="showSettingDialog">
+    <div class="mask"></div>
+    <div class="content">
+      <div class="title">设置功能</div>
+      <div class="list">
+        <div class="model" @click="showGameRule = true">
+          <div class="icon">
+            <img src="@/assets/images/room/icon1.png" alt="" />
+          </div>
+          <div class="text">
+            <img src="@/assets/images/room/text/yygz.png" alt="" />
+          </div>
+        </div>
+        <div class="model" v-if="!watchGame" @click="openWinRecord">
+          <div class="icon">
+            <img src="@/assets/images/room/icon2.png" alt="" />
+          </div>
+          <div class="text">
+            <img src="@/assets/images/room/text/zjjl.png" alt="" />
+          </div>
+        </div>
+        <div class="model" @click="toggleMusic">
+          <div class="icon">
+            <img src="@/assets/images/room/icon3.png" alt="" />
+          </div>
+          <div class="text">
+            <img src="@/assets/images/room/text/music-off.png" alt="" v-if="musicOn" />
+            <img src="@/assets/images/room/text/music-on.png" alt="" v-else />
+          </div>
+        </div>
+        <div class="model" v-if="!watchGame" @click="clickRouter('fault-feedback')">
+          <div class="icon">
+            <img src="@/assets/images/room/icon7.png" alt="" />
+          </div>
+          <div class="text">
+            <img src="@/assets/images/room/text/gzbg.png" alt="" />
+          </div>
+        </div>
+        <div class="model" v-if="!watchGame" @click="showBluetoothConnect = true">
+          <div class="icon">
+            <img src="@/assets/images/room/icon8.png" alt="" />
+            <i class="check" v-if="false"></i>
+          </div>
+          <div class="text">
+            <img src="@/assets/images/room/text/ljsb.png" alt="" />
+          </div>
+        </div>
+        <div class="model">
+          <div class="icon">
+            <img src="@/assets/images/room/icon4.png" alt="" />
+          </div>
+          <div class="text">
+            <img src="@/assets/images/room/text/lxkf.png" alt="" />
+          </div>
+        </div>
+        <!-- <div class="model">
+          <div class="icon">
+            <img src="@/assets/images/room/icon5.png" alt="" />
+          </div>
+          <div class="text">
+            <img src="@/assets/images/room/text/sx.png" alt="" />
+          </div>
+        </div> -->
+      </div>
+      <div class="close" @click="showSettingDialog = false"></div>
+    </div>
+  </div>
+  <!-- 蓝牙连接 -->
   <div class="bluetooth-connect-dialog" v-if="showBluetoothConnect">
     <div class="mask" @click="showBluetoothConnect = false"></div>
     <div class="content">
@@ -185,7 +212,7 @@
       <div class="confirm" @click="clickBluetoothConnect">立即连接</div>
     </div>
   </div>
-
+  <!-- 游戏规则 -->
   <div class="game-rule-dialog" v-if="showGameRule">
     <div class="content">
       <p class="text">游戏规则</p>
@@ -211,7 +238,7 @@
     </div>
     <div class="confirm" @click="showGameRule = false">知道了</div>
   </div>
-
+  <!-- 中奖记录 -->
   <div class="win-record-dialog" v-if="showWinRecord">
     <div class="content">
       <p class="title">中奖记录</p>
@@ -236,12 +263,14 @@
     </div>
     <div class="confirm" @click="showWinRecord = false">知道了</div>
   </div>
-
+  <!-- 弹珠消耗 -->
   <WarnningDialog :show="showWarnningDialog" :level="getRoomLevelName(roomInfo.roomTypeId)" :ball="roomInfo.entryFee"
     @toggleShow="closeWarnningDialog">
   </WarnningDialog>
+  <!-- 弹珠支付确认 -->
   <ConfirmDialog :show="showConfirmDialog" :level="roomInfo.roomName" :ball="roomInfo.entryFee"
     :marbleAmount="marbleAmount" @close="closeConfirmDialog" @confirm="clickConfirmDialog"></ConfirmDialog>
+  <!-- 中奖 -->
   <BallSuccess :show="showBallSuccess"
     :ball="launchInfo.winPointCard > 0 ? launchInfo.winPointCard : launchInfo.winMarble"
     :type="launchInfo.winPointCard > 0 ? 2 : 1" @toggleShow="showBallSuccess = $event"></BallSuccess>
@@ -334,6 +363,7 @@ const addMax = ref(0)
 const enterRoomTime = ref(formatTimestamp(new Date()))
 const pollingRoomStatusTimer = ref(null)
 const pollingDanmakuTimer = ref(null)
+const showSettingDialog = ref(false)
 
 
 onMounted(() => {
@@ -1096,75 +1126,6 @@ const openWinRecord = () => {
       }
     }
 
-    .left-button-list {
-      width: .vw(64) [];
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      position: absolute;
-      top: .vw(180) [];
-      left: .vw(16) [];
-
-      &.no-self-room {
-        top: .vw(120) [];
-      }
-
-      .button {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-
-        &:not(:last-of-type) {
-          margin-bottom: .vw(12) [];
-        }
-
-        .icon {
-          width: .vw(42) [];
-          height: .vw(42) [];
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 100%;
-          background-color: rgba(0, 0, 0, 0.65);
-          position: relative;
-          margin-bottom: .vw(4) [];
-
-          img {
-            width: .vw(28) [];
-            height: .vw(28) [];
-          }
-
-          .check {
-            width: .vw(18) [];
-            height: .vw(18) [];
-            background-size: 100%;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-image: url(@/assets/images/check-icon.png);
-            position: absolute;
-            right: .vw(9) [];
-            bottom: .vw(6) [];
-          }
-        }
-
-        .text {
-          color: var(--white--);
-          -webkit-text-stroke-width: .vw(1) [];
-          -webkit-text-stroke-color: #835b5b;
-          font-family: 'HarmonyOS Sans SC';
-          font-size: .vw(16) [];
-          line-height: .vw(16) [];
-          font-weight: 900;
-          font-style: normal;
-        }
-
-        .text-icon {
-          height: .vw(18) [];
-        }
-      }
-    }
-
     .right-button-list {
       width: .vw(64) [];
       display: flex;
@@ -1592,6 +1553,128 @@ const openWinRecord = () => {
           width: .vw(120) [];
         }
       }
+    }
+  }
+}
+
+.setting-dialog {
+  .mask {
+    content: '';
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(#272933, 0.75);
+  }
+
+  .content {
+    width: .vw(328)[];
+    height: .vw(442)[];
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(@/assets/images/room/setting-dialog-bg.png);
+    position: fixed;
+    z-index: 10001;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: .vw(24)[];
+
+    &::before {
+      content: '';
+      width: .vw(89)[];
+      height: .vw(95)[];
+      background-size: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-image: url(@/assets/images/room/setting-dialog-icon.png);
+      position: absolute;
+      top: .vw(-18)[];
+      left: .vw(24)[];
+    }
+
+    .title {
+      color: var(--light-text--);
+      font-family: 'PingFang SC';
+      font-size: .vw(30) [];
+      line-height: .vw(30) [];
+      letter-spacing: .vw(5) [];
+      font-weight: 900;
+      font-style: normal;
+      text-align: right;
+      margin-right: .vw(15)[];
+      margin-bottom: .vw(35)[];
+    }
+
+    .list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+
+      .model {
+        width: .vw(77)[];
+        height: .vw(93)[];
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        border-radius: .vw(24)[];
+        border: .vw(4)[] solid #FF7716;
+        background-color: #B64C01;
+        margin-bottom: .vw(24) [];
+
+        &:not(:nth-child(3n + 0)) {
+          margin-right: .vw(24) [];
+        }
+
+        .icon {
+          width: .vw(42)[];
+          height: .vw(42)[];
+          margin-bottom: .vw(10)[];
+          position: relative;
+
+          img {
+            width: 100%;
+          }
+
+          .check {
+            width: .vw(18) [];
+            height: .vw(18) [];
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-image: url(@/assets/images/check-icon.png);
+            position: absolute;
+            right: .vw(4) [];
+            bottom: .vw(0) [];
+          }
+        }
+
+        .text {
+          max-width: .vw(64)[];
+          height: .vw(16)[];
+
+          img {
+            height: 100%;
+          }
+        }
+      }
+    }
+
+    .close {
+      width: .vw(24) [];
+      height: .vw(24) [];
+      background-size: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-image: url(@/assets/images/close.png);
+      position: absolute;
+      bottom: .vw(-60)[];
+      left: 50%;
+      transform: translateX(-50%);
     }
   }
 }
