@@ -65,21 +65,26 @@ const rows = ref([
 ])
 // 支付宝appid
 const appId = '2021006143643068'
-const authCode = ref('')
 const bindInfo = ref({})
 const showAplipayBindInfoPopup = ref(false)
 
 onMounted(() => {
-  getUserInfo()
   // 确保 AlipayJSBridge 已加载
   if (window.AlipayJSBridge) {
-    doGetAuthCode();
+    getAuthCode();
   } else {
-    document.addEventListener('AlipayJSBridgeReady', doGetAuthCode, false);
+    document.addEventListener('AlipayJSBridgeReady', getAuthCode, false);
   }
-  if (userInfo.value.alipayBound) {
-    getBindInfo()
-  }
+
+  // 首次进页面，先执行一次
+  getUserInfo()
+
+  // 监听用户是否从支付宝切了回来
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) {
+      getUserInfo()
+    }
+  });
 })
 
 const clickRouter = (name, params = {}, query = {}) => {
@@ -94,58 +99,26 @@ const clickRouter = (name, params = {}, query = {}) => {
     if (userInfo.value.alipayBound) {
       showAplipayBindInfoPopup.value = true
     } else {
-      clickToAlipay()
+      redirectAlipay()
     }
     return
   }
   router.push({ name, params, query })
 }
 
-const doGetAuthCode = () => {
+const getAuthCode = () => {
   ap.getAuthCode({
     appId,
     scopes: ['auth_user'],
   }, function (res) {
-    // authCode.value = res.authCode
-    // clickBound()
     router.push({ name: 'alipay-callback', query: { auth_code: res.authCode } })
   });
 }
 
 // 跳转支付宝
-const clickToAlipay = () => {
-  // const url = encodeURIComponent('https://www.bingobangai.com/setting')
+const redirectAlipay = () => {
   const url = encodeURIComponent(window.location.href)
   window.location.href = `alipays://platformapi/startapp?appId=20000067&url=${url}`
-
-  // 配置参数
-  // const redirectUri = encodeURIComponent('https://www.bingobangai.com/setting')
-  // // const redirectUri = encodeURIComponent(window.location.href)
-  // const scope = 'auth_user' // 或 'auth_base'
-  // const state = ''
-
-  // // 拼接授权URL
-  // let authUrl = `https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=${appId}&scope=${scope}&redirect_uri=${redirectUri}&state=${state}`
-
-  // // 使用"支付宝短链接"来唤起支付宝App
-  // authUrl = `alipays://platformapi/startapp?appId=20000067&url=${encodeURIComponent(authUrl)}`
-
-  // // 用户点击按钮后，跳转到授权页
-  // window.open(authUrl, '_blank')
-}
-
-// 绑定支付宝
-const clickBound = async () => {
-  try {
-    $toast.loading()
-    const res = await api.post('/pinball/user/alipay/bind', { authCode: authCode.value })
-    $toast.close()
-    if (res.code === 200) {
-      updateUserInfo()
-    }
-  } catch (e) {
-    $toast.info('系统错误')
-  }
 }
 
 // 解绑支付宝
@@ -157,10 +130,24 @@ const clickUnBound = async () => {
     if (res.code === 200) {
       $toast.info('支付宝解绑成功')
       showAplipayBindInfoPopup.value = false
-      updateUserInfo()
+      getUserInfo()
     }
   } catch (e) {
     $toast.info('系统错误')
+  }
+}
+
+// 获取用户信息
+const getUserInfo = async () => {
+  const res = await api.post('/pinball/user/info/getUserInfo')
+  if (res.code === 200) {
+    localStorage.setItem('userInfo', JSON.stringify(res.data))
+    userInfo.value = res.data
+    if (userInfo.value.alipayBound) {
+      getBindInfo()
+    } else {
+      bindInfo.value = {}
+    }
   }
 }
 
@@ -175,20 +162,6 @@ const getBindInfo = async () => {
     }
   } catch (e) {
     $toast.info('系统错误')
-  }
-}
-
-// 更新本地缓存：支付宝绑定信息
-const updateUserInfo = async () => {
-  userInfo.value = { ...userInfo.value, alipayBound: !userInfo.value.alipayBound }
-  localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
-}
-
-const getUserInfo = async () => {
-  const res = await api.post('/pinball/user/info/getUserInfo')
-  if (res.code === 200) {
-    userInfo.value = res.data
-    localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
   }
 }
 

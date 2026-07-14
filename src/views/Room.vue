@@ -1332,22 +1332,22 @@ const openWinRecord = () => {
         padding-bottom: .vw(8) [];
         position: relative;
 
-        &.no-game {
-          &::after {
-            content: '发射中，无法操作';
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: .vw(20)[];
-            background-color: rgba(#000, 0.25);
-          }
-        }
+        // &.no-game {
+        //   &::after {
+        //     content: '发射中，无法操作';
+        //     position: absolute;
+        //     left: 0;
+        //     right: 0;
+        //     top: 0;
+        //     bottom: 0;
+        //     display: flex;
+        //     align-items: center;
+        //     justify-content: center;
+        //     color: #fff;
+        //     font-size: .vw(20)[];
+        //     background-color: rgba(#000, 0.25);
+        //   }
+        // }
 
         .left {
           padding-left: .vw(20) [];

@@ -3,7 +3,6 @@
     <div class="content">
       <!-- 加载中 -->
       <template v-if="status === 'loading'">
-        <img class="icon" src="@/assets/images/recharge-success-icon.png" alt="" />
         <p class="title">支付宝绑定中...</p>
       </template>
       <!-- 成功 -->
@@ -13,17 +12,12 @@
       </template>
       <!-- 失败 -->
       <template v-if="status === 'fail'">
-        <img class="icon" src="@/assets/images/recharge-success-icon.png" alt="" />
         <p class="title">支付宝绑定失败</p>
         <p class="desc">{{ errorMsg }}</p>
       </template>
     </div>
     <div class="footer" v-if="status !== 'loading'">
       <div class="btn primary">请手动切回浏览器</div>
-      <!-- <div class="btn" :class="{ primary: status === 'success' }" @click="handleAction">
-        {{ status === 'success' ? '请手动返回浏览器' : '重新绑定' }}
-      </div>
-      <div class="btn" v-if="status === 'fail'" @click="goLogin">返回登录</div> -->
     </div>
   </main>
 </template>
@@ -56,6 +50,7 @@ const handleCallback = async () => {
       getUserInfo()
     }
   } catch (e) {
+    // $toast.info(`${JSON.stringify(e)}`, 1000 * 15)
     status.value = 'fail'
     errorMsg.value = '绑定失败，请重试'
   }
@@ -65,27 +60,6 @@ const getUserInfo = async () => {
   const res = await api.post('/pinball/user/info/getUserInfo')
   if (res.code === 200) {
     localStorage.setItem('userInfo', JSON.stringify(res.data))
-  }
-}
-
-const goHome = () => {
-  router.push({ name: 'home' })
-}
-
-const goLogin = () => {
-  router.push({ name: 'login' })
-}
-
-const handleReAuth = () => {
-  status.value = 'loading'
-  handleCallback()
-}
-
-const handleAction = () => {
-  if (status.value === 'success') {
-    goHome()
-  } else {
-    handleReAuth()
   }
 }
 </script>
