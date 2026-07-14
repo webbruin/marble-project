@@ -85,7 +85,7 @@ onBeforeMount(() => {
 const avatarChange = async (event) => {
   const formData = event[0]
   try {
-    const res = await api.post('/admin/pinball/file/upload', formData)
+    const res = await api.post('/file/upload', formData)
     if (res.code === 200) {
       formdata.value.avatar = res.data.filePathUrl
     }

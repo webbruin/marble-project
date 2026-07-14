@@ -85,7 +85,7 @@ const imgChange = async (event) => {
     const formData = event[n]
     try {
       $toast.loading('上传中')
-      const res = await api.post('/admin/pinball/file/upload', formData)
+      const res = await api.post('/file/upload', formData)
       $toast.close()
       if (res.code === 200) {
         params.value.images.push(res.data.filePathUrl)
@@ -115,7 +115,7 @@ const submit = async () => {
   const images = []
   for (const item of params.value.images) {
     console.log(111, item);
-    const res = await api.post('/admin/pinball/file/upload', item.file)
+    const res = await api.post('/file/upload', item.file)
     if (res.code === 200) {
       images.push(res.data.filePathUrl)
     }
@@ -405,10 +405,7 @@ const submit = async () => {
   }
 
   .submit {
-    position: fixed;
-    left: .vw(18) [];
-    right: .vw(18) [];
-    bottom: .vw(18) [];
+    padding: .vw(18)[];
   }
 }
 </style>
