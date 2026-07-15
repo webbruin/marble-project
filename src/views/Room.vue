@@ -92,10 +92,10 @@
             <span class="count">X{{ formatNumberWithCommas(cardAmount) }}</span>
           </div>
         </div>
-        <div class="gaming" :class="{ 'left-hand': handIsLeft, 'no-game': gaming }" v-if="isStartGame">
+        <div class="gaming" :class="{ 'left-hand': handIsLeft }" v-if="isStartGame">
           <div class="left">
             <p class="desc">已投入{{ ball }}枚弹珠，预计可获得{{ gameInfo.expectedWinMarble }}枚</p>
-            <div class="buttons">
+            <div class="buttons" :class="{ 'no-click': gaming }">
               <div class="item">
                 <span @click="changeBall(5)">+5</span>
               </div>
@@ -364,6 +364,7 @@ const enterRoomTime = ref(formatTimestamp(new Date()))
 const pollingRoomStatusTimer = ref(null)
 const pollingDanmakuTimer = ref(null)
 const showSettingDialog = ref(false)
+const asyncGameOrderResultTimer = ref(null)
 
 
 onMounted(() => {
@@ -387,6 +388,9 @@ onBeforeUnmount(() => {
   }
   if (startTimer.value) {
     clearInterval(startTimer.value)
+  }
+  if (asyncGameOrderResultTimer.value) {
+    clearInterval(asyncGameOrderResultTimer.value)
   }
   if (isLockRoom.value) {
     unlockRoom()
@@ -588,9 +592,56 @@ const addMarble = async (marbleCount) => {
 }
 
 // 发射弹珠
+// const launchBall = async () => {
+//   try {
+//     gaming.value = true
+//     // 力度
+//     const powerLevel = parseInt(stickMovePercent.value / 5)
+//     if (powerLevel <= 0) {
+//       return
+//     }
+//     countdown.value = 0
+//     if (startTimer.value) {
+//       clearInterval(startTimer.value)
+//     }
+//     sendStatus.value = '发射中'
+//     const res = await api.post('/pinball/room/launchBall', {
+//       roomId: roomId.value,
+//       powerLevel,
+//       orderId: gameInfo.value.orderId,
+//     })
+//     sendStatus.value = ''
+//     gaming.value = false
+//     if (res.code === 200) {
+//       if (res.data.winFlag === 1) {
+//         showBallSuccess.value = true
+//         launchInfo.value = res.data
+//       } else {
+//         $toast.info('很遗憾，未中奖')
+//         sendStatus.value = '未中奖'
+//       }
+//       updateCount()
+//       // 重置订单信息
+//       gameInfo.value = {}
+//       isStartGame.value = false
+//       addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
+//       ball.value = roomInfo.value.entryFee
+//     }
+//   } catch (e) {
+//     $toast.info('系统错误')
+//     sendStatus.value = ''
+//     gaming.value = false
+//     // 重置订单信息
+//     gameInfo.value = {}
+//     isStartGame.value = false
+//     addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
+//     ball.value = roomInfo.value.entryFee
+//   }
+// }
+
+// 发射弹珠（异步）
 const launchBall = async () => {
   try {
-    gaming.value = true
     // 力度
     const powerLevel = parseInt(stickMovePercent.value / 5)
     if (powerLevel <= 0) {
@@ -600,15 +651,39 @@ const launchBall = async () => {
     if (startTimer.value) {
       clearInterval(startTimer.value)
     }
-    sendStatus.value = '发射中'
-    const res = await api.post('/pinball/room/launchBall', {
+    const res = await api.post('/pinball/room/launchBallAsync', {
       roomId: roomId.value,
       powerLevel,
       orderId: gameInfo.value.orderId,
     })
-    sendStatus.value = ''
-    gaming.value = false
     if (res.code === 200) {
+      gaming.value = true
+      sendStatus.value = '发射中'
+      // 轮询：异步发射订单结果
+      if (!asyncGameOrderResultTimer.value) {
+        asyncGameOrderResultTimer.value = setInterval(() => {
+          getAsyncGameOrderResult()
+        }, 500)
+      }
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 查询异步发射结果
+const getAsyncGameOrderResult = async () => {
+  try {
+    const res = await api.post('/pinball/room/getAsyncGameOrderResult', { orderId: gameInfo.value.orderId })
+    if (res.code === 200) {
+      if (res.data?.orderStatus != 1) {
+        return
+      }
+      sendStatus.value = ''
+      gaming.value = false
+      // 查询到发射结果，清除定时器
+      clearInterval(asyncGameOrderResultTimer.value)
+      asyncGameOrderResultTimer.value = null
       if (res.data.winFlag === 1) {
         showBallSuccess.value = true
         launchInfo.value = res.data
@@ -622,6 +697,8 @@ const launchBall = async () => {
       isStartGame.value = false
       addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
       ball.value = roomInfo.value.entryFee
+    } else {
+      throw new Error()
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -632,6 +709,9 @@ const launchBall = async () => {
     isStartGame.value = false
     addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
     ball.value = roomInfo.value.entryFee
+    // 查询到发射结果，清除定时器
+    clearInterval(asyncGameOrderResultTimer.value)
+    asyncGameOrderResultTimer.value = null
   }
 }
 
@@ -1332,23 +1412,6 @@ const openWinRecord = () => {
         padding-bottom: .vw(8) [];
         position: relative;
 
-        // &.no-game {
-        //   &::after {
-        //     content: '发射中，无法操作';
-        //     position: absolute;
-        //     left: 0;
-        //     right: 0;
-        //     top: 0;
-        //     bottom: 0;
-        //     display: flex;
-        //     align-items: center;
-        //     justify-content: center;
-        //     color: #fff;
-        //     font-size: .vw(20)[];
-        //     background-color: rgba(#000, 0.25);
-        //   }
-        // }
-
         .left {
           padding-left: .vw(20) [];
 
@@ -1761,6 +1824,10 @@ const openWinRecord = () => {
       background: linear-gradient(90deg, #fd689a 0%, #ffab2d 100%);
     }
   }
+}
+
+&.no-click {
+  pointer-events: none !important;
 }
 
 .game-rule-dialog {

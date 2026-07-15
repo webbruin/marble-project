@@ -91,7 +91,7 @@ const imgChange = async (event) => {
         params.value.images.push(res.data.filePathUrl)
       }
     } catch (e) {
-      $toast.info(`第${n + 1}张上传失败`)
+      $toast.info(`第${+n + 1}张上传失败`)
     }
   }
 }
@@ -112,30 +112,23 @@ const submit = async () => {
     $toast.info('请选择反馈内容')
     return
   }
-  const images = []
-  for (const item of params.value.images) {
-    console.log(111, item);
-    const res = await api.post('/file/upload', item.file)
-    if (res.code === 200) {
-      images.push(res.data.filePathUrl)
-    }
-  }
   const body = {
     ...params.value,
-    images
+    images: JSON.stringify(params.value.images)
   }
-  console.log(222, body);
-  return
   try {
-    loading.value = true
+    $toast.loading()
     const res = await api.post('/pinball/feedback/save', body)
-    loading.value = false
+    $toast.close()
     if (res.code === 200) {
       $toast.info('提交成功')
+      const timer = setTimeout(() => {
+        clearTimeout(timer)
+        router.back()
+      }, 1500)
     }
   } catch (e) {
     $toast.info('系统错误')
-    loading.value = false
   }
 }
 </script>
