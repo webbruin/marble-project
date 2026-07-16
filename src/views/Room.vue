@@ -109,7 +109,7 @@
                 <span>+满</span>
               </div>
               <div class="item">
-                <input type="number" v-model="ball" @change="ballChange" />
+                <span class="input" @click="inputChange">{{ inputBall }}</span>
               </div>
               <div class="item" @click="changeBall(stepBall)">
                 <img class="add" src="@/assets/images/room/add-ball.png" alt="" />
@@ -274,6 +274,14 @@
   <BallSuccess :show="showBallSuccess"
     :ball="launchInfo.winPointCard > 0 ? launchInfo.winPointCard : launchInfo.winMarble"
     :type="launchInfo.winPointCard > 0 ? 2 : 1" @toggleShow="showBallSuccess = $event"></BallSuccess>
+
+  <!-- 弹珠输入弹窗  -->
+  <van-dialog v-model:show="showBallInputDialog" title="投入弹珠" show-cancel-button cancel-button-color="#848691"
+    confirm-button-color="#FFB169" @confirm="ballInputConfirm">
+    <div class="dialog-content">
+      <Input v-model="inputBall" type="number" placeholder="请输入"></Input>
+    </div>
+  </van-dialog>
 </template>
 
 <script setup>
@@ -297,6 +305,7 @@ import { formatNumberWithCommas, getRoomLevelName, formatTimestamp } from '@/uti
 import '@/trtc/lib-generate-test-usersig.min'
 import genTestUserSig from '@/trtc/generateTestUserSig'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
+import Input from '@/components/FormData/Input.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -365,7 +374,8 @@ const pollingRoomStatusTimer = ref(null)
 const pollingDanmakuTimer = ref(null)
 const showSettingDialog = ref(false)
 const asyncGameOrderResultTimer = ref(null)
-
+const showBallInputDialog = ref(false)
+const inputBall = ref(0)
 
 onMounted(() => {
   init()
@@ -591,54 +601,6 @@ const addMarble = async (marbleCount) => {
   }
 }
 
-// 发射弹珠
-// const launchBall = async () => {
-//   try {
-//     gaming.value = true
-//     // 力度
-//     const powerLevel = parseInt(stickMovePercent.value / 5)
-//     if (powerLevel <= 0) {
-//       return
-//     }
-//     countdown.value = 0
-//     if (startTimer.value) {
-//       clearInterval(startTimer.value)
-//     }
-//     sendStatus.value = '发射中'
-//     const res = await api.post('/pinball/room/launchBall', {
-//       roomId: roomId.value,
-//       powerLevel,
-//       orderId: gameInfo.value.orderId,
-//     })
-//     sendStatus.value = ''
-//     gaming.value = false
-//     if (res.code === 200) {
-//       if (res.data.winFlag === 1) {
-//         showBallSuccess.value = true
-//         launchInfo.value = res.data
-//       } else {
-//         $toast.info('很遗憾，未中奖')
-//         sendStatus.value = '未中奖'
-//       }
-//       updateCount()
-//       // 重置订单信息
-//       gameInfo.value = {}
-//       isStartGame.value = false
-//       addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
-//       ball.value = roomInfo.value.entryFee
-//     }
-//   } catch (e) {
-//     $toast.info('系统错误')
-//     sendStatus.value = ''
-//     gaming.value = false
-//     // 重置订单信息
-//     gameInfo.value = {}
-//     isStartGame.value = false
-//     addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
-//     ball.value = roomInfo.value.entryFee
-//   }
-// }
-
 // 发射弹珠（异步）
 const launchBall = async () => {
   try {
@@ -863,11 +825,22 @@ const changeBall = (event) => {
   addMarble(value)
 }
 
-const ballChange = (event) => {
-  let value = +event.target.value
+const inputChange = () => {
+  showBallInputDialog.value = true
+}
+
+const ballInputConfirm = () => {
+  if (inputBall.value < 1) {
+    $toast.info('最少投入1颗弹珠')
+    return
+  }
+  let value = inputBall.value
   value = Math.max(roomInfo.value.minMarble, value)
   value = Math.min(addMax.value, value)
   addMarble(value)
+  nextTick(() => {
+    showBallInputDialog.value = false
+  })
 }
 
 const clickStart = () => {
@@ -1459,17 +1432,17 @@ const openWinRecord = () => {
                 width: .vw(16) [];
               }
 
-              input {
+              .input {
                 width: 100%;
                 height: 100%;
-                border: none;
-                outline: none;
                 color: var(--light-text--);
                 font-size: .vw(16) [];
                 line-height: .vw(16) [];
                 font-weight: 900;
                 font-style: normal;
-                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 background-color: #fff;
               }
             }
@@ -2048,6 +2021,15 @@ const openWinRecord = () => {
     border-radius: .vw(45) [];
     border: 1px solid #ff3a64;
     background: linear-gradient(90deg, #fd689a 0%, #ffab2d 100%);
+  }
+}
+
+.dialog-content {
+  padding: .vw(20)[] .vw(40)[];
+  margin: 0 auto;
+
+  :deep .input {
+    text-align: center !important;
   }
 }
 </style>
