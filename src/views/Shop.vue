@@ -49,7 +49,8 @@
                 </div>
                 <div class="text">{{ item.productName }}</div>
                 <div class="option">
-                  <span class="point">积分 {{ formatNumberWithCommas(item.minSkuPrice) }}</span>
+                  <span class="point">{{ getProductTypeName(item.minSkuPointType) }}{{
+                    formatNumberWithCommas(item.minSkuPrice) }}</span>
                   <span class="add-cart" @click.stop="addCart(item)"></span>
                 </div>
               </div>
@@ -65,7 +66,7 @@
 import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
-import { formatNumberWithCommas } from '@/utils'
+import { formatNumberWithCommas, getProductTypeName } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -494,13 +495,18 @@ const addCart = async ({ productId, minSkuId }) => {
         overflow: hidden;
 
         .cover {
+          width: .vw(166)[];
+          height: .vw(125)[];
           display: flex;
+          align-items: center;
           justify-content: center;
+          overflow: hidden;
           padding: .vw(15) [] .vw(28) [] .vw(20) [] .vw(28) [];
+          margin-top: .vw(10)[];
+          margin-bottom: .vw(10)[];
 
           img {
-            max-width: 100%;
-            max-heignt: 100%;
+            width: 100%;
           }
         }
 

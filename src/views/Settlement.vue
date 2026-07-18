@@ -27,20 +27,20 @@
           <div class="info">
             <p class="name">{{ item.productName }}</p>
             <p class="desc">规格：{{ item.skuName }}</p>
-            <p class="point">{{ formatNumberWithCommas(item.price) }}积分</p>
+            <p class="point">{{ getProductTypeName(item.pointType) }}{{ formatNumberWithCommas(item.price) }}</p>
           </div>
           <div class="count">X{{ item.quantity }}</div>
         </div>
       </div>
       <div class="pay-list">
-        <div class="title">支付方式</div>
-        <div class="item" v-for="(item, index) in payList" :key="index" @click="clickPayType(item)">
-          <img :src="item.icon" alt="" class="icon" />
-          <span class="text">
-            {{ item.name }}
-            {{ item.type === 'point' ? `（剩余：${formatNumberWithCommas(cardAmount)}）` : '' }}
-          </span>
-          <span class="select" :class="{ selected: payType === item.type }"></span>
+        <div class="title">账户积分</div>
+        <div class="item" v-if="selectedPrice">
+          <img src="@/assets/images/point.png" alt="" class="icon" />
+          <span class="text">{{ getProductTypeName(0) }}（剩余：{{ formatNumberWithCommas(pointCardAmount) }}）</span>
+        </div>
+        <div class="item" v-if="selectedMemberPrice">
+          <img src="@/assets/images/point.png" alt="" class="icon" />
+          <span class="text">{{ getProductTypeName(1) }}（剩余：{{ formatNumberWithCommas(memberPointAmount) }}）</span>
         </div>
       </div>
     </div>
@@ -55,8 +55,12 @@
     </div>
     <div class="footer">
       <div class="info">
-        <span class="text">共计：</span>
-        <span class="count">{{ formatNumberWithCommas(selectedPrice) }}积分</span>
+        <div class="text">共计：</div>
+        <div class="count">
+          <p v-if="selectedPrice">{{ getProductTypeName(0) }} {{ formatNumberWithCommas(selectedPrice) }}</p>
+          <p v-if="selectedMemberPrice">{{ getProductTypeName(1) }} {{ formatNumberWithCommas(selectedMemberPrice) }}
+          </p>
+        </div>
       </div>
       <div class="pay" @click="clickPay">确定支付</div>
     </div>
@@ -66,7 +70,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { formatNumberWithCommas, formatToTwoDecimals } from '@/utils'
+import { formatNumberWithCommas, getProductTypeName } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -84,20 +88,14 @@ const paramsByDirect = ref({
   remark: '',
 })
 const settlementList = ref([])
-const payList = ref([
-  {
-    icon: new URL(`@/assets/images/point.png`, import.meta.url).href,
-    name: '积分支付',
-    type: 'point',
-  },
-])
 const address = ref({})
-const cardAmount = ref(0)
-const payType = ref('point')
+const pointCardAmount = ref(0)
+const memberPointAmount = ref(0)
 const isAgree = ref(false)
 
 onMounted(() => {
   getPointCardAmount()
+  getMemberPointAmount()
   init()
 })
 
@@ -146,31 +144,51 @@ const getPointCardAmount = async () => {
   try {
     const res = await api.post('/pinball/user/account/getPointCardAmount')
     if (res.code === 200) {
-      cardAmount.value = +res.data
+      pointCardAmount.value = +res.data
     }
   } catch (e) {
     $toast.info('系统错误')
   }
 }
 
-const selectedPrice = computed(() => {
-  if (settlementList.value.length) {
-    return settlementList.value
-      .map((item) => item.quantity * item.price)
-      .reduce((a, b) => (a || 0) + (b || 0))
+// 查询当前用户会员积分余额
+const getMemberPointAmount = async () => {
+  try {
+    const res = await api.post('/pinball/user/account/getMemberPointAmount')
+    if (res.code === 200) {
+      memberPointAmount.value = +res.data
+    }
+  } catch (e) {
+    $toast.info('系统错误')
   }
-  return 0
+}
+
+// 普通积分合计
+const selectedPrice = computed(() => {
+  let price = 0
+  let list = (settlementList.value || []).filter(item => item.pointType === 0).map((item) => item.quantity * item.price)
+  if (list.length > 1) {
+    price = list.reduce((a, b) => (a || 0) + (b || 0))
+  } else {
+    price = list[0] || 0
+  }
+  return price
+})
+
+// 会员积分合计
+const selectedMemberPrice = computed(() => {
+  let price = 0
+  let list = (settlementList.value || []).filter(item => item.pointType === 1).map((item) => item.quantity * item.price)
+  if (list.length > 1) {
+    price = list.reduce((a, b) => (a || 0) + (b || 0))
+  } else {
+    price = list[0] || 0
+  }
+  return price
 })
 
 const clickSelectAddress = () => {
   router.push({ name: 'address', params: { type: 'select' } })
-}
-
-const clickPayType = (item) => {
-  if (payType.value === item.type) {
-    return
-  }
-  payType.value = item.type
 }
 
 const clickAggrement = (type) => {
@@ -180,10 +198,6 @@ const clickAggrement = (type) => {
 const clickPay = () => {
   if (!params.value.addressId && !paramsByDirect.value.addressId) {
     $toast.info('请选择收货地址')
-    return
-  }
-  if (!payType.value) {
-    $toast.info('请选择支付方式')
     return
   }
   if (!isAgree.value) {
@@ -491,7 +505,7 @@ const orderPay = async (orderId) => {
 
     .info {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
 
       .text {
         color: var(--light-text--);
@@ -503,12 +517,18 @@ const orderPay = async (orderId) => {
       }
 
       .count {
-        color: var(--light-text--);
-        font-family: 'PingFang SC';
-        font-size: .vw(18) [];
-        line-height: .vw(18) [];
-        font-weight: 400;
-        font-style: normal;
+        p {
+          color: var(--light-text--);
+          font-family: 'PingFang SC';
+          font-size: .vw(16) [];
+          line-height: .vw(16) [];
+          font-weight: 400;
+          font-style: normal;
+
+          &:not(:last-child) {
+            margin-bottom: .vw(4) [];
+          }
+        }
       }
     }
 

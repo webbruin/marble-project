@@ -405,7 +405,16 @@ onBeforeUnmount(() => {
   if (isLockRoom.value) {
     unlockRoom()
   }
+  clearTrtc()
 })
+
+// 退出房间，清除trtc
+const clearTrtc = async () => {
+  await trtc.exitRoom();
+  trtc.off('*');  // 解除所有事件绑定
+  trtc.destroy();
+  trtc = null;
+}
 
 const back = () => {
   $modal.show({
@@ -800,7 +809,7 @@ const getRoomStatus = async () => {
     })
     if (res.code === 200) {
       if (res.data === 0) {
-        reload()
+        getRoomDetail()
       }
       if (res.data > 1) {
         clearInterval(pollingRoomStatusTimer.value)

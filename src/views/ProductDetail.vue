@@ -14,18 +14,14 @@
       <div class="main">
         <div class="module module1">
           <div class="point">
-            <span class="text">积分</span>
+            <span class="text">{{ getProductTypeName(selectSku.pointType) }}</span>
             <span class="count">{{ formatNumberWithCommas(selectSku.price) }}</span>
           </div>
           <div class="name">{{ productData.productName }}</div>
           <div class="desc">{{ productData.description }}</div>
           <div class="sku-list" v-if="productData.skuList?.length">
             <template v-for="(item, index) in productData.skuList" :key="index">
-              <div
-                class="sku"
-                :class="{ selected: item.skuId === selectSkuId }"
-                @click="selectSkuId = item.skuId"
-              >
+              <div class="sku" :class="{ selected: item.skuId === selectSkuId }" @click="selectSkuId = item.skuId">
                 <div class="sku-img" v-if="item.image">
                   <img :src="item.image" alt="" />
                 </div>
@@ -44,6 +40,7 @@
       <div class="cart" @click="toCart">
         <img src="@/assets/images/product-detail/cart.png" alt="" />
       </div>
+      <div class="add-cart" @click="clickAddCart">加入购物车</div>
       <div class="settlement" @click="toSettlement">立即兑换</div>
     </div>
   </div>
@@ -52,7 +49,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { formatNumberWithCommas } from '@/utils'
+import { formatNumberWithCommas, getProductTypeName } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -89,6 +86,21 @@ const getProductDetail = async () => {
   }
 }
 
+const addCart = async ({ productId, skuId }) => {
+  try {
+    const res = await api.post('/pinball/shop/cart/add', {
+      productId,
+      skuId,
+      quantity: 1,
+    })
+    if (res.code === 200) {
+      $toast.info('加入购物车成功')
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
 const selectSku = computed(() => {
   return productData.value.skuList
     ? productData.value.skuList.find((item) => item.skuId === selectSkuId.value)
@@ -97,6 +109,10 @@ const selectSku = computed(() => {
 
 const toCart = () => {
   router.push({ name: 'cart' })
+}
+
+const clickAddCart = () => {
+  addCart(selectSku.value)
 }
 
 const toSettlement = () => {
@@ -173,7 +189,7 @@ const toSettlement = () => {
           margin-bottom: .vw(16) [];
 
           .text {
-            color: #f20c32;
+            color: var(--orange--);
             font-family: 'PingFang SC';
             font-size: .vw(14) [];
             line-height: .vw(14) [];
@@ -183,7 +199,7 @@ const toSettlement = () => {
           }
 
           .count {
-            color: #f20c32;
+            color: var(--orange--);
             font-family: 'PingFang SC';
             font-size: .vw(18) [];
             line-height: .vw(18) [];
@@ -305,6 +321,21 @@ const toSettlement = () => {
         width: 100%;
         height: 100%;
       }
+    }
+
+    .add-cart {
+      flex: 1;
+      color: var(--light-text--);
+      font-family: 'PingFang SC';
+      font-size: .vw(16) [];
+      line-height: .vw(48) [];
+      font-weight: 500;
+      text-align: center;
+      font-style: normal;
+      border-radius: .vw(45) [];
+      border: 1px solid #EDEDF0;
+      background-color: #fff;
+      margin-right: .vw(20)[];
     }
 
     .settlement {

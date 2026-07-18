@@ -98,7 +98,7 @@ const orderStatusMap = {
   0: '待支付',
   1: '已支付',
   2: '已发货',
-  3: '已收货',
+  3: '已完成',
   4: '退款中',
   5: '已退款',
   6: '已关闭',
@@ -106,6 +106,20 @@ const orderStatusMap = {
 
 const getOrderStatusName = (status) => {
   return orderStatusMap[status] || ''
+}
+
+// 商品类型枚举
+const productTypeMap = {
+  0: '积分',
+  1: '会员积分',
+}
+
+const getProductTypeName = (type) => {
+  return productTypeMap[type] || ''
+}
+
+const isMemberPoints = (type) => {
+  return +type === 1
 }
 
 // 房间等级枚举
@@ -153,5 +167,8 @@ export {
   getOrderStatusName,
   roomLevelMap,
   getRoomLevelName,
+  productTypeMap,
+  getProductTypeName,
+  isMemberPoints,
   formatTimestamp,
 }

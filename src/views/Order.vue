@@ -2,13 +2,8 @@
   <main class="order">
     <Header title="订单"></Header>
     <div class="tab" ref="tabRef">
-      <div
-        class="item"
-        :class="{ selected: params.orderStatus === item.orderStatus }"
-        v-for="(item, index) in tabList"
-        :key="index"
-        @click="clickTab(item.orderStatus)"
-      >
+      <div class="item" :class="{ selected: params.orderStatus === item.orderStatus }" v-for="(item, index) in tabList"
+        :key="index" @click="clickTab(item.orderStatus)">
         {{ item.name }}
       </div>
     </div>
@@ -16,12 +11,7 @@
       <InfiniteScroll :loading="loading" :loadOver="loadOver" :empty="isEmpty" @load="loadMore">
         <template #content>
           <div class="order-list">
-            <div
-              class="item"
-              v-for="(item, index) in orderList"
-              :key="index"
-              @click="toOrderDetail(item)"
-            >
+            <div class="item" v-for="(item, index) in orderList" :key="index" @click="toOrderDetail(item)">
               <div class="address">
                 <span class="text">{{ item.recipientAddress }}</span>
                 <span class="status">{{ getOrderStatusName(item.orderStatus) }}</span>
@@ -34,8 +24,12 @@
                     <span class="num">X{{ skuItem.quantity }}</span>
                   </div>
                 </div>
+                <!-- {{ getProductTypeName(item.pointType) }} -->
                 <div class="info">
-                  <p class="point">积分{{ formatNumberWithCommas(item.totalAmount) }}</p>
+                  <p class="point" v-if="selectedPrice(item.items)">{{ getProductTypeName(0) }}{{
+                    formatNumberWithCommas(selectedPrice(item.items)) }}</p>
+                  <p class="point" v-if="selectedMemberPrice(item.items)">{{ getProductTypeName(1) }}{{
+                    formatNumberWithCommas(selectedMemberPrice(item.items)) }}</p>
                   <p class="count">共{{ item.totalQuantity }}件</p>
                 </div>
               </div>
@@ -49,7 +43,6 @@
                 </template>
                 <template v-if="item.orderStatus === 3">
                   <div class="button button1">再来一单</div>
-                  <div class="button button2">确认收货</div>
                 </template>
                 <template v-if="item.orderStatus === 4">
                   <div class="button button2">取消退款</div>
@@ -70,7 +63,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
-import { formatNumberWithCommas, formatToTwoDecimals, getOrderStatusName } from '@/utils'
+import { formatNumberWithCommas, getProductTypeName, getOrderStatusName } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -166,6 +159,30 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
     return
   }
   router.push({ name: 'order-detail', params: { orderId }, query: { orderStatus } })
+}
+
+// 普通积分合计
+const selectedPrice = (items = []) => {
+  let price = 0
+  let list = items.filter(item => item.pointType === 0).map((item) => item.quantity * item.price)
+  if (list.length > 1) {
+    price = list.reduce((a, b) => (a || 0) + (b || 0))
+  } else {
+    price = list[0] || 0
+  }
+  return price
+}
+
+// 会员积分合计
+const selectedMemberPrice = (items = []) => {
+  let price = 0
+  let list = items.filter(item => item.pointType === 1).map((item) => item.quantity * item.price)
+  if (list.length > 1) {
+    price = list.reduce((a, b) => (a || 0) + (b || 0))
+  } else {
+    price = list[0] || 0
+  }
+  return price
 }
 </script>
 
@@ -291,15 +308,21 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
             margin-right: .vw(20) [];
 
             .cover {
-              min-width: .vw(56) [];
               width: .vw(56) [];
               height: .vw(56) [];
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: .vw(6) [];
               position: relative;
+              overflow: hidden;
+
+              &:not(:last-of-type) {
+                margin-right: .vw(8)[];
+              }
 
               img {
-                max-width: 100%;
-                max-height: 100%;
-                border-radius: .vw(6) [];
+                width: 100%;
               }
 
               .num {
@@ -328,6 +351,7 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
               line-height: .vw(14) [];
               font-weight: 600;
               font-style: normal;
+              text-align: right;
               margin-bottom: .vw(6) [];
             }
 
@@ -338,6 +362,7 @@ const toOrderDetail = ({ orderId, orderStatus }) => {
               line-height: .vw(12) [];
               font-weight: 400;
               font-style: normal;
+              text-align: right;
             }
           }
         }

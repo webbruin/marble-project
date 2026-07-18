@@ -46,7 +46,7 @@
         </div>
         <div class="item" @click="clickRouter('order', { status: 3 })">
           <i class="icon status3"></i>
-          <p class="text">已收货</p>
+          <p class="text">已完成</p>
         </div>
         <div class="item" @click="clickRouter('order', { status: 4 })">
           <i class="icon status4"></i>

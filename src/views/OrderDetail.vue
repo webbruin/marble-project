@@ -37,9 +37,14 @@
           </div>
         </div>
         <!-- 合计积分 -->
-        <div class="total-point">
-          <div class="text">合计积分</div>
-          <div class="count">{{ formatNumberWithCommas(orderData.totalAmount) }}</div>
+        <div class="total-point" v-if="selectedPrice">
+          <div class="text">合计{{ getProductTypeName(0) }}</div>
+          <div class="count">{{ formatNumberWithCommas(selectedPrice) }}</div>
+        </div>
+        <!-- 合计会员积分 -->
+        <div class="total-point" v-if="selectedMemberPrice">
+          <div class="text">合计{{ getProductTypeName(1) }}</div>
+          <div class="count">{{ formatNumberWithCommas(selectedMemberPrice) }}</div>
         </div>
       </template>
 
@@ -52,12 +57,18 @@
           </div>
           <div class="info" v-if="orderData.orderStatus === 4">您已提交退款申请，请联系客服处理</div>
           <div class="info" v-if="orderData.orderStatus === 5">您的退款申请{{ refundAudit.refundStatus === 2 ? '失败' : '成功'
-          }}，请联系客服处理</div>
+            }}，请联系客服处理</div>
         </div>
         <!-- 退积分 -->
         <div class="total-point">
-          <div class="text">退积分</div>
-          <div class="count">{{ formatNumberWithCommas(orderData.totalAmount) }}</div>
+          <template v-if="selectedPrice">
+            <div class="text">退{{ getProductTypeName(0) }}</div>
+            <div class="count">{{ formatNumberWithCommas(selectedPrice) }}</div>
+          </template>
+          <template v-if="selectedMemberPrice">
+            <div class="text">退{{ getProductTypeName(1) }}</div>
+            <div class="count">{{ formatNumberWithCommas(selectedMemberPrice) }}</div>
+          </template>
         </div>
         <!-- 退款审批 -->
         <div class="return-audit">
@@ -88,17 +99,21 @@
               <div class="info">
                 <span class="spu-name">{{ item.productName }}</span>
                 <span class="text">规格：{{ item.skuName }}</span>
-                <span class="text">单价：{{ formatNumberWithCommas(item.price) }}{{ item.pointType ===
-                  0 ? '积分' : '会员积分'
+                <span class="text">单价：{{ formatNumberWithCommas(item.price) }}{{ getProductTypeName(item.pointType)
                   }}</span>
                 <span class="text">数量：{{ item.quantity }}</span>
               </div>
-              <div class="point">积分{{ formatNumberWithCommas(item.quantity * item.price) }}</div>
+              <div class="point">{{ getProductTypeName(item.pointType) }}{{ formatNumberWithCommas(item.quantity *
+                item.price) }}</div>
             </div>
           </div>
-          <div class="total">
-            <span class="text">合计积分</span>
-            <span class="point">{{ formatNumberWithCommas(allPoint) }}</span>
+          <div class="total" v-if="selectedPrice">
+            <span class="text">合计{{ getProductTypeName(0) }}</span>
+            <span class="point">{{ formatNumberWithCommas(selectedPrice) }}</span>
+          </div>
+          <div class="total" v-if="selectedMemberPrice">
+            <span class="text">合计{{ getProductTypeName(1) }}</span>
+            <span class="point">{{ formatNumberWithCommas(selectedMemberPrice) }}</span>
           </div>
         </div>
       </template>
@@ -125,7 +140,6 @@
       </template>
       <template v-if="orderData.orderStatus === 3">
         <div class="button1" @click="clickPlaceOrderAgain">再来一单</div>
-        <div class="button2" @click="clickConfirmReceive">确认收货</div>
       </template>
       <template v-if="orderData.orderStatus === 4">
         <div class="button2" @click="clickRefundCancel">取消退款</div>
@@ -175,7 +189,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Input from '@/components/FormData/Input.vue'
 import Button from '@/components/FormData/Button.vue'
-import { formatNumberWithCommas, formatToTwoDecimals, getOrderStatusName } from '@/utils'
+import { formatNumberWithCommas, getProductTypeName, getOrderStatusName } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -254,6 +268,30 @@ const refundAudit = computed(() => {
     refundStatus,
     refundProgress: progress
   }
+})
+
+// 普通积分合计
+const selectedPrice = computed(() => {
+  let price = 0
+  let list = (orderData.value.items || []).filter(item => item.pointType === 0).map((item) => item.quantity * item.price)
+  if (list.length > 1) {
+    price = list.reduce((a, b) => (a || 0) + (b || 0))
+  } else {
+    price = list[0] || 0
+  }
+  return price
+})
+
+// 会员积分合计
+const selectedMemberPrice = computed(() => {
+  let price = 0
+  let list = (orderData.value.items || []).filter(item => item.pointType === 1).map((item) => item.quantity * item.price)
+  if (list.length > 1) {
+    price = list.reduce((a, b) => (a || 0) + (b || 0))
+  } else {
+    price = list[0] || 0
+  }
+  return price
 })
 
 // 申请退款
@@ -518,15 +556,21 @@ const clickPlaceOrderAgain = () => {
           overflow-y: hidden;
 
           .cover {
-            min-width: .vw(56)[];
             width: .vw(56) [];
             height: .vw(56) [];
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: .vw(6) [];
             position: relative;
+            overflow: hidden;
+
+            &:not(:last-of-type) {
+              margin-right: .vw(8)[];
+            }
 
             img {
-              max-width: 100%;
-              max-height: 100%;
-              border-radius: .vw(6)[];
+              width: 100%;
             }
 
             .num {
@@ -674,6 +718,7 @@ const clickPlaceOrderAgain = () => {
         line-height: .vw(14) [];
         font-weight: 500;
         font-style: normal;
+        padding: 0 .vw(8)[];
         margin-bottom: .vw(8)[];
       }
 
@@ -747,6 +792,10 @@ const clickPlaceOrderAgain = () => {
         align-items: center;
         justify-content: space-between;
         padding: 0 .vw(8)[];
+
+        &:not(:last-child) {
+          margin-bottom: .vw(8)[];
+        }
 
         .text {
           color: var(--light-text--);

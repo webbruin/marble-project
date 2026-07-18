@@ -19,11 +19,7 @@
             <template v-for="(item, index) in cartList" :key="index">
               <div class="item" v-if="item.quantity > 0">
                 <div class="check">
-                  <i
-                    class="select"
-                    :class="{ selected: item.selected === 1 }"
-                    @click="clickSelectCart(item)"
-                  ></i>
+                  <i class="select" :class="{ selected: item.selected === 1 }" @click="clickSelectCart(item)"></i>
                 </div>
                 <div class="module">
                   <div class="cover">
@@ -32,27 +28,16 @@
                   <div class="info">
                     <p class="name">{{ item.productName }}</p>
                     <p class="desc">规格：{{ item.skuName }}</p>
-                    <p class="price">积分 {{ formatNumberWithCommas(item.price) }}</p>
+                    <p class="price">{{ getProductTypeName(item.pointType) }}{{ formatNumberWithCommas(item.price) }}
+                    </p>
                   </div>
                 </div>
                 <div class="option">
-                  <i
-                    class="sub"
-                    :class="{ disabled: item.quantity < 1 }"
-                    @click="subQuantity(item)"
-                  ></i>
+                  <i class="sub" :class="{ disabled: item.quantity < 1 }" @click="subQuantity(item)"></i>
                   <div class="quantity">
-                    <input
-                      type="number"
-                      v-model="item.quantity"
-                      @input="quantityChange($event, item)"
-                    />
+                    <input type="number" v-model="item.quantity" @input="quantityChange($event, item)" />
                   </div>
-                  <i
-                    class="plus"
-                    :class="{ disabled: item.quantity >= item.stock }"
-                    @click="plusQuantity(item)"
-                  ></i>
+                  <i class="plus" :class="{ disabled: item.quantity >= item.stock }" @click="plusQuantity(item)"></i>
                 </div>
               </div>
             </template>
@@ -66,13 +51,17 @@
         <span class="text">全选</span>
       </div>
       <div class="price">
-        <p class="text">合计积分</p>
-        <p class="quantity">{{ formatNumberWithCommas(selectedItemPrice) }}</p>
+        <div class="price-item" v-if="selectedItemPrice">
+          <span class="text">合计{{ getProductTypeName(0) }}</span>
+          <span class="quantity">{{ formatNumberWithCommas(selectedItemPrice) }}</span>
+        </div>
+        <div class="price-item" v-if="selectedItemMemberPrice">
+          <span class="text">合计{{ getProductTypeName(1) }}</span>
+          <span class="quantity">{{ formatNumberWithCommas(selectedItemMemberPrice) }}</span>
+        </div>
       </div>
       <div class="checkout" :class="{ disabled: !selectedItemQuantity }" @click="clickSettlement">
-        <span class="text"
-          >去结算{{ selectedItemQuantity ? `(${selectedItemQuantity})` : '' }}</span
-        >
+        <span class="text">去结算{{ selectedItemQuantity ? `(${selectedItemQuantity})` : '' }}</span>
       </div>
     </div>
   </main>
@@ -82,7 +71,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
-import { formatNumberWithCommas } from '@/utils'
+import { formatNumberWithCommas, getProductTypeName } from '@/utils'
 
 const router = useRouter()
 
@@ -147,12 +136,25 @@ const selectedItemQuantity = computed(() => {
 })
 
 const selectedItemPrice = computed(() => {
-  if (selectedCartList.value.length) {
-    return selectedCartList.value
-      .map((item) => item.quantity * item.price)
-      .reduce((a, b) => (a || 0) + (b || 0))
+  let price = 0
+  let list = (selectedCartList.value || []).filter(item => item.pointType === 0).map((item) => item.quantity * item.price)
+  if (list.length > 1) {
+    price = list.reduce((a, b) => (a || 0) + (b || 0))
+  } else {
+    price = list[0] || 0
   }
-  return 0
+  return price
+})
+
+const selectedItemMemberPrice = computed(() => {
+  let price = 0
+  let list = (selectedCartList.value || []).filter(item => item.pointType === 1).map((item) => item.quantity * item.price)
+  if (list.length > 1) {
+    price = list.reduce((a, b) => (a || 0) + (b || 0))
+  } else {
+    price = list[0] || 0
+  }
+  return price
 })
 
 const cartListIsAll = computed(() => {
@@ -494,26 +496,35 @@ const clearCart = async () => {
     }
 
     .price {
-      margin-left: .vw(30) [];
+      margin-left: .vw(20) [];
       margin-right: .vw(10) [];
 
-      .text {
-        color: var(--light-text--);
-        font-family: 'PingFang SC';
-        font-size: .vw(12) [];
-        line-height: .vw(12) [];
-        font-weight: 400;
-        font-style: normal;
-        margin-bottom: .vw(4) [];
-      }
+      .price-item {
+        display: flex;
+        align-items: center;
 
-      .quantity {
-        color: var(--orange--);
-        font-family: 'PingFang SC';
-        font-size: .vw(18) [];
-        line-height: .vw(18) [];
-        font-weight: 500;
-        font-style: normal;
+        &:not(:last-child) {
+          margin-bottom: .vw(4) [];
+        }
+
+        .text {
+          color: var(--light-text--);
+          font-family: 'PingFang SC';
+          font-size: .vw(12) [];
+          line-height: .vw(12)[];
+          font-weight: 400;
+          font-style: normal;
+          margin-right: .vw(2) [];
+        }
+
+        .quantity {
+          color: var(--orange--);
+          font-family: 'PingFang SC';
+          font-size: .vw(18) [];
+          line-height: .vw(18)[];
+          font-weight: 500;
+          font-style: normal;
+        }
       }
     }
 
