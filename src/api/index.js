@@ -25,6 +25,9 @@ api.interceptors.response.use(
     if (code === 200) {
       // ...
     }
+    else if (code === 11401) {
+      // ...
+    }
     else if (code === 401) {
       const timer = setTimeout(() => {
         clearTimeout(timer)
