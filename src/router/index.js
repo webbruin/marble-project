@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { isWechat } from '@/utils'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -126,6 +127,11 @@ const router = createRouter({
       name: 'alipay-callback',
       component: () => import('../views/AlipayCallback.vue'),
     },
+    {
+      path: '/guide',
+      name: 'guide',
+      component: () => import('../views/Guide.vue'),
+    },
     // 404
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/404.vue') },
   ],
@@ -168,8 +174,14 @@ const needLoginPage = [
 ]
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
+  // 判断当前是否微信浏览器，是则跳到引导页
+  if (isWechat() && to.name !== 'guide') {
+    next({ name: 'guide' })
+  } else if (!isWechat() && to.name === 'guide') {
+    next({ name: 'home' })
+  }
   // 将已登录用户，重定向到首页
+  const token = localStorage.getItem('token')
   if (token && to.name === 'login') {
     next({ name: 'home' })
   }

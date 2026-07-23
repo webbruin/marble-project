@@ -122,6 +122,11 @@ const isMemberPoints = (type) => {
   return +type === 1
 }
 
+// 判断当前浏览器环境
+const isWechat = () => /micromessenger/i.test(navigator.userAgent)
+
+const isAlipay = () => /alipayclient|alipay/i.test(navigator.userAgent)
+
 // 房间等级枚举
 const roomLevelMap = {
   1: '初级房间',
@@ -170,5 +175,7 @@ export {
   productTypeMap,
   getProductTypeName,
   isMemberPoints,
+  isWechat,
+  isAlipay,
   formatTimestamp,
 }

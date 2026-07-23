@@ -22,13 +22,17 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     const { code, message } = response.data || {}
-    if (code === 401) {
+    if (code === 200) {
+      // ...
+    }
+    else if (code === 401) {
       const timer = setTimeout(() => {
         clearTimeout(timer)
         localStorage.removeItem('token')
         location.href = '/login'
       }, 1000)
-    } else if (code !== 200) {
+    }
+    else {
       const timer = setTimeout(() => {
         window.$toast?.info(message || '请求失败')
         clearTimeout(timer)

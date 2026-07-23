@@ -50,7 +50,7 @@ const router = useRouter()
 const userInfo = ref(JSON.parse(localStorage.getItem('userInfo')) || {})
 const rows = ref([
   [
-    { name: '购买说明', show: true, router: 'aggrement', params: { type: 'gmsm' } },
+    { name: '用户协议', show: true, router: 'aggrement', params: { type: 'yhxy' } },
     { name: '充值协议', show: true, router: 'aggrement', params: { type: 'czxy' } },
     { name: '隐私政策', show: true, router: 'aggrement', params: { type: 'ysxy' } },
   ],
