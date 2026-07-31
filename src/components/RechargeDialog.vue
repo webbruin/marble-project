@@ -6,13 +6,8 @@
       <p class="title">弹珠充值</p>
       <div class="recharge">
         <div class="ball-count-list">
-          <div
-            class="item"
-            :class="{ selected: selectedRechargePackage === item.packageId }"
-            v-for="(item, index) in rechargeList"
-            :key="index"
-            @click="clickPackage(item)"
-          >
+          <div class="item" :class="{ selected: selectedRechargePackage === item.packageId }"
+            v-for="(item, index) in rechargeList" :key="index" @click="clickPackage(item)">
             <div class="ball">
               <i class="icon"></i>
               <i class="count">X{{ Number(item.marbleAmount) + Number(item.giftMarbleAmount) }}</i>
@@ -23,12 +18,7 @@
         <div class="payway">
           <div class="sub-title">支付方式</div>
           <div class="payway-list">
-            <div
-              class="item"
-              v-for="(item, index) in paywayList"
-              :key="index"
-              @click="clickPayway(item)"
-            >
+            <div class="item" v-for="(item, index) in paywayList" :key="index" @click="clickPayway(item)">
               <img src="@/assets/images/alipay.png" alt="" class="icon" />
               <span class="text">{{ item.name }}</span>
               <i class="select" :class="{ selected: selectedPayway === item.value }"></i>
@@ -54,12 +44,15 @@
     </div>
     <div class="close" @click="closeRechargeSuccess"></div>
   </div>
+
+  <Aggrement ref="aggrementRef"></Aggrement>
 </template>
 
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { formatToTwoDecimals } from '@/utils'
+import Aggrement from '@/views/Aggrement.vue'
 
 const router = useRouter()
 
@@ -77,6 +70,7 @@ const isAgree = ref(false)
 const showRechargeSuccess = ref(false)
 const timer = ref(null)
 const time = ref(1000) // 轮询间隔1000ms
+const aggrementRef = ref(null);
 
 onMounted(() => {
   getRechargeList()
@@ -176,7 +170,7 @@ const clickPayway = (item) => {
 }
 
 const clickAggrement = () => {
-  router.push({ name: 'aggrement', params: { type: 'czxy' } })
+  aggrementRef.value.showPopup('czxy')
 }
 
 const closeRechargeSuccess = () => {
@@ -194,7 +188,7 @@ const closeRechargeSuccess = () => {
   height: 100%;
   background-color: rgba(#272933, 0.75);
   position: fixed;
-  z-index: 10001;
+  z-index: 1001;
   left: 0;
   bottom: 0;
 }
@@ -205,7 +199,7 @@ const closeRechargeSuccess = () => {
   align-items: center;
   flex-direction: column;
   position: fixed;
-  z-index: 10002;
+  z-index: 1002;
   left: 0;
   bottom: 0;
   transform: translateY(115%);

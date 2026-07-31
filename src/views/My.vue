@@ -24,9 +24,10 @@
         <div class="progress">
           <p :style="{ width: `${userLevelInfo.totalRechargeAmount / userLevelInfo.needRechargeAmount}%` }"></p>
         </div>
-        <div class="count">
+        <div class="count" v-if="userLevelInfo.totalRechargeAmount && userLevelInfo.needRechargeAmount">
           {{ userLevelInfo.totalRechargeAmount }}/{{ userLevelInfo.needRechargeAmount }}
         </div>
+        <div class="count" v-else>恭喜，你已经是站在山顶的王者了</div>
         <i class="vip-icon" :class="`level${userLevelInfo.levelValue}`"></i>
       </div>
     </div>

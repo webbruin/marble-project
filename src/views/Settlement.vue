@@ -65,12 +65,15 @@
       <div class="pay" @click="clickPay">确定支付</div>
     </div>
   </main>
+
+  <Aggrement ref="aggrementRef"></Aggrement>
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { formatNumberWithCommas, getProductTypeName } from '@/utils'
+import Aggrement from '@/views/Aggrement.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -92,6 +95,7 @@ const address = ref({})
 const pointCardAmount = ref(0)
 const memberPointAmount = ref(0)
 const isAgree = ref(false)
+const aggrementRef = ref(null);
 
 onMounted(() => {
   getPointCardAmount()
@@ -192,7 +196,7 @@ const clickSelectAddress = () => {
 }
 
 const clickAggrement = (type) => {
-  router.push({ name: 'aggrement', params: { type } })
+  aggrementRef.value.showPopup(type)
 }
 
 const clickPay = () => {

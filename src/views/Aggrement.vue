@@ -1,18 +1,29 @@
 <template>
-  <main class="aggrement">
+  <main class="aggrement" v-if="route.params.type">
     <Header :title="agree.title"></Header>
     <div class="body">
       <p v-for="(item, index) in agree.content" :key="index">{{ item }}</p>
     </div>
   </main>
+
+  <!-- 充值协议弹窗 -->
+  <van-popup v-model:show="showAggrementPopup" position="bottom" round closeable>
+    <div class="popup-content">
+      <div class="title">{{ agree.title }}</div>
+      <div class="body">
+        <p v-for="(item, index) in agree.content" :key="index">{{ item }}</p>
+      </div>
+    </div>
+  </van-popup>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
+const type = ref(route.params.type)
 const agreeDataMap = {
   czxy: {
     title: '充值协议',
@@ -200,11 +211,18 @@ const agreeDataMap = {
     ],
   },
 }
+const showAggrementPopup = ref(false)
 
 const agree = computed(() => {
-  const type = route.params.type
-  return agreeDataMap[type] || {}
+  return agreeDataMap[type.value] || {}
 })
+
+const showPopup = (text) => {
+  type.value = text
+  showAggrementPopup.value = true
+}
+
+defineExpose({ showPopup })
 </script>
 
 <style scoped lang="less">
@@ -236,6 +254,27 @@ const agree = computed(() => {
         margin-bottom: .vw(10) [];
       }
     }
+  }
+}
+
+.popup-content {
+  padding: .vw(18)[] 0;
+
+  .title {
+    color: var(--light-text--);
+    font-family: 'PingFang SC';
+    font-size: .vw(18) [];
+    line-height: .vw(18) [];
+    font-weight: 500;
+    font-style: normal;
+    text-align: center;
+    margin-bottom: .vw(20)[];
+  }
+
+  .body {
+    max-height: 65vh;
+    overflow: auto;
+    padding: 0 .vw(18)[];
   }
 }
 </style>
