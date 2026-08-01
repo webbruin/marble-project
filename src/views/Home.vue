@@ -16,7 +16,7 @@
         <img class="icon" src="@/assets/images/home/other-icon.png" alt="" v-else />
         <span class="text" :class="{ light: params.roomTypeId == item.roomTypeId }">{{
           item.roomTypeName
-          }}</span>
+        }}</span>
       </div>
     </div>
     <div class="banner">
@@ -30,7 +30,7 @@
       <div class="left">
         <div class="recharge" @click="showRechargeDialog = true">
           <p class="text">弹珠充值</p>
-          <p class="desc">弹珠充值充值中心</p>
+          <p class="desc">弹珠充值中心</p>
           <img src="@/assets/images/home/recharge-icon.png" alt="" class="icon" />
         </div>
       </div>
