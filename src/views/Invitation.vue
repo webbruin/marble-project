@@ -159,8 +159,7 @@ const getInvitationActivityCurrent = async () => {
 
 const getInvitationSummary = async () => {
   try {
-    const { activityId } = params.value
-    const res = await api.post('/pinball/invitation/my/summary', { activityId })
+    const res = await api.post(`/pinball/invitation/my/summary?activityId=${params.value?.activityId}`)
     if (res.code === 200) {
       inviteInfo.value = res.data || {}
     }
