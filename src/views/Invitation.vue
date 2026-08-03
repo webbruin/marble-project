@@ -200,7 +200,7 @@ const getInvitationList = async (init) => {
 const clickShare = async () => {
   try {
     const { activityId } = params.value
-    const res = await api.post('/pinball/invitation/code/generate', { activityId })
+    const res = await api.post(`/pinball/invitation/code/generate?activityId=${activityId}`)
     if (res.code === 200) {
       shareQrCode.value = await getQRCodeDataURL(res.data.shareUrl, { margin: 3 })
       showShareQrCode.value = true
