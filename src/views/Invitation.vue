@@ -65,39 +65,30 @@
 
   <div class="new-user-dialog" v-if="showNewUser">
     <div class="content">
-      <p class="text">拉新规则</p>
+      <p class="text">邀请拉新规则</p>
       <div class="desc">
-        <p>一、活动时间</p>
-        <p>
-          即日起 ——
-          活动结束前（具体结束时间将通过小程序公告通知，逾期未参与/未兑换奖励视为自动放弃）
-        </p>
-        <p>二、参与对象 1. 邀请者：本小程序已注册并完成实名认证的用户（无违规记录）；</p>
-        <p>
-          2.
-          被邀请者：未注册过本小程序的新用户（同一手机号、同一设备、同一身份证号视为同一用户，不可重复参与）。
-        </p>
-        <p>三、拉新流程（超简单，3步搞定）</p>
-        <p>1. 邀请者登录小程序，进入【我的】-【拉新有礼】页面，获取专属拉新二维码/邀请链接；</p>
-        <p>2. 邀请者将二维码/链接分享给好友（微信好友、朋友圈均可），邀请好友注册；</p>
-        <p>
-          3.
-          被邀请者通过该二维码/链接，完成小程序注册+实名认证（若有），即视为拉新成功，双方即时解锁对应奖励。
-        </p>
+        <p>一、 邀请赚佣金规则</p>
+        <p>1. 仅限实名认证的“缤果邦弹珠”APP 注册用户可参与邀请拉新活动奖励，封禁/异常状态账号无法参与。</p>
+        <p>2、拉新活动规则会定期更新，所以每次的奖励都会有所不同，具体奖励可见首页轮播广告</p>
+        <p>二、 邀请流程</p>
+        <p>1. 推广人员在 APP 内“邀请好友”页面，生成专属邀请链接/二维码，分享给好友。</p>
+        <p>2. 被邀请人通过专属链接/二维码注册账号，绑定手机号，即视为邀请成功。</p>
+        <p>3. 被邀请人每次有效充值消费，推广人员可立即获得一定比例基础佣金奖励。</p>
+        <p>4. 一个手机账号只能注册一次，如果被邀请人已经注册过，那么通过推广员的链接/二维码登录的无法视为拉新，无法获得佣金奖励</p>
       </div>
     </div>
     <div class="confirm" @click="showNewUser = false">知道了</div>
   </div>
 
-  <div class="share-qr-code-dialog" v-if="showShareQrCode">
-    <div class="content">
+  <div class="share-qr-code-dialog" v-if="showShareQrCode" @click="showShareQrCode = false">
+    <div class="content" @click.stop>
       <img src="@/assets/images/invitation/share-text1.png" alt="" class="text1" />
       <img src="@/assets/images/invitation/share-text2.png" alt="" class="text2" />
       <div class="qr-code" v-if="shareQrCode">
         <img :src="shareQrCode" alt="" />
       </div>
     </div>
-    <div class="confirm">截图保存图片</div>
+    <div class="confirm">请自行截图保存</div>
   </div>
 </template>
 
@@ -199,8 +190,10 @@ const getInvitationList = async (init) => {
 
 const clickShare = async () => {
   try {
+    $toast.loading()
     const { activityId } = params.value
     const res = await api.post(`/pinball/invitation/code/generate?activityId=${activityId}`)
+    $toast.close()
     if (res.code === 200) {
       shareQrCode.value = await getQRCodeDataURL(res.data.shareUrl, { margin: 3 })
       showShareQrCode.value = true
@@ -711,8 +704,8 @@ const clickWithdraw = async () => {
   top: 0;
 
   .content {
-    width: .vw(358) [];
-    height: .vw(553) [];
+    width: .vw(286) [];
+    height: .vw(442) [];
     display: flex;
     flex-direction: column;
     background-size: 100%;
