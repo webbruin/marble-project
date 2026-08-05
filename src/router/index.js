@@ -176,7 +176,7 @@ const needLoginPage = [
 router.beforeEach((to, from, next) => {
   // 判断当前是否微信浏览器，是则跳到引导页
   if (isWechat() && to.name !== 'guide') {
-    next({ name: 'guide' })
+    next({ name: 'guide', query: to.query })
   } else if (!isWechat() && to.name === 'guide') {
     next({ name: 'home' })
   }
@@ -190,7 +190,8 @@ router.beforeEach((to, from, next) => {
     // 校验页面登陆
     const needLogin = needLoginPage.some((name) => name === to.name)
     if (needLogin) {
-      next({ name: 'login' })
+      const query = to.redirectedFrom?.query || {}
+      next({ name: 'login', query })
     } else {
       next()
     }

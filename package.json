@@ -17,6 +17,7 @@
     "@vant/area-data": "^2.1.0",
     "axios": "^1.14.0",
     "crypto-js": "^4.2.0",
+    "howler": "^2.2.4",
     "qrcode": "^1.5.4",
     "trtc-sdk-v5": "^5.16.0",
     "vant": "^4.9.24",

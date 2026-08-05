@@ -6,14 +6,8 @@
     <template v-if="type === 'tel'">
       <span class="tel">+86</span>
     </template>
-    <input
-      class="input"
-      :type="getType"
-      :placeholder="placeholder"
-      :readonly="readonly"
-      :disabled="disabled"
-      v-model="inputValue"
-    />
+    <input class="input" :type="getType" :placeholder="placeholder" :readonly="readonly" :disabled="disabled"
+      v-model="inputValue" />
     <template v-if="type === 'password'">
       <i class="browse" :class="{ off: browseOff }" @click="browseOff = !browseOff"></i>
     </template>
@@ -45,6 +39,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  invitationCode: {
+    type: String,
+    default: '',
+  },
   readonly: {
     type: Boolean,
     default: false,
@@ -68,11 +66,12 @@ const getType = computed(() => {
   return type
 })
 
-onMounted(() => {})
+onMounted(() => { })
 
 const clickSendCode = async () => {
   let body = {
     mobile: props.mobile,
+    invitationCode: props.invitationCode  // 可选
   }
   const res = await api.post('/pinball/user/auth/sendSmsCode', body)
   if (res.code === 200) {

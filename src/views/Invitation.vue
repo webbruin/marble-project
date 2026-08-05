@@ -195,7 +195,8 @@ const clickShare = async () => {
     const res = await api.post(`/pinball/invitation/code/generate?activityId=${activityId}`)
     $toast.close()
     if (res.code === 200) {
-      shareQrCode.value = await getQRCodeDataURL(res.data.shareUrl, { margin: 3 })
+      const url = `https://www.bingobangai.com/login?invitationCode=${res.data.invitationCode}`
+      shareQrCode.value = await getQRCodeDataURL(url, { margin: 3 })
       showShareQrCode.value = true
     }
   } catch (e) {

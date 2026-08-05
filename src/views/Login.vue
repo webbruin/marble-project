@@ -19,7 +19,8 @@
           <!-- 验证码登陆 -->
           <template v-if="loginType === 'msgCode'">
             <div class="item">
-              <Input v-model="formdata.msgCode" :mobile="formdata.mobile" type="code" placeholder="请输入验证码"></Input>
+              <Input v-model="formdata.msgCode" :mobile="formdata.mobile" :invitationCode="invitationCode" type="code"
+                placeholder="请输入验证码"></Input>
             </div>
           </template>
           <!-- 密码登陆 -->
@@ -71,6 +72,7 @@ const formdata = ref({
   password: '',
 })
 const isAgree = ref(false)
+const invitationCode = ref(route.query.invitationCode)
 
 onMounted(() => { })
 

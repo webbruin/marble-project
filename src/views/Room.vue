@@ -22,7 +22,7 @@
         <div class="status" v-if="sendStatus">{{ sendStatus }}</div>
         <div class="status" v-else-if="countdown">倒计时：{{ countdown }}S</div>
         <div class="audience-list" v-if="memberList.length">
-          <div class="user" v-for="(item, index) in Math.min(memberList, 3)" :key="index" @click="clickMember(item)">
+          <div class="user" v-for="(item, index) in memberListFilter" :key="index" @click="clickMember(item)">
             <template v-if="item.avatar">
               <img class="icon" :src="item.avatar" alt="" />
             </template>
@@ -31,7 +31,7 @@
             </template>
           </div>
           <div class="user">
-            <span class="count">{{ memberList.length }}</span>
+            <span class="count">{{ memberList.length < 100 ? memberList.length : '99+' }}</span>
           </div>
         </div>
       </div>
@@ -157,7 +157,7 @@
             <img src="@/assets/images/room/text/zjjl.png" alt="" />
           </div>
         </div>
-        <div class="model" @click="toggleMusic">
+        <div class="model" @click="toggleMusic(!musicOn)">
           <div class="icon">
             <img src="@/assets/images/room/icon3.png" alt="" />
           </div>
@@ -286,6 +286,7 @@ import {
   computed,
   onBeforeUnmount,
   onMounted,
+  onUnmounted,
   reactive,
   ref,
   watch,
@@ -293,6 +294,7 @@ import {
   nextTick,
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Howl } from 'howler';
 import TRTC from 'trtc-sdk-v5'
 import WarnningDialog from '@/components/WarnningDialog.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
@@ -303,6 +305,9 @@ import '@/trtc/lib-generate-test-usersig.min'
 import genTestUserSig from '@/trtc/generateTestUserSig'
 import InfiniteScroll from '@/components/InfiniteScroll.vue'
 import Input from '@/components/FormData/Input.vue'
+import roomBgM4a from '@/assets/sound/room-bg.m4a'
+import ballSuccessM4a from '@/assets/sound/ball-success.m4a'
+import ballFailM4a from '@/assets/sound/ball-fail.m4a'
 
 const route = useRoute()
 const router = useRouter()
@@ -324,7 +329,6 @@ const tencentRoomId = ref(+route.query.tencentRoomId)
 const userInfo = ref(JSON.parse(localStorage.getItem('userInfo')) || {})
 const marbleAmount = ref(0)
 const cardAmount = ref(0)
-const collapse = ref(false)
 const isStartGame = ref(false)
 const ball = ref(0)
 const stepBall = ref(0)
@@ -371,8 +375,25 @@ const pollingRoomStatusTimer = ref(null)
 const pollingDanmakuTimer = ref(null)
 const showSettingDialog = ref(false)
 const asyncGameOrderResultTimer = ref(null)
+const audienceHeartbeatTimer = ref(null)
 const showBallInputDialog = ref(false)
 const inputBall = ref(0)
+// 加载音频文件
+const roomBgSound = new Howl({ src: [roomBgM4a] })
+const ballSuccessSound = new Howl({
+  src: [ballSuccessM4a],
+  onplay: () => {
+  },
+  onend: () => {
+  }
+})
+const ballFailSound = new Howl({
+  src: [ballFailM4a],
+  onplay: () => {
+  },
+  onend: () => {
+  }
+})
 
 onMounted(() => {
   init()
@@ -383,6 +404,10 @@ onMounted(() => {
   // 轮询：弹幕列表
   pollingDanmakuTimer.value = setInterval(() => {
     queryDanmaku()
+  }, 5000)
+  // 轮询：直播间-观众心跳
+  audienceHeartbeatTimer.value = setInterval(() => {
+    audienceHeartbeat()
   }, 5000)
 })
 
@@ -399,10 +424,17 @@ onBeforeUnmount(() => {
   if (asyncGameOrderResultTimer.value) {
     clearInterval(asyncGameOrderResultTimer.value)
   }
+  if (audienceHeartbeatTimer.value) {
+    clearInterval(audienceHeartbeatTimer.value)
+  }
   if (isLockRoom.value) {
     unlockRoom()
   }
   clearTrtc()
+  // 卸载音频
+  roomBgSound.unload()
+  ballSuccessSound.unload()
+  ballFailSound.unload()
 })
 
 // 退出房间，清除trtc
@@ -425,6 +457,8 @@ const back = () => {
 const init = async () => {
   $toast.loading()
   await Promise.all([getRoomDetail(), createRoom()])
+  // 播放房间背景音乐
+  toggleMusic(true)
   $toast.close()
 }
 
@@ -505,8 +539,9 @@ const getRoomDetail = async () => {
       ball.value = roomInfo.value.entryFee
       addMax.value = roomInfo.value.maxMarble - roomInfo.value.entryFee
       stepBall.value = roomInfo.value.entryFee
-      // 查询观战人列表
-      getMemberList()
+      // 查询观众列表
+      audienceHeartbeat()
+      // getMemberList()
       // 当前是否观战
       if (self === 0 && useStatus === 1) {
         watchGame.value = true
@@ -655,9 +690,11 @@ const getAsyncGameOrderResult = async () => {
       if (res.data.winFlag === 1) {
         showBallSuccess.value = true
         launchInfo.value = res.data
+        ballSuccessSound.play()
       } else {
         $toast.info('很遗憾，未中奖')
         sendStatus.value = '未中奖'
+        ballFailSound.play()
       }
       updateCount()
       // 重置订单信息
@@ -769,17 +806,8 @@ const loadMore = () => {
 }
 
 // 解锁
-const unlockRoom = async () => {
-  try {
-    const res = await api.post('/pinball/room/unlockRoom', {
-      roomId: roomId.value,
-    })
-    if (res.code === 200) {
-      // ...
-    }
-  } catch (e) {
-    $toast.info('系统错误')
-  }
+const unlockRoom = () => {
+  api.post('/pinball/room/unlockRoom', { roomId: roomId.value })
 }
 
 // 查询成员列表（Next分页）
@@ -818,6 +846,34 @@ const getRoomStatus = async () => {
           },
         })
       }
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 直播间-观众心跳
+const audienceHeartbeat = async () => {
+  try {
+    const res = await api.post('/pinball/room/audienceHeartbeat', { roomId: roomId.value })
+    if (res.code === 200) {
+      getAudience()
+    }
+  } catch (e) {
+    $toast.info('系统错误')
+  }
+}
+
+// 直播间-分页查询观众列表
+const getAudience = async () => {
+  try {
+    const res = await api.post('/pinball/room/pageAudience', {
+      roomId: roomId.value,
+      current: 1,
+      pageSize: 100
+    })
+    if (res.code === 200) {
+      memberList.value = res.data.data || []
     }
   } catch (e) {
     $toast.info('系统错误')
@@ -931,18 +987,29 @@ const setCountdown = () => {
   }, 1000)
 }
 
-const toggleMusic = () => {
-  musicOn.value = !musicOn.value
+const toggleMusic = (status) => {
+  musicOn.value = status
+  if (musicOn.value) {
+    roomBgSound.loop(true)
+    roomBgSound.volume(0.5)
+    roomBgSound.play()
+  } else {
+    roomBgSound.stop()
+  }
 }
 
 const clickMember = (item) => {
-  $toast.info(item.nickName)
+  $toast.info(`${item.nickName}【${item.userId}】`)
 }
 
 const openWinRecord = () => {
   showWinRecord.value = true
   winRecordList()
 }
+
+const memberListFilter = computed(() => {
+  return (memberList.value || []).slice(0, 3).filter(item => item.userId != userInfo.value.userId)
+})
 </script>
 
 <style scoped lang="less">
