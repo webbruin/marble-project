@@ -21,7 +21,7 @@
         </div>
         <div class="status" v-if="sendStatus">{{ sendStatus }}</div>
         <div class="status" v-else-if="countdown">倒计时：{{ countdown }}S</div>
-        <div class="audience-list" v-if="memberList.length">
+        <div class="audience-list" v-if="memberListFilter.length">
           <div class="user" v-for="(item, index) in memberListFilter" :key="index" @click="clickMember(item)">
             <template v-if="item.avatar">
               <img class="icon" :src="item.avatar" alt="" />
@@ -31,7 +31,7 @@
             </template>
           </div>
           <div class="user">
-            <span class="count">{{ memberList.length < 100 ? memberList.length : '99+' }}</span>
+            <span class="count">{{ memberListFilter.length < 100 ? memberListFilter.length : '99+' }}</span>
           </div>
         </div>
       </div>
@@ -808,22 +808,6 @@ const loadMore = () => {
 // 解锁
 const unlockRoom = () => {
   api.post('/pinball/room/unlockRoom', { roomId: roomId.value })
-}
-
-// 查询成员列表（Next分页）
-const getMemberList = async () => {
-  try {
-    const res = await api.post('/pinball/room/memberList', {
-      next: '',
-      pageSize: 3,
-      roomId: roomId.value
-    })
-    if (res.code === 200) {
-      memberList.value = res.data.memberList || []
-    }
-  } catch (e) {
-    $toast.info('系统错误')
-  }
 }
 
 // 获取房间使用状态
